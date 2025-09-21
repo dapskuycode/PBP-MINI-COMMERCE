@@ -1,4 +1,4 @@
-<?php   
+<?php
 
 use Illuminate\Support\Facades\Route;
 
@@ -17,5 +17,11 @@ Route::post('/register', function () {
 });
 
 Route::get('/login', function () {
-    return view('login'); // You'll need to create this view
+    return view('login');
 })->name('login');
+
+Route::post('/login', function () {
+    // Handle login logic here
+    // This will be implemented later with proper controller
+    return redirect('/login')->with('error', 'Login functionality coming soon!');
+});
