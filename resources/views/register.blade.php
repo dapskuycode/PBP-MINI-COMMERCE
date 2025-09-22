@@ -72,7 +72,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ url('/register') }}" method="POST">
+                        <form action="{{ route('register') }}" method="POST">
                             @csrf
 
                             <div class="mb-4">
@@ -138,14 +138,19 @@
                             <div class="mb-4">
                                 <div class="form-check">
                                     <input type="checkbox"
-                                           class="form-check-input"
+                                           class="form-check-input @error('terms') is-invalid @enderror"
                                            id="terms"
                                            name="terms"
+                                           value="1"
+                                           {{ old('terms') ? 'checked' : '' }}
                                            required>
                                     <label class="form-check-label" for="terms">
                                         Saya setuju dengan <a href="#" class="text-decoration-none">Syarat & Ketentuan</a>
                                         dan <a href="#" class="text-decoration-none">Kebijakan Privasi</a>
                                     </label>
+                                    @error('terms')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -170,7 +175,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
         // Password strength indicator
         document.getElementById('password').addEventListener('input', function() {

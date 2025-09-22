@@ -88,7 +88,7 @@
                             </div>
                         @endif
 
-                        <form method="POST" action="{{ url('/login') }}">
+                        <form method="POST" action="{{ route('login') }}">
                             @csrf
 
                             <div class="mb-4">
@@ -176,7 +176,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
         // Toggle password visibility
         document.getElementById('togglePassword').addEventListener('click', function() {
