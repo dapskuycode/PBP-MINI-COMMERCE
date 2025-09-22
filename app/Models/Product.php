@@ -9,7 +9,17 @@ class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['category_id', 'name', 'description', 'price', 'stock'];
+    protected $fillable = [
+        'category_id',
+        'name',
+        'description',
+        'price',
+        'stock',
+    ];
+
+    protected $casts = [
+        'price' => 'decimal:2',
+    ];
 
     public function category()
     {
@@ -29,5 +39,10 @@ class Product extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class);
+    }
+    // Format price to Indonesian Rupiah
+    public function getFormattedPriceAttribute()
+    {
+        return 'Rp ' . number_format((float)$this->price, 0, ',', '.');
     }
 }
