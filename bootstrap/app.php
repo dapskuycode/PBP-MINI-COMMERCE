@@ -14,6 +14,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
+        
+        // Exclude CSRF protection for API testing
+        $middleware->validateCsrfTokens(except: [
+            'login',
+            'register',
+            'admin/products',
+            'admin/products/*',
+            'admin/users/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

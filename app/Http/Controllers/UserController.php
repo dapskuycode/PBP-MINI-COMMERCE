@@ -46,12 +46,41 @@ class UserController extends Controller
 
             $user = Auth::user();
 
-            // Redirect berdasarkan role user
+            // Return JSON response for API requests
+            if ($request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Login successful',
+                    'data' => [
+                        'user' => [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'role' => $user->role,
+                            'is_admin' => $user->is_admin,
+                        ]
+                    ],
+                    'redirect' => $user->is_admin ? route('dashboard') : route('home')
+                ]);
+            }
+
+            // Redirect berdasarkan role user untuk web requests
             if ($user->is_admin) {
                 return redirect()->intended(route('dashboard'));
             } else {
                 return redirect()->intended(route('home'));
             }
+        }
+
+        // Return JSON error for API requests
+        if ($request->wantsJson() || $request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email atau password yang Anda masukkan salah.',
+                'errors' => [
+                    'email' => ['Email atau password yang Anda masukkan salah.']
+                ]
+            ], 401);
         }
 
         return back()->withErrors([
