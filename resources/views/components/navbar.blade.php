@@ -89,6 +89,9 @@
                     <a href="{{ route('login') }}" class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors">
                         Login
                     </a>
+                    <a href="{{ route('register') }}" class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors">
+                        Register
+                    </a>
                 @endauth
 
                 <!-- Mobile Menu Button -->
