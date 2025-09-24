@@ -4,147 +4,321 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Mini Commerce</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f8f9fa;
-            min-height: 100vh;
+        .gradient-bg {
+            background: linear-gradient(rgba(130, 210, 188, 0.6), rgba(0, 0, 0, 0.5)), 
+                url('/images/bg-login.jpg') no-repeat center center/cover;
         }
-        .card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
+        .glass-effect {
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            background-color: rgba(255, 255, 255, 0.75);
+            border: 1px solid rgba(209, 213, 219, 0.3);
         }
-        .card-header {
-            background-color: #007bff;
-            border-radius: 8px 8px 0 0;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        .form-control:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        .input-focus:focus {
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
     </style>
 </head>
-<body>
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-5">
-                <div class="card shadow">
-                    <div class="card-header text-white text-center py-3">
-                        <h4 class="mb-0">Register</h4>
-                    </div>
-                    <div class="card-body p-4">
-                        @if ($errors->any())
-                            <div class="alert alert-danger" role="alert">
-                                <strong>Error!</strong> Ada beberapa masalah dengan input Anda:
-                                <ul class="mt-2 mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+<body class="relative min-h-screen overflow-x-hidden overflow-y-auto flex items-center justify-center py-8 px-4">
+  <!-- ⬇ BG wrapper: fixed + overflow-hidden agar pinggir rata -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <!-- Gambar + blur (scale lebih besar supaya aman di semua DPI) -->
+    <div class="absolute inset-0 bg-cover bg-center"
+         style="background-image:url('/images/bg-login.jpg'); filter:blur(8px) brightness(1.0);transform:scale(1.05);">
+    </div>
+    <!-- Overlay full (opsional atur intensitas) -->
+    <div class="absolute inset-0 bg-black/35"></div>
+  </div>
 
-                        @if (session('success'))
-                            <div class="alert alert-success" role="alert">
-                                {{ session('success') }}
-                            </div>
-                        @endif
 
-                        <form action="{{ url('/register') }}" method="POST">
-                            @csrf
+    <!-- Konten utama -->
+    <div class="relative z-10 w-full max-w-md">
+        <!-- Logo/Brand Section -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
+                <i class="fas fa-shopping-cart text-2xl text-[#82D2BC]"></i>
+            </div>
+            <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">
+                Mini Commerce
+            </h1>
+            <p class="text-emerald-100">Bergabunglah dengan kami!</p>
+        </div>
 
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nama Lengkap</label>
-                                <input type="text"
-                                       class="form-control @error('name') is-invalid @enderror"
-                                       id="name"
-                                       name="name"
-                                       value="{{ old('name') }}"
-                                       placeholder="Masukkan nama lengkap Anda"
-                                       required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+        <!-- Register Form -->
+        <div class="glass-effect rounded-2xl shadow-xl p-8">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Buat Akun Baru</h2>
+                <p class="text-gray-600">Daftar untuk memulai berbelanja</p>
+            </div>
 
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email"
-                                       class="form-control @error('email') is-invalid @enderror"
-                                       id="email"
-                                       name="email"
-                                       value="{{ old('email') }}"
-                                       placeholder="contoh@email.com"
-                                       required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password"
-                                       class="form-control @error('password') is-invalid @enderror"
-                                       id="password"
-                                       name="password"
-                                       placeholder="Minimal 8 karakter"
-                                       required>
-                                @error('password')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                                <input type="password"
-                                       class="form-control"
-                                       id="password_confirmation"
-                                       name="password_confirmation"
-                                       placeholder="Ulangi password Anda"
-                                       required>
-                            </div>
-
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input type="checkbox"
-                                           class="form-check-input"
-                                           id="terms"
-                                           name="terms"
-                                           required>
-                                    <label class="form-check-label" for="terms">
-                                        Saya setuju dengan <a href="#" class="text-decoration-none">Syarat & Ketentuan</a>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="d-grid mb-3">
-                                <button type="submit" class="btn btn-primary">
-                                    Daftar Sekarang
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-footer text-center py-3 bg-light">
-                        <p class="mb-0">
-                            Sudah punya akun?
-                            <a href="{{ url('/login') }}" class="text-decoration-none">
-                                Masuk di sini
-                            </a>
-                        </p>
+            @if ($errors->any())
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700 font-medium">Ada beberapa masalah dengan input Anda:</p>
+                            <ul class="mt-2 text-sm text-red-600">
+                                @foreach ($errors->all() as $error)
+                                    <li class="flex items-center">
+                                        <i class="fas fa-dot-circle text-xs mr-2"></i>
+                                        {{ $error }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </div>
                 </div>
+            @endif
+
+            @if (session('success'))
+                <div class="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-green-700">{{ session('success') }}</p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <form action="{{ url('/register') }}" method="POST" class="space-y-6">
+                @csrf
+
+                <!-- Name Field -->
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-2 text-emerald-500"></i>Nama Lengkap
+                    </label>
+                    <div class="relative">
+                        <input type="text"
+                               class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200 @error('name') border-red-500 @enderror"
+                               id="name"
+                               name="name"
+                               value="{{ old('name') }}"
+                               placeholder="Masukkan nama lengkap Anda"
+                               required>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-user text-gray-400"></i>
+                        </div>
+                    </div>
+                    @error('name')
+                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <!-- Email Field -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email
+                    </label>
+                    <div class="relative">
+                        <input type="email"
+                               class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200 @error('email') border-red-500 @enderror"
+                               id="email"
+                               name="email"
+                               value="{{ old('email') }}"
+                               placeholder="contoh@email.com"
+                               required>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                    </div>
+                    @error('email')
+                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-emerald-500"></i>Password
+                    </label>
+                    <div class="relative">
+                        <input type="password"
+                               class="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200 @error('password') border-red-500 @enderror"
+                               id="password"
+                               name="password"
+                               placeholder="Minimal 8 karakter"
+                               required>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('password')">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600" id="toggleIconPassword"></i>
+                        </button>
+                    </div>
+                    @error('password')
+                        <p class="mt-1 text-sm text-red-600 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <!-- Password Confirmation Field -->
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-lock mr-2 text-emerald-500"></i>Konfirmasi Password
+                    </label>
+                    <div class="relative">
+                        <input type="password"
+                               class="w-full px-4 py-3 pl-12 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200"
+                               id="password_confirmation"
+                               name="password_confirmation"
+                               placeholder="Ulangi password Anda"
+                               required>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('password_confirmation')">
+                            <i class="fas fa-eye text-gray-400 hover:text-gray-600" id="toggleIconConfirmation"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Terms and Conditions -->
+                <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                        <input type="checkbox"
+                               class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded"
+                               id="terms"
+                               name="terms"
+                               required>
+                    </div>
+                    <div class="ml-3 text-sm">
+                        <label for="terms" class="text-gray-700">
+                            Saya setuju dengan 
+                            <a href="#" class="text-emerald-600 hover:text-emerald-500 font-medium">Syarat & Ketentuan</a>
+                            dan 
+                            <a href="#" class="text-emerald-600 hover:text-emerald-500 font-medium">Kebijakan Privasi</a>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Register Button -->
+                <button type="submit" class="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-3 px-4 rounded-lg font-medium hover:from-emerald-700 hover:to-emerald-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Daftar Sekarang
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="mt-6">
+                <div class="relative">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-gray-500">atau</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Link -->
+            <div class="mt-6 text-center">
+                <p class="text-gray-600">
+                    Sudah punya akun?
+                    <a href="{{ url('/login') }}" class="text-emerald-600 hover:text-emerald-500 font-medium ml-1">
+                        Masuk di sini
+                    </a>
+                </p>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="mt-4 text-center">
+                <a href="{{ url('/welcome') }}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    Kembali ke Beranda
+                </a>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleIcon = document.getElementById('toggleIcon' + (fieldId === 'password' ? 'Password' : 'Confirmation'));
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Password strength indicator
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            const strengthIndicator = document.getElementById('password-strength');
+            
+            if (password.length === 0) {
+                if (strengthIndicator) strengthIndicator.remove();
+                return;
+            }
+
+            let strength = 0;
+            let strengthText = '';
+            let strengthColor = '';
+
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password)) strength++;
+            if (/[A-Z]/.test(password)) strength++;
+            if (/[0-9]/.test(password)) strength++;
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            switch (strength) {
+                case 0:
+                case 1:
+                    strengthText = 'Sangat Lemah';
+                    strengthColor = 'text-red-600';
+                    break;
+                case 2:
+                    strengthText = 'Lemah';
+                    strengthColor = 'text-orange-600';
+                    break;
+                case 3:
+                    strengthText = 'Sedang';
+                    strengthColor = 'text-yellow-600';
+                    break;
+                case 4:
+                    strengthText = 'Kuat';
+                    strengthColor = 'text-green-600';
+                    break;
+                case 5:
+                    strengthText = 'Sangat Kuat';
+                    strengthColor = 'text-green-700';
+                    break;
+            }
+
+            let existingIndicator = document.getElementById('password-strength');
+            if (!existingIndicator) {
+                const indicator = document.createElement('p');
+                indicator.id = 'password-strength';
+                indicator.className = `mt-1 text-sm flex items-center ${strengthColor}`;
+                indicator.innerHTML = `<i class="fas fa-shield-alt mr-1"></i>Kekuatan Password: ${strengthText}`;
+                this.parentNode.parentNode.appendChild(indicator);
+            } else {
+                existingIndicator.className = `mt-1 text-sm flex items-center ${strengthColor}`;
+                existingIndicator.innerHTML = `<i class="fas fa-shield-alt mr-1"></i>Kekuatan Password: ${strengthText}`;
+            }
+        });
+    </script>
 </body>
 </html>
