@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('admin/products/{product}/stock', [ProductController::class, 'updateStock'])
             ->name('admin.products.update-stock');
     });
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
 });
 
 

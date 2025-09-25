@@ -146,7 +146,18 @@
                         <small class="text-muted">Kategori: {{ $product->category->name }}</small><br>
                         <small class="text-muted">Stok: {{ $product->stock }}</small>
                         <div class="d-flex gap-2 mt-2">
-                            <button class="btn btn-outline-primary btn-sm">Edit</button>
+                            <button 
+                                class="btn btn-warning btn-sm btn-edit"
+                                data-id="{{ $product->id }}"
+                                data-category_id="{{ $product->category_id }}"
+                                data-name="{{ $product->name }}"
+                                data-description="{{ $product->description }}"
+                                data-price="{{ $product->price }}"
+                                data-stock="{{ $product->stock }}"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal">
+                                Edit
+                            </button>
                             <button class="btn btn-outline-danger btn-sm">Hapus</button>
                         </div>
                     </div>
@@ -164,7 +175,7 @@
         </div>
 
         <!-- Pagination -->
-        @if($totalProducts > 8)
+        @if($totalProducts > 100)
         <div class="row">
             <div class="col-12">
                 <nav>
@@ -190,7 +201,83 @@
         </div>
         @endif
     </div>
+    <!-- Modal Edit -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" id="editForm">
+            @csrf
+            @method('PUT')
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit Produk</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                <input type="hidden" name="id" id="edit-id">
+                <div class="mb-3">
+                    <label for="edit-name" class="form-label">Nama Produk</label>
+                    <input type="text" class="form-control" id="edit-name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-category" class="form-label">Kategori</label>
+                    <select class="form-select" id="edit-category" name="category_id" required>
+                        <option value="" disabled selected>Pilih Kategori</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        @endforeach
+                    </select>
+                <div class="mb-3">
+                    <label for="edit-price" class="form-label">Harga</label>
+                    <input type="number" class="form-control" id="edit-price" name="price" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-stock" class="form-label">Stok</label>
+                    <input type="number" class="form-control" id="edit-stock" name="stock" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-description" class="form-label">Deskripsi</label>
+                    <textarea class="form-control" id="edit-description" name="description"></textarea>
+                </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const editButtons = document.querySelectorAll(".btn-edit");
+            const editForm = document.getElementById("editForm");
+
+            editButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    // ambil data dari tombol
+                    const id = this.dataset.id;
+                    const category = this.dataset.category_id;
+                    const name = this.dataset.name;
+                    const price = this.dataset.price;
+                    const stock = this.dataset.stock;
+                    const description = this.dataset.description;
+
+                    // isi form modal
+                    document.getElementById("edit-id").value = id;
+                    document.getElementById("edit-category").value = category;
+                    document.getElementById("edit-name").value = name;
+                    document.getElementById("edit-price").value = price;
+                    document.getElementById("edit-stock").value = stock;
+                    document.getElementById("edit-description").value = description;
+
+                    // update action form agar sesuai dengan produk
+                    editForm.action = `/products/${id}`;
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>

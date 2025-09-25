@@ -13,13 +13,14 @@ class DashboardController extends Controller
         // Get latest 8 products with their categories
         $products = Product::with('category')
             ->latest()
-            ->limit(8)
+            ->limit(100)
             ->get();
 
         // Get some basic stats
         $totalProducts = Product::count();
         $totalCategories = Category::count();
+        $categories = Category::all();
 
-        return view('admindashboard', compact('products', 'totalProducts', 'totalCategories'));
+        return view('admindashboard', compact('products', 'totalProducts', 'totalCategories', 'categories'));
     }
 }

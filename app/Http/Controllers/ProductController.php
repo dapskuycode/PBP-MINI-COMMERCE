@@ -114,13 +114,12 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
         ]);
 
-        $product->update([
-            'category_id' => $request->category_id,
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-        ]);
+        $product->update($request->only(['category_id','name','description','price','stock']));
+
+        // Jika request dari Blade (bukan dari API)
+        if (!$request->expectsJson()) {
+            return redirect()->route('dashboard')->with('success', 'Produk berhasil diperbarui');
+        }
 
         return response()->json([
             'success' => true,
