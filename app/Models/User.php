@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function carts()
     {
-        return $this->hasMany(Cart::class);
+        return $this->hasOne(Cart::class);
     }
 
     public function orders()
@@ -76,5 +76,16 @@ class User extends Authenticatable
     public function hasRole($role)
     {
         return $this->role === $role;
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            if ($user->role === 'user') {
+                \App\Models\Cart::create([
+                    'user_id' => $user->id,
+                ]);
+            }
+        });
     }
 }
