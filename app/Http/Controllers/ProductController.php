@@ -52,6 +52,7 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'discount' => 'required|integer|min:0|max:100',
         ]);
 
         $product = Product::create([
@@ -60,7 +61,12 @@ class ProductController extends Controller
             'description' => $request->description,
             'price' => $request->price,
             'stock' => $request->stock,
+            'discount' => $request->discount,
         ]);
+
+        if (!$request->expectsJson()) {
+            return redirect()->route('dashboard')->with('success', 'Produk berhasil ditambahkan');
+        }
 
         return response()->json([
             'success' => true,
@@ -112,9 +118,10 @@ class ProductController extends Controller
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'discount' => 'required|integer|min:0|max:100',
         ]);
 
-        $product->update($request->only(['category_id','name','description','price','stock']));
+        $product->update($request->only(['category_id','name','description','price','stock','discount']));
 
         // Jika request dari Blade (bukan dari API)
         if (!$request->expectsJson()) {

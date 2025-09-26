@@ -55,6 +55,7 @@ Route::middleware('auth')->group(function () {
             ->name('admin.products.update-stock');
     });
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 });
 
 

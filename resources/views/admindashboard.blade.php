@@ -126,7 +126,9 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5>Produk Terbaru</h5>
-                    <a href="#" class="btn btn-primary btn-sm">Tambah Produk</a>
+                    <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+                        Tambah Produk
+                    </a>    
                 </div>
             </div>
         </div>
@@ -144,7 +146,8 @@
                         <p class="card-text text-muted">{{ Str::limit($product->description, 60) }}</p>
                         <p class="price">{{ $product->formatted_price }}</p>
                         <small class="text-muted">Kategori: {{ $product->category->name }}</small><br>
-                        <small class="text-muted">Stok: {{ $product->stock }}</small>
+                        <small class="text-muted">Stok: {{ $product->stock }}</small><br>
+                        <h6 class="text-muted" style="color: white; padding: 3px 6px; border-radius: 4px; display: inline-block;">Diskon: {{ $product->discount }}%</h6>
                         <div class="d-flex gap-2 mt-2">
                             <button 
                                 class="btn btn-warning btn-sm btn-edit"
@@ -154,6 +157,7 @@
                                 data-description="{{ $product->description }}"
                                 data-price="{{ $product->price }}"
                                 data-stock="{{ $product->stock }}"
+                                data-discount="{{ $product->discount }}"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal">
                                 Edit
@@ -226,6 +230,7 @@
                             <option value="{{ $category->id }}">{{ $category->name }}</option>
                         @endforeach
                     </select>
+                </div>
                 <div class="mb-3">
                     <label for="edit-price" class="form-label">Harga</label>
                     <input type="number" class="form-control" id="edit-price" name="price" required>
@@ -233,6 +238,10 @@
                 <div class="mb-3">
                     <label for="edit-stock" class="form-label">Stok</label>
                     <input type="number" class="form-control" id="edit-stock" name="stock" required>
+                </div>
+                <div class="mb-3">
+                    <label for="edit-discount" class="form-label">Diskon</label>
+                    <input type="number" class="form-control" id="edit-discount" name="discount" required>
                 </div>
                 <div class="mb-3">
                     <label for="edit-description" class="form-label">Deskripsi</label>
@@ -247,6 +256,56 @@
             </form>
         </div>
     </div>
+    <!-- Modal Tambah Produk -->
+    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ route('products.store') }}">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">Tambah Produk</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="create-name" class="form-label">Nama Produk</label>
+                            <input type="text" class="form-control" id="create-name" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-category" class="form-label">Kategori</label>
+                            <select class="form-select" id="create-category" name="category_id" required>
+                                <option value="" disabled selected>Pilih Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-price" class="form-label">Harga</label>
+                            <input type="number" class="form-control" id="create-price" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-stock" class="form-label">Stok</label>
+                            <input type="number" class="form-control" id="create-stock" name="stock" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-discount" class="form-label">Diskon</label>
+                            <input type="number" class="form-control" id="create-discount" name="discount" value="0" min="0" max="100" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="create-description" class="form-label">Deskripsi</label>
+                            <textarea class="form-control" id="create-description" name="description"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -262,6 +321,7 @@
                     const name = this.dataset.name;
                     const price = this.dataset.price;
                     const stock = this.dataset.stock;
+                    const discount = this.dataset.discount;
                     const description = this.dataset.description;
 
                     // isi form modal
@@ -270,6 +330,7 @@
                     document.getElementById("edit-name").value = name;
                     document.getElementById("edit-price").value = price;
                     document.getElementById("edit-stock").value = stock;
+                    document.getElementById("edit-discount").value = discount + "%";
                     document.getElementById("edit-description").value = description;
 
                     // update action form agar sesuai dengan produk
