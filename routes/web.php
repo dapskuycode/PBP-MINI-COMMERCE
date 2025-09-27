@@ -30,6 +30,16 @@ Route::post('/login', [UserController::class, 'login'])->name('login.submit');
 Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [UserController::class, 'register'])->name('register.submit');
 
+//tentang kami
+Route::view('/about', 'about')->name('about');
+
+// Halaman Cart
+Route::view('/cart', 'cart')->name('cart');
+
+// Dummy endpoints (sementara biar tombol tidak error)
+Route::post('/cart/dummy', function () { return back();})->name('cart.dummy');
+
+
 /*
 |--------------------------------------------------------------------------
 | Forgot / Reset Password (tanpa paket Breeze/Jetstream)
