@@ -106,7 +106,7 @@
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email
+                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email/Username
                     </label>
                     <div class="relative">
                         <input type="email"
@@ -166,8 +166,8 @@
                             Ingat saya
                         </label>
                     </div>
-                    <a href="#" class="text-sm text-emerald-600 hover:text-emerald-500 font-medium">
-                        Lupa password?
+                    <a href="{{ route('password.request') }}" class="text-sm text-emerald-600 hover:text-emerald-500 font-medium">
+                    Lupa password?
                     </a>
                 </div>
 
