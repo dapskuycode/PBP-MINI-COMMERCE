@@ -1,343 +1,415 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Mini Commerce</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            background-color: #007bff !important;
-        }
-        .product-card {
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            transition: transform 0.2s;
-        }
-        .product-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .product-image {
-            height: 200px;
-            background-color: #e9ecef;
-            border-radius: 8px 8px 0 0;
-        }
-        .price {
-            color: #007bff;
-            font-weight: bold;
-        }
-    </style>
+    <title>Dashboard Admin • TokoKami</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">Sanny Shop</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Produk</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Kategori</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Pesanan</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            {{ Auth::user()->name }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#">Profil</a></li>
-                            <li><a class="dropdown-item" href="#">Pengaturan</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body class="bg-gray-50">
+    @include('components.navbar', ['isAdmin' => true])
 
     <!-- Main Content -->
-    <div class="container mt-4">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <!-- Welcome Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h4>Selamat Datang di Dashboard!</h4>
-                        <p class="text-muted">Kelola produk dan pesanan Anda dengan mudah.</p>
-                    </div>
-                </div>
+        <div class="mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h1 class="text-2xl font-bold text-gray-900">Selamat Datang di Dashboard Admin!</h1>
+                <p class="text-gray-600 mt-2">Kelola produk dan pesanan Anda dengan mudah.</p>
             </div>
         </div>
 
         <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Produk</h5>
-                        <h2 class="text-primary">{{ $totalProducts }}</h2>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-gray-900">Total Produk</h3>
+                <p class="text-3xl font-bold text-blue-600">{{ $totalProducts }}</p>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Kategori</h5>
-                        <h2 class="text-success">{{ $totalCategories }}</h2>
-                    </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-gray-900">Total Kategori</h3>
+                <p class="text-3xl font-bold text-green-600">{{ $totalCategories }}</p>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Stok Tersedia</h5>
-                        <h2 class="text-info">{{ $products->sum('stock') }}</h2>
-                    </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-gray-900">Stok Tersedia</h3>
+                <p class="text-3xl font-bold text-cyan-600">{{ $products->sum('stock') }}</p>
             </div>
-            <div class="col-md-3">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title">Nilai Stok</h5>
-                        <h2 class="text-warning">Rp {{ number_format($products->sum(function($product) { return $product->price * $product->stock; }), 0, ',', '.') }}</h2>
-                    </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-gray-900">Nilai Stok</h3>
+                <p class="text-3xl font-bold text-amber-600">Rp {{ number_format($products->sum(function($product) { return $product->price * $product->stock; }), 0, ',', '.') }}</p>
             </div>
         </div>
 
         <!-- Products Section -->
-        <div class="row">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5>Produk Terbaru</h5>
-                    <a href="#" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
-                        Tambah Produk
-                    </a>    
-                </div>
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Produk Terbaru</h2>
+                <button onclick="openCreateModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Tambah Produk
+                </button>
             </div>
-        </div>
 
-        <!-- Product Grid -->
-        <div class="row">
-            @forelse($products as $product)
-            <div class="col-md-3 mb-4">
-                <div class="card product-card">
-                    <div class="product-image d-flex align-items-center justify-content-center">
-                        <span class="text-muted">Foto Produk</span>
-                    </div>
-                    <div class="card-body">
-                        <h6 class="card-title">{{ $product->name }}</h6>
-                        <p class="card-text text-muted">{{ Str::limit($product->description, 60) }}</p>
-                        <p class="price">{{ $product->formatted_price }}</p>
-                        <small class="text-muted">Kategori: {{ $product->category->name }}</small><br>
-                        <small class="text-muted">Stok: {{ $product->stock }}</small><br>
-                        <h6 class="text-muted" style="color: white; padding: 3px 6px; border-radius: 4px; display: inline-block;">Diskon: {{ $product->discount }}%</h6>
-                        <div class="d-flex gap-2 mt-2">
-                            <button 
-                                class="btn btn-warning btn-sm btn-edit"
-                                data-id="{{ $product->id }}"
-                                data-category_id="{{ $product->category_id }}"
-                                data-name="{{ $product->name }}"
-                                data-description="{{ $product->description }}"
-                                data-price="{{ $product->price }}"
-                                data-stock="{{ $product->stock }}"
-                                data-discount="{{ $product->discount }}"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal">
-                                Edit
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm">Hapus</button>
+            <!-- Product Grid -->
+            @if($products->count() > 0)
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @foreach($products as $product)
+                        <div class="bg-gray-50 rounded-lg border border-gray-200 hover:shadow-lg transition-all duration-300 group">
+                            <!-- Product Image -->
+                            <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-t-lg flex items-center justify-center">
+                                @if($product->photos && $product->photos->count() > 0)
+                                    <img src="{{ asset('storage/' . $product->photos->first()->url) }}" alt="{{ $product->name }}" class="w-full h-full object-cover rounded-t-lg">
+                                @else
+                                    <div class="text-center">
+                                        <svg class="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span class="text-sm text-gray-500">Foto Produk</span>
+                                    </div>
+                                @endif
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="p-4">
+                                <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">{{ $product->name }}</h3>
+                                <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ Str::limit($product->description, 60) }}</p>
+                                
+                                <div class="space-y-2 mb-4">
+                                    <p class="text-lg font-bold text-emerald-600">{{ $product->formatted_price }}</p>
+                                    <div class="flex items-center justify-between text-xs text-gray-500">
+                                        <span>{{ $product->category->name }}</span>
+                                        <span>Stok: {{ $product->stock }}</span>
+                                    </div>
+                                    @if($product->discount > 0)
+                                        <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full">
+                                            Diskon {{ $product->discount }}%
+                                        </span>
+                                    @endif
+                                </div>
+                                
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2">
+                                    <button 
+                                        onclick="openEditModal({{ json_encode($product) }})"
+                                        class="flex-1 bg-amber-500 text-white py-2 px-3 rounded-lg hover:bg-amber-600 text-sm font-medium">
+                                        Edit
+                                    </button>
+                                    <button 
+                                        onclick="deleteProduct({{ $product->id }})"
+                                        class="flex-1 bg-red-500 text-white py-2 px-3 rounded-lg hover:bg-red-600 text-sm font-medium">
+                                        Hapus
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
                     </div>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-2">Belum ada produk</h3>
+                    <p class="text-gray-600 mb-4">Silakan tambahkan produk pertama Anda.</p>
+                    <button onclick="openCreateModal()" class="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700">
+                        Tambah Produk
+                    </button>
                 </div>
-            </div>
-            @empty
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <h5>Belum ada produk</h5>
-                    <p>Silakan tambahkan produk pertama Anda.</p>
-                    <a href="#" class="btn btn-primary">Tambah Produk</a>
-                </div>
-            </div>
-            @endforelse
+            @endif
         </div>
 
         <!-- Pagination -->
-        @if($totalProducts > 100)
-        <div class="row">
-            <div class="col-12">
-                <nav>
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">Sebelumnya</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Selanjutnya</a>
-                        </li>
-                    </ul>
+        @if($totalProducts > 12)
+            <div class="flex justify-center mt-8">
+                <nav class="flex items-center space-x-2">
+                    <button class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Sebelumnya
+                    </button>
+                    <button class="px-3 py-2 text-sm text-white bg-emerald-600 border border-emerald-600 rounded-lg">1</button>
+                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">2</button>
+                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">3</button>
+                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                        Selanjutnya
+                    </button>
                 </nav>
             </div>
-        </div>
         @endif
-    </div>
-    <!-- Modal Edit -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="POST" id="editForm">
-            @csrf
-            @method('PUT')
-            <div class="modal-content">
-                <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Produk</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                <input type="hidden" name="id" id="edit-id">
-                <div class="mb-3">
-                    <label for="edit-name" class="form-label">Nama Produk</label>
-                    <input type="text" class="form-control" id="edit-name" name="name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="edit-category" class="form-label">Kategori</label>
-                    <select class="form-select" id="edit-category" name="category_id" required>
-                        <option value="" disabled selected>Pilih Kategori</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="edit-price" class="form-label">Harga</label>
-                    <input type="number" class="form-control" id="edit-price" name="price" required>
-                </div>
-                <div class="mb-3">
-                    <label for="edit-stock" class="form-label">Stok</label>
-                    <input type="number" class="form-control" id="edit-stock" name="stock" required>
-                </div>
-                <div class="mb-3">
-                    <label for="edit-discount" class="form-label">Diskon</label>
-                    <input type="number" class="form-control" id="edit-discount" name="discount" required>
-                </div>
-                <div class="mb-3">
-                    <label for="edit-description" class="form-label">Deskripsi</label>
-                    <textarea class="form-control" id="edit-description" name="description"></textarea>
-                </div>
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="submit" class="btn btn-primary">Simpan</button>
-                </div>
+    </main>
+    <!-- Edit Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
+                <form id="editForm" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Edit Produk</h3>
+                            <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <input type="hidden" name="id" id="edit-id">
+                            
+                            <div>
+                                <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                                <input type="text" id="edit-name" name="name" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div>
+                                <label for="edit-category" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                <select id="edit-category" name="category_id" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                    <option value="" disabled>Pilih Kategori</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="edit-price" class="block text-sm font-medium text-gray-700 mb-1">Harga</label>
+                                    <input type="number" id="edit-price" name="price" required 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label for="edit-stock" class="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                                    <input type="number" id="edit-stock" name="stock" required 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="edit-discount" class="block text-sm font-medium text-gray-700 mb-1">Diskon (%)</label>
+                                <input type="number" id="edit-discount" name="discount" min="0" max="100" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div>
+                                <label for="edit-description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea id="edit-description" name="description" rows="3" 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-6 py-3 flex justify-end gap-3 rounded-b-xl">
+                        <button type="button" onclick="closeEditModal()" 
+                                class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
-            </form>
         </div>
     </div>
-    <!-- Modal Tambah Produk -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="POST" action="{{ route('products.store') }}">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">Tambah Produk</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <!-- Create Modal -->
+    <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
+                <form method="POST" action="{{ route('admin.products.store') }}">
+                    @csrf
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Tambah Produk Baru</h3>
+                            <button type="button" onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label for="create-name" class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                                <input type="text" id="create-name" name="name" required 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div>
+                                <label for="create-category" class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                <select id="create-category" name="category_id" required 
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                    <option value="" disabled selected>Pilih Kategori</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="create-price" class="block text-sm font-medium text-gray-700 mb-1">Harga</label>
+                                    <input type="number" id="create-price" name="price" required 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+                                <div>
+                                    <label for="create-stock" class="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                                    <input type="number" id="create-stock" name="stock" required 
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="create-discount" class="block text-sm font-medium text-gray-700 mb-1">Diskon (%)</label>
+                                <input type="number" id="create-discount" name="discount" value="0" min="0" max="100" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500">
+                            </div>
+                            
+                            <div>
+                                <label for="create-description" class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea id="create-description" name="description" rows="3" 
+                                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                            </div>
+                        </div>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="create-name" class="form-label">Nama Produk</label>
-                            <input type="text" class="form-control" id="create-name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-category" class="form-label">Kategori</label>
-                            <select class="form-select" id="create-category" name="category_id" required>
-                                <option value="" disabled selected>Pilih Kategori</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-price" class="form-label">Harga</label>
-                            <input type="number" class="form-control" id="create-price" name="price" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-stock" class="form-label">Stok</label>
-                            <input type="number" class="form-control" id="create-stock" name="stock" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-discount" class="form-label">Diskon</label>
-                            <input type="number" class="form-control" id="create-discount" name="discount" value="0" min="0" max="100" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="create-description" class="form-label">Deskripsi</label>
-                            <textarea class="form-control" id="create-description" name="description"></textarea>
-                        </div>
+                    
+                    <div class="bg-gray-50 px-6 py-3 flex justify-end gap-3 rounded-b-xl">
+                        <button type="button" onclick="closeCreateModal()" 
+                                class="px-4 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
+                            Batal
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-700">
+                            Tambah Produk
+                        </button>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const editButtons = document.querySelectorAll(".btn-edit");
-            const editForm = document.getElementById("editForm");
+        // Modal Functions
+        function openCreateModal() {
+            document.getElementById('createModal').classList.remove('hidden');
+        }
 
-            editButtons.forEach(button => {
-                button.addEventListener("click", function () {
-                    // ambil data dari tombol
-                    const id = this.dataset.id;
-                    const category = this.dataset.category_id;
-                    const name = this.dataset.name;
-                    const price = this.dataset.price;
-                    const stock = this.dataset.stock;
-                    const discount = this.dataset.discount;
-                    const description = this.dataset.description;
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.add('hidden');
+            document.querySelector('#createModal form').reset();
+        }
 
-                    // isi form modal
-                    document.getElementById("edit-id").value = id;
-                    document.getElementById("edit-category").value = category;
-                    document.getElementById("edit-name").value = name;
-                    document.getElementById("edit-price").value = price;
-                    document.getElementById("edit-stock").value = stock;
-                    document.getElementById("edit-discount").value = discount + "%";
-                    document.getElementById("edit-description").value = description;
+        function openEditModal(product) {
+            // Fill form with product data
+            document.getElementById('edit-id').value = product.id;
+            document.getElementById('edit-name').value = product.name;
+            document.getElementById('edit-category').value = product.category_id;
+            document.getElementById('edit-price').value = product.price;
+            document.getElementById('edit-stock').value = product.stock;
+            document.getElementById('edit-discount').value = product.discount || 0;
+            document.getElementById('edit-description').value = product.description || '';
+            
+            // Set form action
+            document.getElementById('editForm').action = `/admin/products/${product.id}`;
+            
+            // Show modal
+            document.getElementById('editModal').classList.remove('hidden');
+        }
 
-                    // update action form agar sesuai dengan produk
-                    editForm.action = `/products/${id}`;
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+            document.getElementById('editForm').reset();
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('Apakah Anda yakin ingin menghapus produk ini?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/products/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
                 });
-            });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Produk berhasil dihapus!');
+                    location.reload();
+                } else {
+                    alert(result.message || 'Gagal menghapus produk');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus produk');
+            }
+        }
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(event) {
+            const createModal = document.getElementById('createModal');
+            const editModal = document.getElementById('editModal');
+            
+            if (event.target === createModal) {
+                closeCreateModal();
+            }
+            if (event.target === editModal) {
+                closeEditModal();
+            }
         });
+
+        // Close modals with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeCreateModal();
+                closeEditModal();
+            }
+        });
+
+        // Add some utility styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 
 </body>

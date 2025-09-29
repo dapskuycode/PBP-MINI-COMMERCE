@@ -20,32 +20,28 @@
         <span class="mx-2">/</span>
         <span class="text-gray-700 font-medium">Keranjang</span>
       </nav>
-      <form method="POST" action="{{ route('cart.dummy') }}">
+      <form method="POST" action="{{ route('cart.clear') }}">
         @csrf
-        <button class="text-sm text-red-600 hover:text-red-700 font-medium">
+        <button class="text-sm text-red-600 hover:text-red-700 font-medium" 
+                onclick="return confirm('Apakah Anda yakin ingin mengosongkan keranjang?')">
           Kosongkan Keranjang
         </button>
       </form>
     </div>
 
     @php
-      // Ambil items dari session (atau kirimkan dari controller)
-      // Contoh struktur item:
-      // ['id'=>1,'name'=>'Keripik Balado','price'=>15000,'quantity'=>2,'image'=>'/images/p1.jpg','variant'=>'Pedas 100g']
-      $items = $items ?? session('cart.items', []);
+      // Use real cart items from database
+      $items = $cartItems ?? collect();
 
-      // Hitung subtotal tanpa arrow function (aman semua PHP 7.x/8.x)
-      $subtotal = 0;
-      foreach ($items as $i) {
-          $price = isset($i['price']) ? (int)$i['price'] : 0;
-          $qty   = isset($i['quantity']) ? (int)$i['quantity'] : 1;
-          $subtotal += $price * $qty;
-      }
+      // Calculate subtotal dynamically from product prices
+      $subtotal = $items->sum(function($item) {
+          return $item->product ? ($item->product->price * $item->quantity) : 0;
+      });
+      
+      function rupiah_fmt($n){ return 'Rp '.number_format((int)$n,0,',','.'); }
       $shipping = $subtotal > 0 ? 12000 : 0;
       $discount = 0;
       $total = max($subtotal + $shipping - $discount, 0);
-
-      function rupiah_fmt($n){ return 'Rp '.number_format((int)$n,0,',','.'); }
     @endphp
 
     {{-- State kosong --}}
@@ -70,36 +66,42 @@
         <div class="lg:col-span-2 space-y-4">
           @foreach ($items as $item)
             <div class="bg-white rounded-xl shadow p-4 sm:p-5 border border-gray-100 flex gap-4">
-              <img src="{{ $item['image'] ?? asset('images/product-placeholder.png') }}"
+              <img src="{{ $item->product && $item->product->photos->count() > 0 ? asset('storage/' . $item->product->photos->first()->url) : asset('images/product-placeholder.png') }}"
                    class="w-24 h-24 rounded-lg object-cover"
-                   alt="{{ $item['name'] ?? 'Produk' }}">
+                   alt="{{ $item->product->name ?? 'Produk' }}">
               <div class="flex-1">
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <h3 class="font-semibold text-gray-900">{{ $item['name'] ?? 'Produk' }}</h3>
-                    @if(!empty($item['variant']))
-                      <p class="text-sm text-gray-500 mt-0.5">{{ $item['variant'] }}</p>
-                    @endif
+                    <h3 class="font-semibold text-gray-900">{{ $item->product->name ?? 'Produk' }}</h3>
+                    <p class="text-sm text-gray-500 mt-0.5">Qty: {{ $item->quantity }}</p>
                   </div>
                   <div class="text-right">
-                    <p class="font-semibold text-gray-900">{{ rupiah_fmt($item['price'] ?? 0) }}</p>
+                    <p class="font-semibold text-gray-900">{{ $item->product ? rupiah_fmt($item->product->price) : 'Rp 0' }}</p>
                     <p class="text-xs text-gray-400">/ item</p>
+                    <p class="text-sm font-medium text-emerald-600 mt-1">Total: {{ $item->product ? rupiah_fmt($item->product->price * $item->quantity) : 'Rp 0' }}</p>
                   </div>
                 </div>
 
                 <div class="mt-3 flex items-center justify-between">
-                  {{-- Qty control (sementara kirim ke dummy) --}}
-                  <form method="POST" action="{{ route('cart.dummy') }}" class="flex items-center gap-2">
-                    @csrf
-                    <button class="w-8 h-8 rounded-md bg-gray-100 text-gray-700 grid place-items-center hover:bg-gray-200" aria-label="Kurangi">−</button>
-                    <input value="{{ $item['quantity'] ?? 1 }}" class="w-12 text-center border rounded-md py-1" />
-                    <button class="w-8 h-8 rounded-md bg-gray-100 text-gray-700 grid place-items-center hover:bg-gray-200" aria-label="Tambah">+</button>
-                  </form>
+                  {{-- Qty control --}}
+                  <div class="flex items-center gap-2">
+                    <button onclick="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})" 
+                            class="w-8 h-8 rounded-md bg-gray-100 text-gray-700 grid place-items-center hover:bg-gray-200" 
+                            aria-label="Kurangi" {{ $item->quantity <= 1 ? 'disabled' : '' }}>−</button>
+                    <input id="qty-{{ $item->id }}" value="{{ $item->quantity }}" 
+                           class="w-12 text-center border rounded-md py-1" 
+                           onchange="updateQuantity({{ $item->id }}, this.value)" />
+                    <button onclick="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})" 
+                            class="w-8 h-8 rounded-md bg-gray-100 text-gray-700 grid place-items-center hover:bg-gray-200" 
+                            aria-label="Tambah">+</button>
+                  </div>
 
-                  {{-- Hapus (sementara dummy) --}}
-                  <form method="POST" action="{{ route('cart.dummy') }}">
+                  {{-- Remove item --}}
+                  <form method="POST" action="{{ route('cart.remove', $item->id) }}" style="display: inline;">
                     @csrf
-                    <button class="text-sm text-red-600 hover:text-red-700 font-medium">Hapus</button>
+                    @method('DELETE')
+                    <button class="text-sm text-red-600 hover:text-red-700 font-medium" 
+                            onclick="return confirm('Hapus item ini dari keranjang?')">Hapus</button>
                   </form>
                 </div>
               </div>
@@ -141,5 +143,47 @@
       </section>
     @endif
   </main>
+
+  <script>
+    // Add CSRF token to all AJAX requests
+    document.querySelector('head').innerHTML += '<meta name="csrf-token" content="{{ csrf_token() }}">';
+
+    async function updateQuantity(itemId, newQuantity) {
+      if (newQuantity < 1) {
+        if (confirm('Hapus item ini dari keranjang?')) {
+          // Redirect to remove route
+          window.location.href = '/cart/remove/' + itemId;
+          return;
+        } else {
+          return;
+        }
+      }
+
+      try {
+        const response = await fetch(`/cart/update/${itemId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+          },
+          body: JSON.stringify({
+            quantity: newQuantity
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.success) {
+          // Reload the page to show updated cart
+          window.location.reload();
+        } else {
+          alert('Error: ' + data.message);
+        }
+      } catch (error) {
+        console.error('Error updating cart:', error);
+        alert('Error updating cart. Please try again.');
+      }
+    }
+  </script>
 </body>
 </html>

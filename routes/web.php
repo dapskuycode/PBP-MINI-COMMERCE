@@ -33,11 +33,18 @@ Route::post('/register', [UserController::class, 'register'])->name('register.su
 //tentang kami
 Route::view('/about', 'about')->name('about');
 
-// Halaman Cart
-Route::view('/cart', 'cart')->name('cart');
+// Product routes
+Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 
-// Dummy endpoints (sementara biar tombol tidak error)
-Route::post('/cart/dummy', function () { return back();})->name('cart.dummy');
+// Search route
+Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
+// Category routes
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+
+// Cart routes are handled in authenticated section
 
 
 /*
@@ -143,7 +150,15 @@ Route::middleware('auth')->group(function () {
             ->name('admin.products.update-stock');
     });
 
-    // Public product create/update aliases (kalau memang diperlukan)
-    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
-    Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    // Cart functionality
+    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+    Route::patch('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+    Route::post('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+    
+    // Test route for debugging
+    Route::get('/test-auth', function () {
+        return view('test-auth');
+    })->name('test.auth');
 });

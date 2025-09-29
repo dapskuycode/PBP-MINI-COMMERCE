@@ -9,7 +9,7 @@ class ItemPhoto extends Model
 {
     use HasFactory;
 
-    protected $table = 'item_photo';
+    protected $table = 'item_photos';
 
     protected $fillable = ['product_id', 'url'];
 

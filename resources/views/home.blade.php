@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>TokoKami - Mini Commerce</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
@@ -214,6 +215,37 @@
             <!-- Sample Recommended Products -->
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
                 @include('components.product-card', [
+                    'title' => 'Cimol Bojot Premium',
+                    'price' => 'Rp 20.000',
+                    'originalPrice' => 'Rp 25.000',
+                    'rating' => 4.3,
+                    'sold' => 294,
+                    'discount' => 20
+                ])
+                
+                @include('components.product-card', [
+                    'title' => 'Keripik Buah Organik',
+                    'price' => 'Rp 12.500',
+                    'rating' => 4.8,
+                    'sold' => 189
+                ])
+                
+                @include('components.product-card', [
+                    'title' => 'Pempek Ikan Asli Palembang',
+                    'price' => 'Rp 30.000',
+                    'rating' => 4.9,
+                    'sold' => 720
+                ])
+                
+                @include('components.product-card', [
+                    'title' => 'Rendang Sapi Padang',
+                    'price' => 'Rp 40.000',
+                    'originalPrice' => 'Rp 50.000',
+                    'rating' => 4.8,
+                    'sold' => 186,
+                    'discount' => 20
+                ])        
+            @include('components.product-card', [
                     'title' => 'Lumpia Rebung Semarang',
                     'price' => 'Rp 45.000',
                     'rating' => 5.0,
@@ -335,6 +367,60 @@
             updateBannerSlider(); // Initialize first slide
             startAutoBanner();
         });
+
+        // Add to Cart functionality
+        function addToCart(productId) {
+            fetch('/cart/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: 1
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response URL:', response.url);
+                console.log('Response redirected:', response.redirected);
+                
+                // Check for authentication required (redirect to login)
+                if (response.status === 302 || response.redirected || response.url.includes('/login')) {
+                    if (confirm('Anda perlu login untuk menambahkan produk ke keranjang. Login sekarang?')) {
+                        window.location.href = '/login';
+                    }
+                    return null;
+                }
+                
+                // Check for other HTTP errors
+                if (!response.ok) {
+                    if (response.status === 419) {
+                        alert('Session expired. Please refresh the page and try again.');
+                        return null;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                return response.json();
+            })
+            .then(data => {
+                if (data === null) return; // Handle redirect case
+                
+                if (data && data.success) {
+                    alert('Produk berhasil ditambahkan ke keranjang!');
+                } else if (data && data.message) {
+                    alert('Error: ' + data.message);
+                } else {
+                    alert('Unexpected response format');
+                }
+            })
+            .catch(error => {
+                console.error('Cart error details:', error);
+                alert('Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.');
+            });
+        }
     </script>
 </body>
 </html>

@@ -10,19 +10,26 @@ use Illuminate\Support\Facades\Auth;
 class ProductController extends Controller
 {
     /**
-     * Display a listing of products for admin.
+     * Display a listing of products.
      */
     public function index()
     {
-        $products = Product::with('category')
+        $products = Product::with(['category', 'photos', 'reviews', 'orderItems'])
+            ->where('stock', '>', 0)
             ->latest()
-            ->paginate(15);
+            ->paginate(12);
 
-        return response()->json([
-            'success' => true,
-            'data' => $products,
-            'message' => 'Products retrieved successfully'
-        ]);
+        // If this is an API request, return JSON
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $products,
+                'message' => 'Products retrieved successfully'
+            ]);
+        }
+
+        // Otherwise return view for web
+        return view('products.index', compact('products'));
     }
 
     /**
@@ -81,12 +88,26 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load(['category', 'variants', 'photos', 'reviews.user']);
+        
+        // Get related products from same category
+        $relatedProducts = Product::with('category')
+            ->where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->where('stock', '>', 0)
+            ->limit(4)
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $product,
-            'message' => 'Product retrieved successfully'
-        ]);
+        // If this is an API request, return JSON
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'data' => $product,
+                'message' => 'Product retrieved successfully'
+            ]);
+        }
+
+        // Otherwise return view for web
+        return view('products.show', compact('product', 'relatedProducts'));
     }
 
     /**
