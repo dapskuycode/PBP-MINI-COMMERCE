@@ -41,6 +41,10 @@
             bottom: 0;
             background: rgba(0,0,0,0.3);
         }
+
+        .product-slider {
+            /* Width will be set dynamically by JavaScript */
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -209,88 +213,55 @@
         <section class="mb-12">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800">REKOMENDASI TOKO</h2>
-                <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium">Lihat Semua →</a>
+                <a href="{{ route('products.index') }}" class="text-emerald-600 hover:text-emerald-700 font-medium">Lihat Semua →</a>
             </div>
 
-            <!-- Sample Recommended Products -->
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-                @include('components.product-card', [
-                    'title' => 'Cimol Bojot Premium',
-                    'price' => 'Rp 20.000',
-                    'originalPrice' => 'Rp 25.000',
-                    'rating' => 4.3,
-                    'sold' => 294,
-                    'discount' => 20
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Keripik Buah Organik',
-                    'price' => 'Rp 12.500',
-                    'rating' => 4.8,
-                    'sold' => 189
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Pempek Ikan Asli Palembang',
-                    'price' => 'Rp 30.000',
-                    'rating' => 4.9,
-                    'sold' => 720
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Rendang Sapi Padang',
-                    'price' => 'Rp 40.000',
-                    'originalPrice' => 'Rp 50.000',
-                    'rating' => 4.8,
-                    'sold' => 186,
-                    'discount' => 20
-                ])        
-            @include('components.product-card', [
-                    'title' => 'Lumpia Rebung Semarang',
-                    'price' => 'Rp 45.000',
-                    'rating' => 5.0,
-                    'sold' => 108
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Bumbu Pecel Madiun',
-                    'price' => 'Rp 28.000',
-                    'rating' => 4.6,
-                    'sold' => 204
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Dodol Garut Original',
-                    'price' => 'Rp 15.000',
-                    'originalPrice' => 'Rp 20.000',
-                    'rating' => 4.4,
-                    'sold' => 156,
-                    'discount' => 25
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Kerupuk Udang Sidoarjo',
-                    'price' => 'Rp 18.000',
-                    'rating' => 4.7,
-                    'sold' => 89
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Abon Sapi Malang',
-                    'price' => 'Rp 35.000',
-                    'rating' => 4.9,
-                    'sold' => 67
-                ])
-                
-                @include('components.product-card', [
-                    'title' => 'Sambal Pecel Lele',
-                    'price' => 'Rp 22.000',
-                    'originalPrice' => 'Rp 28.000',
-                    'rating' => 4.5,
-                    'sold' => 134,
-                    'discount' => 21
-                ])
-            </div>
+            @if($recommendedProducts && $recommendedProducts->count() > 0)
+                <!-- Product Slider Container -->
+                <div class="relative overflow-hidden">
+                    <!-- Product Slider -->
+                    <div class="product-slider flex transition-transform duration-500 ease-in-out" id="productSlider">
+                        @foreach($recommendedProducts as $product)
+                            <div class="flex-shrink-0 w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-2">
+                                @include('components.product-card', ['product' => $product])
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- Navigation buttons -->
+                    <button class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all z-10" onclick="moveProductSlider(-1)">
+                        <i class="bi bi-chevron-left text-gray-800"></i>
+                    </button>
+                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-2 shadow-lg transition-all z-10" onclick="moveProductSlider(1)">
+                        <i class="bi bi-chevron-right text-gray-800"></i>
+                    </button>
+
+                    <!-- Dots indicator -->
+                    <div class="flex justify-center mt-4 space-x-2" id="productDotsContainer">
+                        <!-- Dots will be generated dynamically by JavaScript -->
+                    </div>
+                </div>
+            @else
+                <!-- Empty State when no products -->
+                <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                    <div class="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Belum ada produk untuk direkomendasikan</h3>
+                    <p class="text-gray-600 mb-6 max-w-md mx-auto">
+                        Produk akan muncul di sini setelah admin menambahkan produk ke database.
+                    </p>
+                    @auth
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.products.index') }}" class="bg-emerald-500 text-white px-6 py-3 rounded-lg hover:bg-emerald-600 transition-colors font-medium">
+                                <i class="bi bi-plus-circle mr-2"></i>Tambah Produk
+                            </a>
+                        @endif
+                    @endauth
+                </div>
+            @endif
         </section>
     </main>
 
@@ -366,7 +337,108 @@
         document.addEventListener('DOMContentLoaded', () => {
             updateBannerSlider(); // Initialize first slide
             startAutoBanner();
+            initProductSlider(); // Initialize product slider
         });
+
+        // Product Slider Variables
+        let currentProductIndex = 0;
+        let itemsPerSlide = 5; // Default for xl screens
+        let totalProductSlides = 0;
+        const productSlider = document.getElementById('productSlider');
+
+        // Initialize product slider
+        function initProductSlider() {
+            if (!productSlider) return;
+            
+            updateItemsPerSlide();
+            const totalProducts = {{ $recommendedProducts ? $recommendedProducts->count() : 0 }};
+            totalProductSlides = Math.ceil(totalProducts / itemsPerSlide);
+            
+            generateProductDots();
+            updateProductSlider();
+            
+            // Update on window resize
+            window.addEventListener('resize', () => {
+                updateItemsPerSlide();
+                totalProductSlides = Math.ceil(totalProducts / itemsPerSlide);
+                currentProductIndex = Math.min(currentProductIndex, totalProductSlides - 1);
+                generateProductDots();
+                updateProductSlider();
+            });
+        }
+
+        // Generate dots dynamically
+        function generateProductDots() {
+            const dotsContainer = document.getElementById('productDotsContainer');
+            if (!dotsContainer) return;
+            
+            dotsContainer.innerHTML = '';
+            
+            for (let i = 0; i < totalProductSlides; i++) {
+                const dot = document.createElement('span');
+                dot.className = 'product-dot w-3 h-3 bg-gray-300 rounded-full cursor-pointer transition-all hover:bg-emerald-500';
+                dot.onclick = () => currentProductSlide(i + 1);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        // Update items per slide based on screen size
+        function updateItemsPerSlide() {
+            const width = window.innerWidth;
+            if (width < 768) {
+                itemsPerSlide = 2; // Mobile
+            } else if (width < 1024) {
+                itemsPerSlide = 3; // Tablet
+            } else if (width < 1280) {
+                itemsPerSlide = 4; // Desktop
+            } else {
+                itemsPerSlide = 5; // Large desktop
+            }
+        }
+
+        // Function to move product slider
+        function moveProductSlider(direction) {
+            currentProductIndex += direction;
+
+            if (currentProductIndex < 0) {
+                currentProductIndex = totalProductSlides - 1;
+            } else if (currentProductIndex >= totalProductSlides) {
+                currentProductIndex = 0;
+            }
+
+            updateProductSlider();
+        }
+
+        // Function to go to specific product slide
+        function currentProductSlide(slideNumber) {
+            currentProductIndex = slideNumber - 1;
+            updateProductSlider();
+        }
+
+        // Function to update product slider position and dots
+        function updateProductSlider() {
+            if (!productSlider) return;
+            
+            // Set slider width based on total products
+            const totalProducts = {{ $recommendedProducts ? $recommendedProducts->count() : 0 }};
+            const sliderWidth = (totalProducts / itemsPerSlide) * 100;
+            productSlider.style.width = `${sliderWidth}%`;
+            
+            const translateX = currentProductIndex * -(100 / totalProductSlides);
+            productSlider.style.transform = `translateX(${translateX}%)`;
+
+            // Update dots
+            const currentProductDots = document.querySelectorAll('.product-dot');
+            currentProductDots.forEach((dot, index) => {
+                if (index === currentProductIndex) {
+                    dot.classList.remove('bg-gray-300');
+                    dot.classList.add('bg-emerald-500');
+                } else {
+                    dot.classList.remove('bg-emerald-500');
+                    dot.classList.add('bg-gray-300');
+                }
+            });
+        }
 
         // Add to Cart functionality
         function addToCart(productId) {
