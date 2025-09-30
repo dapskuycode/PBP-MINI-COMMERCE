@@ -115,9 +115,7 @@ Route::view('/terms', 'terms')->name('terms');
 Route::view('/privacy', 'privacy')->name('privacy'); 
 
 Route::middleware('auth')->group(function () {
-    // Dashboard
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
+    
     // User account management
     Route::get('/logout', [UserController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
@@ -131,6 +129,8 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware('admin')->group(function () {
         // User management
+        // Dashboard
+        Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('admin/users', UserController::class, [
             'as' => 'admin',
             'except' => ['create', 'store'] // Registration handled by public routes

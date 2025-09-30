@@ -5,11 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin']);
+    }
+
     public function index()
     {
+        // Double check admin access
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('home')->with('error', 'Akses ditolak. Halaman ini hanya untuk admin.');
+        }
         // Get latest 8 products with their categories
         $products = Product::with('category')
             ->latest()

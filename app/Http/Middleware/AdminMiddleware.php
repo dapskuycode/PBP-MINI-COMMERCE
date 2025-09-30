@@ -17,8 +17,14 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        if (!Auth::check() || !Auth::user()->is_admin) {
-            abort(403, 'Unauthorized access. Admin privileges required.');
+        // Check if user is authenticated
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Check if user is admin
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('home')->with('error', 'Akses ditolak. Halaman ini hanya untuk admin.');
         }
 
         return $next($request);

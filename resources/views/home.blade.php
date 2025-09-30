@@ -48,6 +48,29 @@
     </style>
 </head>
 <body class="bg-gray-50">
+    <!-- Flash Messages -->
+    @if(session('success'))
+        <div class="fixed top-4 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                {{ session('success') }}
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="fixed top-4 right-4 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                {{ session('error') }}
+            </div>
+        </div>
+    @endif
+
     <!-- Include Navbar Component -->
     @include('components.navbar')
 
@@ -338,6 +361,16 @@
             updateBannerSlider(); // Initialize first slide
             startAutoBanner();
             initProductSlider(); // Initialize product slider
+            
+            // Auto-hide flash messages after 5 seconds
+            const flashMessages = document.querySelectorAll('.fixed.top-4.right-4');
+            flashMessages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transform = 'translateX(100%)';
+                    message.style.transition = 'transform 0.3s ease';
+                    setTimeout(() => message.remove(), 300);
+                }, 5000);
+            });
         });
 
         // Product Slider Variables
