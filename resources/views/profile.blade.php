@@ -1,91 +1,142 @@
-{{-- resources/views/profile.blade.php --}}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Profil • Mini Commerce</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Profil Pengguna — UMKM Mini-Commerce</title>
+
+  {{-- Pakai Tailwind via CDN supaya langsung tampil rapi tanpa build --}}
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .glass{background:rgba(255,255,255,.78);backdrop-filter:blur(16px) saturate(140%)}
-    .shadow-soft{box-shadow:0 20px 60px rgba(0,0,0,.15)}
-  </style>
 </head>
-<body class="min-h-screen bg-emerald-700/20 relative">
-  {{-- BG --}}
-  <div class="fixed inset-0 -z-10">
-    <img src="{{ asset('images/bg-login.jpg') }}" class="w-full h-full object-cover" alt="">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-  </div>
+<body class="bg-gray-50 text-gray-900 antialiased">
 
-  <div class="max-w-3xl mx-auto px-4 py-10">
-    {{-- Header --}}
-    <div class="text-center mb-6">
-      <div class="mx-auto w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center shadow-soft">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A9 9 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      </div>
-      <h1 class="mt-3 text-3xl font-extrabold text-white drop-shadow">Profil Pengguna</h1>
-      <p class="text-emerald-100">Kelola informasi akun Anda</p>
-    </div>
+  {{-- NAVBAR kamu --}}
+  @include('components.navbar')
 
-    @if (session('success'))
-      <div class="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-800 px-4 py-3 text-sm">
-        {{ session('success') }}
-      </div>
-    @endif
+  @php
+      $user = auth()->user();
+      $maskedPhone = ($user && ($user->phone ?? null))
+          ? str_repeat('*', max(strlen($user->phone) - 2, 0)) . substr($user->phone, -2)
+          : '**********23';
+  @endphp
 
-    {{-- Card profil --}}
-    <div class="glass rounded-2xl ring-1 ring-white/40 shadow-soft p-6 sm:p-8">
-      <div class="flex flex-col sm:flex-row sm:items-center gap-6">
-        {{-- Avatar inisial --}}
-        <div class="shrink-0">
-          @php
-            $initials = collect(explode(' ', auth()->user()->name ?? 'User'))
-              ->map(fn($p) => mb_substr($p,0,1))
-              ->take(2)->implode('');
-          @endphp
-          <div class="w-20 h-20 rounded-full bg-emerald-600 text-white flex items-center justify-center text-2xl font-bold">
-            {{ $initials }}
+  <div class="min-h-screen bg-rose-50">
+      {{-- Top bar judul --}}
+      <header class="bg-emerald-400">
+          <div class="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
+              <div class="text-white font-semibold text-lg">UMKM Mini-Commerce</div>
+
+              <div class="flex items-center gap-4">
+                  <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 4.5V21h16v-2.5C20 16.17 16.33 14 12 14Z"/>
+                      </svg>
+                  </div>
+
+                  {{-- Logout GET (sesuai web.php kamu) --}}
+                  <a href="{{ route('logout') }}"
+                     class="rounded-md bg-rose-100 px-4 py-1.5 text-rose-600 text-sm font-medium hover:bg-rose-200">
+                      Logout
+                  </a>
+              </div>
           </div>
-        </div>
+      </header>
 
-        <div class="flex-1 space-y-1">
-          <h2 class="text-2xl font-bold text-gray-900">{{ auth()->user()->name }}</h2>
-          <p class="text-gray-600">
-            <span class="font-medium text-gray-700">Username:</span> {{ auth()->user()->username ?? '—' }}
-          </p>
-          <p class="text-gray-600">
-            <span class="font-medium text-gray-700">Email:</span> {{ auth()->user()->email }}
-          </p>
-          <p class="text-gray-600">
-            <span class="font-medium text-gray-700">Bergabung:</span>
-            {{ optional(auth()->user()->created_at)->translatedFormat('d F Y') }}
-          </p>
-        </div>
+      <div class="mx-auto max-w-7xl px-6">
+          <div class="py-6 text-gray-800">
+              <h1 class="text-2xl font-bold">Profil Pengguna</h1>
+          </div>
 
-        <div class="sm:self-start">
-          <a href="{{ route('user.profile.edit') }}"
-             class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 text-white font-semibold px-4 py-2 hover:bg-emerald-700">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5h2m-7 7h8m-8 4h8M15.232 5.232l1.536-1.536a2.182 2.182 0 113.086 3.086L9 18l-4 1 1-4 9.232-9.768z"/>
-            </svg>
-            Edit Profil
-          </a>
-        </div>
+          <div class="grid grid-cols-12 gap-6 pb-12">
+              {{-- Sidebar kiri --}}
+              <aside class="col-span-12 md:col-span-3">
+                  <div class="rounded-xl bg-white shadow-sm p-6">
+                      <div class="flex flex-col items-center gap-3">
+                          <div class="h-20 w-20 rounded-full bg-gray-200 flex items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 4.5V21h16v-2.5C20 16.17 16.33 14 12 14Z"/>
+                              </svg>
+                          </div>
+                          <div class="text-center">
+                              <div class="font-semibold">{{ $user->name ?? 'Nama Pengguna' }}</div>
+                              <div class="text-sm text-gray-500">{{ $user->email ?? 'email.pengguna@gmail.com' }}</div>
+                          </div>
+                      </div>
+
+                      <nav class="mt-8 space-y-2">
+                          <a href="{{ route('user.profile') }}"
+                             class="block rounded-lg px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700">
+                              Profil Saya
+                          </a>
+                          {{-- orders.index belum ada di routes → arahkan ke keranjang sebagai placeholder --}}
+                          <a href="{{ route('cart.index') }}"
+                             class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                              Riwayat Pesanan
+                          </a>
+                          <a href="{{ route('user.change-password') }}"
+                             class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                              Ubah Password
+                          </a>
+                      </nav>
+                  </div>
+              </aside>
+
+              {{-- Konten utama --}}
+              <main class="col-span-12 md:col-span-9">
+                  <div class="rounded-xl bg-white shadow-sm overflow-hidden">
+                      <div class="border-b px-6 py-4">
+                          <h2 class="text-lg font-semibold">Informasi Akun</h2>
+                      </div>
+
+                      <div class="p-6">
+                          <dl class="grid grid-cols-12 items-center gap-y-6">
+                              <dt class="col-span-12 md:col-span-4 text-gray-600">Username</dt>
+                              <dd class="col-span-12 md:col-span-8 font-medium">
+                                  {{ $user->username ?? 'username_pengguna' }}
+                              </dd>
+
+                              <dt class="col-span-12 md:col-span-4 text-gray-600">Nama Pengguna</dt>
+                              <dd class="col-span-12 md:col-span-8 flex items-center gap-3">
+                                  <span class="font-medium">{{ $user->name ?? 'nama pengguna' }}</span>
+                                  <a href="{{ route('user.profile.edit') }}"
+                                     class="text-emerald-600 text-sm font-semibold hover:underline">Ubah</a>
+                              </dd>
+
+                              <dt class="col-span-12 md:col-span-4 text-gray-600">Email</dt>
+                              <dd class="col-span-12 md:col-span-8 font-medium">
+                                  {{ $user->email ?? 'email.admin@gmail.com' }}
+                              </dd>
+
+                              <dt class="col-span-12 md:col-span-4 text-gray-600">Nomor HP</dt>
+                              <dd class="col-span-12 md:col-span-8 font-medium">
+                                  {{ $maskedPhone }}
+                              </dd>
+
+                              <dt class="col-span-12 md:col-span-4 text-gray-600">Jenis Kelamin</dt>
+                              <dd class="col-span-12 md:col-span-8">
+                                  <div class="flex items-center gap-8">
+                                      <label class="inline-flex items-center gap-2">
+                                          <input type="radio" class="h-4 w-4"
+                                                 @checked(($user->gender ?? null) === 'male') disabled>
+                                          <span>Laki-laki</span>
+                                      </label>
+                                      <label class="inline-flex items-center gap-2">
+                                          <input type="radio" class="h-4 w-4"
+                                                 @checked(($user->gender ?? null) === 'female') disabled>
+                                          <span>Perempuan</span>
+                                      </label>
+                                  </div>
+                              </dd>
+                          </dl>
+                      </div>
+                  </div>
+              </main>
+          </div>
       </div>
-
-      <div class="mt-6 border-t pt-6 flex flex-wrap gap-3">
-        <a href="{{ route('user.change-password') }}"
-           class="inline-flex items-center gap-2 text-emerald-700 hover:text-emerald-800 font-medium">
-          <i class="fa-solid fa-key"></i> Ubah Kata Sandi
-        </a>
-        <a href="{{ route('dashboard') }}"
-           class="inline-flex items-center gap-2 text-gray-700 hover:text-gray-900 font-medium">
-          <i class="fa-solid fa-gauge"></i> Kembali ke Dashboard
-        </a>
-      </div>
-    </div>
   </div>
+
+  {{-- FOOTER kamu --}}
+  @include('components.footer')
+
 </body>
 </html>

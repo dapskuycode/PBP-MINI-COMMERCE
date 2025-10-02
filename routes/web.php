@@ -11,6 +11,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Models\User;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,7 @@ Route::middleware('auth')->group(function () {
         Route::patch('admin/products/{product}', [ProductController::class, 'updateStock'])
             ->name('admin.products.update-stock');
     });
+    
 
     // Cart functionality
     Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
@@ -161,4 +163,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/test-auth', function () {
         return view('test-auth');
     })->name('test.auth');
+
+    //Orders
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
 });

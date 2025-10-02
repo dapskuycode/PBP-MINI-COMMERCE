@@ -17,47 +17,92 @@
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Include Navbar -->
+    {{-- Navbar --}}
     @include('components.navbar', ['isAdmin' => auth()->check() && auth()->user()->is_admin])
 
-    <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8 mt-20">
-        <!-- Header -->
+    <div class="container mx-auto px-4 py-4" style="margin-top:40px">
+        {{-- Header --}}
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">All Products</h1>
             <p class="text-gray-600">Discover our complete collection of products</p>
         </div>
 
-        <!-- Products Grid -->
-        @if($products->count() > 0)
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
-                @foreach($products as $product)
-                    @include('components.product-card', ['product' => $product])
-                @endforeach
-            </div>
+        {{-- GRID: Sidebar kategori (3) + Konten produk (9) --}}
+        <div class="grid grid-cols-12 gap-6">
+            {{-- Sidebar Kiri: kategori vertikal (1 baris = 1 item) --}}
+            <aside class="col-span-12 md:col-span-3">
+                <div class="sticky top-24 rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">🏷️</div>
+                        <h2 class="font-semibold">Kategori</h2>
+                    </div>
 
-            <!-- Pagination -->
-            <div class="flex justify-center">
-                {{ $products->links() }}
-            </div>
-        @else
-            <!-- Empty State -->
-            <div class="text-center py-16">
-                <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
+                    @php
+                        // Pakai $categories dari controller jika ada; kalau belum, fallback contoh
+                        $fallback = collect([
+                            (object)['name'=>'Semua','slug'=>'semua'],
+                            (object)['name'=>'Makanan Manis','slug'=>'makanan','emoji'=>'🍰'],
+                            (object)['name'=>'Minuman','slug'=>'minuman','emoji'=>'🧃'],
+                            (object)['name'=>'Makanan Kemasan','slug'=>'fashion','emoji'=>'👗'],
+                        ]);
+                        $cats = (isset($categories) && count($categories)) ? $categories : $fallback;
+                    @endphp
+
+                    <ul class="space-y-2">
+                        @foreach($cats as $cat)
+                            <li>
+                                {{-- Belum aktif diklik → pakai button --}}
+                                <button type="button"
+                                        class="w-full flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm hover:bg-gray-50">
+                                    <span class="flex items-center gap-2">
+                                        <span class="text-lg">{{ $cat->emoji ?? '🏷️' }}</span>
+                                        <span class="font-medium text-gray-700">{{ $cat->name }}</span>
+                                    </span>
+                                    <span class="text-gray-400">›</span>
+                                </button>
+                            </li>
+                        @endforeach
+                    </ul>
+
+                    {{-- Catatan kecil (opsional) --}}
+                    <p class="mt-4 text-xs text-gray-500 leading-relaxed">
+                        Nanti kalau mau diaktifkan, ubah tombol jadi link ke
+                        <code class="bg-gray-100 px-1 rounded">/products?category=slug-kategori</code>.
+                    </p>
                 </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No products available</h3>
-                <p class="text-gray-500">Check back later for new products.</p>
-            </div>
-        @endif
+            </aside>
+
+            {{-- Konten Produk --}}
+            <section class="col-span-12 md:col-span-9">
+                @if($products->count() > 0)
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
+                        @foreach($products as $product)
+                            @include('components.product-card', ['product' => $product])
+                        @endforeach
+                    </div>
+
+                    <div class="flex justify-center">
+                        {{ $products->links() }}
+                    </div>
+                @else
+                    <div class="text-center py-16 rounded-2xl bg-white border border-gray-200">
+                        <div class="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No products available</h3>
+                        <p class="text-gray-500">Check back later for new products.</p>
+                    </div>
+                @endif
+            </section>
+        </div>
     </div>
 
-    <!-- Include Footer -->
+    {{-- Footer --}}
     @include('components.footer')
 
-    <!-- Add to Cart Functionality -->
+    {{-- Add to Cart (tetap seperti punyamu) --}}
     <script>
         function addToCart(productId) {
             fetch('/cart/add', {
@@ -66,25 +111,15 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: 1
-                })
+                body: JSON.stringify({ product_id: productId, quantity: 1 })
             })
             .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response URL:', response.url);
-                console.log('Response redirected:', response.redirected);
-                
-                // Check for authentication required (redirect to login)
                 if (response.status === 302 || response.redirected || response.url.includes('/login')) {
                     if (confirm('Anda perlu login untuk menambahkan produk ke keranjang. Login sekarang?')) {
                         window.location.href = '/login';
                     }
                     return null;
                 }
-                
-                // Check for other HTTP errors
                 if (!response.ok) {
                     if (response.status === 419) {
                         alert('Session expired. Please refresh the page and try again.');
@@ -92,12 +127,10 @@
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
                 return response.json();
             })
             .then(data => {
-                if (data === null) return; // Handle redirect case
-                
+                if (data === null) return;
                 if (data && data.success) {
                     alert('Produk berhasil ditambahkan ke keranjang!');
                 } else if (data && data.message) {
