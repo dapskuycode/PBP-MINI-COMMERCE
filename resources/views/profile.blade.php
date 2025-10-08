@@ -68,11 +68,17 @@
                              class="block rounded-lg px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700">
                               Profil Saya
                           </a>
-                          {{-- orders.index belum ada di routes → arahkan ke keranjang sebagai placeholder --}}
-                          <a href="{{ route('cart.index') }}"
+                          <a href="{{ route('orders.index') }}"
                              class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                               Riwayat Pesanan
                           </a>
+                          
+                            <a href="{{ route('favorites') }}"
+                                class="block px-4 py-2 rounded text-sm
+                                        {{ request()->routeIs('profile.favorites') ? 'bg-emerald-100 text-emerald-800 font-medium' : 'text-gray-700 hover:bg-gray-100' }}">
+                                Produk Favorit
+                             </a>
+
                           <a href="{{ route('user.change-password') }}"
                              class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                               Ubah Password

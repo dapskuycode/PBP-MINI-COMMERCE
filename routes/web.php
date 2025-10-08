@@ -45,7 +45,14 @@ Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->
 Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 
-// Cart routes are handled in authenticated section
+
+// Halaman checkout (frontend only, tanpa middleware)
+Route::view('/checkout', 'checkout')->name('checkout');
+
+//Riwayat Pesanan
+Route::view('/Riwayat Pesanan', 'orders')->name('orders.index');
+
+
 
 
 /*
@@ -111,6 +118,7 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+
 //syarat dan ketentuan
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/privacy', 'privacy')->name('privacy'); 
@@ -166,4 +174,11 @@ Route::middleware('auth')->group(function () {
 
     //Orders
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+
 });
+
+// Halaman Produk Favorit 
+Route::middleware('auth')->group(function () {
+    Route::view('/favorites', 'favorites')->name('favorites');
+});
+
