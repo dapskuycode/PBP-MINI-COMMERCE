@@ -12,7 +12,7 @@
           </div>
           <div>
             <div class="text-xl font-bold text-gray-900">
-              TokoKami {{ $isAdmin ? 'Admin' : '' }}
+              TokoKami
             </div>
             <div class="text-xs text-gray-500">UMKM Mini-Commerce</div>
           </div>

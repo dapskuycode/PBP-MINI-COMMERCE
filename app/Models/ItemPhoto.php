@@ -23,57 +23,36 @@ class ItemPhoto extends Model
         'is_primary' => 'boolean',
     ];
 
-    /**
-     * Get the product that owns the photo
-     */
     public function product()
     {
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get the full URL for the photo
-     */
     public function getFullUrlAttribute()
     {
         return Storage::url($this->url);
     }
 
-    /**
-     * Get the absolute path for the photo
-     */
     public function getAbsoluteUrlAttribute()
     {
         return asset('storage/' . $this->url);
     }
 
-    /**
-     * Check if this photo exists in storage
-     */
     public function exists()
     {
         return Storage::disk('public')->exists($this->url);
     }
 
-    /**
-     * Scope to get primary photos only
-     */
     public function scopePrimary($query)
     {
         return $query->where('is_primary', true);
     }
 
-    /**
-     * Scope to get non-primary photos only
-     */
     public function scopeSecondary($query)
     {
         return $query->where('is_primary', false);
     }
 
-    /**
-     * Auto-delete file when model is deleted
-     */
     protected static function booted()
     {
         static::deleted(function ($photo) {

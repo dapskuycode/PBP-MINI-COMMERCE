@@ -47,14 +47,12 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-
-    // Format price to Indonesian Rupiah
+    
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format((float)$this->price, 0, ',', '.');
     }
 
-    // Get discounted price
     public function getDiscountedPriceAttribute()
     {
         if ($this->discount > 0) {
@@ -63,13 +61,11 @@ class Product extends Model
         return $this->price;
     }
 
-    // Format discounted price to Indonesian Rupiah
     public function getFormattedDiscountedPriceAttribute()
     {
         return 'Rp ' . number_format((float)$this->discounted_price, 0, ',', '.');
     }
 
-    // Check if product has discount
     public function getHasDiscountAttribute()
     {
         return $this->discount > 0;

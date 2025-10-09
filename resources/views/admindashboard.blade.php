@@ -234,7 +234,6 @@
                             <div id="existing-photos-container" class="hidden">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Foto Saat Ini</label>
                                 <div id="existing-photos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
-                                    <!-- Existing photos will be shown here -->
                                 </div>
                             </div>
                             
@@ -247,7 +246,6 @@
                                 
                                 <!-- New Photo Preview Container -->
                                 <div id="edit-photo-preview" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 hidden">
-                                    <!-- Preview images will be shown here -->
                                 </div>
                             </div>
                         </div>
