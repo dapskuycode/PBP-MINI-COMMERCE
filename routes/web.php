@@ -150,6 +150,12 @@ Route::middleware('auth')->group(function () {
             'as' => 'admin'
         ]);
 
+        //Category management
+        Route::get('/admin/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('admin.categories.index');
+        Route::resource('admin/categories', App\Http\Controllers\CategoryController::class, [
+            'as' => 'admin'
+        ]);
+
         // Additional product routes
         Route::get('admin/products/category/{categoryId}', [ProductController::class, 'getByCategory'])
             ->name('admin.products.by-category');
