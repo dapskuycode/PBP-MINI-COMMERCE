@@ -31,6 +31,6 @@ class DashboardController extends Controller
         $totalCategories = Category::count();
         $categories = Category::all();
 
-        return view('admindashboard', compact('products', 'totalProducts', 'totalCategories', 'categories'));
+        return view('admin.admindashboard', compact('products', 'totalProducts', 'totalCategories', 'categories'));
     }
 }
