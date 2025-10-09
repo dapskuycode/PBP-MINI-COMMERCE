@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ItemPhoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -54,12 +56,13 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'category_id' => 'required|exists:categories,id',
+            'category_id' => 'required|exists:categories,id',  
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'discount' => 'required|integer|min:0|max:100',
+            'discount' => 'required|numeric|min:0|max:100',
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $product = Product::create([
@@ -71,13 +74,32 @@ class ProductController extends Controller
             'discount' => $request->discount,
         ]);
 
+        // Handle photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $index => $file) {
+                if ($file->isValid()) {
+                    // Store the file in public/storage/photos
+                    $path = $file->store('photos', 'public');
+                    
+                    if ($path !== false) {
+                        // Create ItemPhoto record
+                        $product->photos()->create([
+                            'url' => $path,
+                            'alt_text' => $product->name . ' - Photo ' . ($index + 1),
+                            'is_primary' => $index === 0, // First photo is primary
+                        ]);
+                    }
+                }
+            }
+        }
+
         if (!$request->expectsJson()) {
             return redirect()->route('dashboard')->with('success', 'Produk berhasil ditambahkan');
         }
 
         return response()->json([
             'success' => true,
-            'data' => $product->load('category'),
+            'data' => $product->load(['category', 'photos']),
             'message' => 'Product created successfully'
         ], 201);
     }
@@ -133,16 +155,78 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'discount' => 'required|integer|min:0|max:100',
-        ]);
+        try {
+            // Debug logging for update
+            \Log::info('Product update called', [
+                'product_id' => $product->id,
+                'has_files' => $request->hasFile('photos'),
+                'files_count' => $request->hasFile('photos') ? count($request->file('photos')) : 0,
+                'request_method' => $request->method(),
+                'all_input' => $request->all()
+            ]);
 
-        $product->update($request->only(['category_id','name','description','price','stock','discount']));
+            \Log::info('Starting validation for update...');
+            $request->validate([
+                'category_id' => 'required|exists:categories,id',
+                'name' => 'required|string|max:255',
+                'description' => 'required|string',
+                'price' => 'required|numeric|min:0',
+                'stock' => 'required|integer|min:0',
+                'discount' => 'required|numeric|min:0|max:100',
+                'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+            \Log::info('Validation passed for update');
+
+            \Log::info('Updating product data...');
+            $product->update($request->only(['category_id','name','description','price','stock','discount']));
+            \Log::info('Product data updated successfully');
+
+        // Handle photo uploads
+        if ($request->hasFile('photos')) {
+            \Log::info('Processing photo uploads for update', ['count' => count($request->file('photos'))]);
+            
+            foreach ($request->file('photos') as $index => $file) {
+                \Log::info('Processing file for update', [
+                    'index' => $index,
+                    'original_name' => $file->getClientOriginalName(),
+                    'is_valid' => $file->isValid(),
+                    'size' => $file->getSize(),
+                    'mime_type' => $file->getMimeType()
+                ]);
+                
+                if ($file->isValid()) {
+                    // Store the file in public/storage/photos
+                    $path = $file->store('photos', 'public');
+                    \Log::info('File stored for update', ['path' => $path]);
+                    
+                    if ($path !== false) {
+                        // Check if this should be primary photo
+                        $existingPhotosCount = $product->photos()->count();
+                        $isPrimary = ($existingPhotosCount === 0 && $index === 0);
+                        
+                        \Log::info('Creating photo with primary status', [
+                            'existing_photos_count' => $existingPhotosCount,
+                            'index' => $index,
+                            'is_primary' => $isPrimary
+                        ]);
+                        
+                        // Create ItemPhoto record
+                        $photo = $product->photos()->create([
+                            'url' => $path,
+                            'alt_text' => $product->name . ' - Photo ' . ($index + 1),
+                            'is_primary' => $isPrimary,
+                        ]);
+                        \Log::info('Photo record created for update', ['photo_id' => $photo->id]);
+                    } else {
+                        \Log::error('Failed to store file in update', ['original_name' => $file->getClientOriginalName()]);
+                    }
+                }
+            }
+        } else {
+            \Log::info('No files found in update request');
+        }
+
+        \Log::info('Product update completed successfully');
 
         // Jika request dari Blade (bukan dari API)
         if (!$request->expectsJson()) {
@@ -151,9 +235,33 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $product->load('category'),
+            'data' => $product->load(['category', 'photos']),
             'message' => 'Product updated successfully'
         ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed in product update', [
+                'errors' => $e->errors(),
+                'message' => $e->getMessage()
+            ]);
+            throw $e;
+        } catch (\Exception $e) {
+            \Log::error('Error in product update', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            if (!$request->expectsJson()) {
+                return redirect()->back()->with('error', 'Gagal memperbarui produk: ' . $e->getMessage());
+            }
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

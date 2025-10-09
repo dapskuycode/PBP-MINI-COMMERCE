@@ -20,6 +20,7 @@ class Product extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'discount' => 'decimal:2',
     ];
 
     public function category()
@@ -51,5 +52,26 @@ class Product extends Model
     public function getFormattedPriceAttribute()
     {
         return 'Rp ' . number_format((float)$this->price, 0, ',', '.');
+    }
+
+    // Get discounted price
+    public function getDiscountedPriceAttribute()
+    {
+        if ($this->discount > 0) {
+            return $this->price * (1 - ($this->discount / 100));
+        }
+        return $this->price;
+    }
+
+    // Format discounted price to Indonesian Rupiah
+    public function getFormattedDiscountedPriceAttribute()
+    {
+        return 'Rp ' . number_format((float)$this->discounted_price, 0, ',', '.');
+    }
+
+    // Check if product has discount
+    public function getHasDiscountAttribute()
+    {
+        return $this->discount > 0;
     }
 }

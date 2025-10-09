@@ -202,7 +202,7 @@
 
             <!-- Back to Home -->
             <div class="mt-4 text-center">
-                <a href="{{ url('/welcome') }}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
+                <a href="{{ url('/') }}" class="inline-flex items-center text-sm text-gray-500 hover:text-gray-700">
                     <i class="fas fa-arrow-left mr-2"></i>
                     Kembali ke Beranda
                 </a>

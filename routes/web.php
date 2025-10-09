@@ -157,6 +157,15 @@ Route::middleware('auth')->group(function () {
             ->name('admin.products.search');
         Route::patch('admin/products/{product}', [ProductController::class, 'updateStock'])
             ->name('admin.products.update-stock');
+
+        // Photo management  
+        Route::resource('admin/photos', App\Http\Controllers\ItemPhotoController::class, [
+            'as' => 'admin'
+        ]);
+        Route::post('admin/photos/{itemPhoto}/set-primary', [App\Http\Controllers\ItemPhotoController::class, 'setPrimary'])
+            ->name('admin.photos.set-primary');
+        Route::post('admin/photos/bulk-delete', [App\Http\Controllers\ItemPhotoController::class, 'bulkDelete'])
+            ->name('admin.photos.bulk-delete');
     });
     
 

@@ -165,8 +165,8 @@
     <!-- Edit Modal -->
     <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
-                <form id="editForm" method="POST">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-screen overflow-y-auto">
+                <form id="editForm" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="p-6">
@@ -177,6 +177,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                                 </svg>
                             </button>
+                        </div>
+                        
+                        <!-- Error Display -->
+                        <div id="edit-errors" class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded hidden">
+                            <ul id="edit-error-list" class="list-disc list-inside">
+                            </ul>
                         </div>
                         
                         <div class="space-y-4">
@@ -223,6 +229,27 @@
                                 <textarea id="edit-description" name="description" rows="3" 
                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
                             </div>
+                            
+                            <!-- Existing Photos Display -->
+                            <div id="existing-photos-container" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Foto Saat Ini</label>
+                                <div id="existing-photos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                                    <!-- Existing photos will be shown here -->
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="edit-photos" class="block text-sm font-medium text-gray-700 mb-1">Tambah Foto Baru</label>
+                                <input type="file" id="edit-photos" name="photos[]" multiple accept="image/*" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                                       onchange="previewEditPhotos(this)">
+                                <p class="text-xs text-gray-500 mt-1">Pilih beberapa foto sekaligus untuk ditambahkan</p>
+                                
+                                <!-- New Photo Preview Container -->
+                                <div id="edit-photo-preview" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 hidden">
+                                    <!-- Preview images will be shown here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -243,8 +270,8 @@
     <!-- Create Modal -->
     <div id="createModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-xl shadow-xl max-w-md w-full max-h-screen overflow-y-auto">
-                <form method="POST" action="{{ route('admin.products.store') }}">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-screen overflow-y-auto">
+                <form method="POST" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="p-6">
                         <div class="flex justify-between items-center mb-4">
@@ -255,6 +282,17 @@
                                 </svg>
                             </button>
                         </div>
+                        
+                        <!-- Error Display -->
+                        @if($errors->any())
+                            <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                                <ul class="list-disc list-inside">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         
                         <div class="space-y-4">
                             <div>
@@ -298,6 +336,19 @@
                                 <textarea id="create-description" name="description" rows="3" 
                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500"></textarea>
                             </div>
+                            
+                            <div>
+                                <label for="create-photos" class="block text-sm font-medium text-gray-700 mb-1">Foto Produk</label>
+                                <input type="file" id="create-photos" name="photos[]" multiple accept="image/*" 
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-emerald-500 focus:border-emerald-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                                       onchange="previewCreatePhotos(this)">
+                                <p class="text-xs text-gray-500 mt-1">Pilih beberapa foto sekaligus (maksimal 10 foto)</p>
+                                
+                                <!-- Photo Preview Container -->
+                                <div id="create-photo-preview" class="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3 hidden">
+                                    <!-- Preview images will be shown here -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -326,6 +377,9 @@
         function closeCreateModal() {
             document.getElementById('createModal').classList.add('hidden');
             document.querySelector('#createModal form').reset();
+            // Clear photo previews
+            document.getElementById('create-photo-preview').innerHTML = '';
+            document.getElementById('create-photo-preview').classList.add('hidden');
         }
 
         function openEditModal(product) {
@@ -338,6 +392,14 @@
             document.getElementById('edit-discount').value = product.discount || 0;
             document.getElementById('edit-description').value = product.description || '';
             
+            // Display existing photos
+            displayExistingPhotos(product.photos || []);
+            
+            // Clear new photo previews
+            document.getElementById('edit-photo-preview').innerHTML = '';
+            document.getElementById('edit-photo-preview').classList.add('hidden');
+            document.getElementById('edit-photos').value = '';
+            
             // Set form action
             document.getElementById('editForm').action = `/admin/products/${product.id}`;
             
@@ -348,6 +410,11 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
             document.getElementById('editForm').reset();
+            // Clear photo previews and existing photos display
+            document.getElementById('edit-photo-preview').innerHTML = '';
+            document.getElementById('edit-photo-preview').classList.add('hidden');
+            document.getElementById('existing-photos').innerHTML = '';
+            document.getElementById('existing-photos-container').classList.add('hidden');
         }
 
         async function deleteProduct(productId) {
@@ -398,6 +465,271 @@
                 closeEditModal();
             }
         });
+
+        // Add form submit debugging
+        document.addEventListener('DOMContentLoaded', function() {
+            // Debug create form submission
+            const createForm = document.querySelector('#createModal form');
+            if (createForm) {
+                createForm.addEventListener('submit', function(e) {
+                    console.log('Create form submitting...');
+                    console.log('Form action:', this.action);
+                    console.log('Form method:', this.method);
+                    console.log('Form enctype:', this.enctype);
+                    
+                    const formData = new FormData(this);
+                    let fileCount = 0;
+                    let debugInfo = [];
+                    
+                    console.log('FormData entries:');
+                    for (let [key, value] of formData.entries()) {
+                        if (value instanceof File) {
+                            console.log(key + ':', value.name, value.type, value.size + ' bytes');
+                            debugInfo.push(key + ': ' + value.name + ' (' + value.type + ', ' + value.size + ' bytes)');
+                            fileCount++;
+                        } else {
+                            console.log(key + ':', value);
+                            debugInfo.push(key + ': ' + value);
+                        }
+                    }
+                    
+                    // Log file info (no alert)
+                    if (fileCount > 0) {
+                        console.log('Found ' + fileCount + ' files for submission');
+                    } else {
+                        console.log('No files detected in form');
+                    }
+                });
+            }
+
+            // Debug edit form submission
+            const editForm = document.querySelector('#editForm');
+            if (editForm) {
+                editForm.addEventListener('submit', function(e) {
+                    console.log('Edit form submitting...');
+                    console.log('Form action:', this.action);
+                    console.log('Form method:', this.method);
+                    console.log('Form enctype:', this.enctype);
+                    
+                    const formData = new FormData(this);
+                    let fileCount = 0;
+                    let debugInfo = [];
+                    
+                    console.log('Edit FormData entries:');
+                    for (let [key, value] of formData.entries()) {
+                        if (value instanceof File) {
+                            console.log(key + ':', value.name, value.type, value.size + ' bytes');
+                            debugInfo.push(key + ': ' + value.name + ' (' + value.type + ', ' + value.size + ' bytes)');
+                            fileCount++;
+                        } else {
+                            console.log(key + ':', value);
+                            debugInfo.push(key + ': ' + value);
+                        }
+                    }
+                    
+                    // Log file info for edit (no alert)
+                    if (fileCount > 0) {
+                        console.log('Found ' + fileCount + ' files for edit submission');
+                    } else {
+                        console.log('No files detected in edit form');
+                    }
+                });
+            }
+        });
+
+        // Photo preview functions
+        function previewCreatePhotos(input) {
+            console.log('previewCreatePhotos called', input.files);
+            const previewContainer = document.getElementById('create-photo-preview');
+            previewContainer.innerHTML = '';
+            
+            if (input.files && input.files.length > 0) {
+                console.log('Files selected:', input.files.length);
+                previewContainer.classList.remove('hidden');
+                
+                // Limit to 10 photos
+                const filesToProcess = Math.min(input.files.length, 10);
+                
+                for (let i = 0; i < filesToProcess; i++) {
+                    const file = input.files[i];
+                    console.log('Processing file:', file.name, file.type, file.size);
+                    
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const photoDiv = document.createElement('div');
+                            photoDiv.className = 'relative group';
+                            photoDiv.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview" class="w-full h-20 object-cover rounded-lg border border-gray-200">
+                                <button type="button" onclick="removePreviewPhoto(this, 'create')" 
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    ×
+                                </button>
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
+                                    ${file.name} (${(file.size/1024).toFixed(1)}KB)
+                                </div>
+                            `;
+                            previewContainer.appendChild(photoDiv);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        console.log('File rejected (not image):', file.name);
+                    }
+                }
+                
+                if (input.files.length > 10) {
+                    alert('Maksimal 10 foto yang dapat dipilih. Hanya 10 foto pertama yang akan diproses.');
+                }
+            } else {
+                previewContainer.classList.add('hidden');
+            }
+        }
+
+        function previewEditPhotos(input) {
+            console.log('previewEditPhotos called', input.files);
+            const previewContainer = document.getElementById('edit-photo-preview');
+            previewContainer.innerHTML = '';
+            
+            if (input.files && input.files.length > 0) {
+                console.log('Edit files selected:', input.files.length);
+                previewContainer.classList.remove('hidden');
+                
+                // Limit to 10 photos
+                const filesToProcess = Math.min(input.files.length, 10);
+                
+                for (let i = 0; i < filesToProcess; i++) {
+                    const file = input.files[i];
+                    console.log('Processing edit file:', file.name, file.type, file.size);
+                    
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const photoDiv = document.createElement('div');
+                            photoDiv.className = 'relative group';
+                            photoDiv.innerHTML = `
+                                <img src="${e.target.result}" alt="Preview" class="w-full h-20 object-cover rounded-lg border border-gray-200">
+                                <button type="button" onclick="removePreviewPhoto(this, 'edit')" 
+                                        class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 text-xs hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    ×
+                                </button>
+                                <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 rounded-b-lg">
+                                    ${file.name} (${(file.size/1024).toFixed(1)}KB)
+                                </div>
+                            `;
+                            previewContainer.appendChild(photoDiv);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        console.log('Edit file rejected (not image):', file.name);
+                    }
+                }
+                
+                if (input.files.length > 10) {
+                    alert('Maksimal 10 foto yang dapat dipilih. Hanya 10 foto pertama yang akan diproses.');
+                }
+            } else {
+                previewContainer.classList.add('hidden');
+            }
+        }
+
+        function displayExistingPhotos(photos) {
+            const existingPhotosContainer = document.getElementById('existing-photos');
+            const existingPhotosWrapper = document.getElementById('existing-photos-container');
+            
+            existingPhotosContainer.innerHTML = '';
+            
+            if (photos && photos.length > 0) {
+                existingPhotosWrapper.classList.remove('hidden');
+                
+                photos.forEach((photo, index) => {
+                    const photoDiv = document.createElement('div');
+                    photoDiv.className = 'relative group';
+                    photoDiv.innerHTML = `
+                        <img src="/storage/${photo.url}" alt="Existing photo" class="w-full h-20 object-cover rounded-lg border border-gray-200">
+                        <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                            <button type="button" onclick="deleteExistingPhoto(${photo.id}, this)" 
+                                    class="bg-red-500 text-white rounded-full w-8 h-8 text-sm hover:bg-red-600">
+                                ×
+                            </button>
+                        </div>
+                        ${photo.is_primary ? '<div class="absolute top-1 left-1 bg-emerald-500 text-white text-xs px-1 rounded">Utama</div>' : ''}
+                    `;
+                    existingPhotosContainer.appendChild(photoDiv);
+                });
+            } else {
+                existingPhotosWrapper.classList.add('hidden');
+            }
+        }
+
+        function removePreviewPhoto(button, type) {
+            const photoDiv = button.parentElement;
+            photoDiv.remove();
+            
+            const previewContainer = document.getElementById(type + '-photo-preview');
+            if (previewContainer.children.length === 0) {
+                previewContainer.classList.add('hidden');
+            }
+        }
+
+        async function deleteExistingPhoto(photoId, buttonElement) {
+            console.log('deleteExistingPhoto called with ID:', photoId);
+            
+            if (!confirm('Apakah Anda yakin ingin menghapus foto ini?')) {
+                console.log('User cancelled deletion');
+                return;
+            }
+
+            console.log('User confirmed deletion. Processing...');
+
+            try {
+                const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                console.log('CSRF Token:', csrfToken);
+                
+                const url = `/admin/photos/${photoId}`;
+                console.log('Request URL:', url);
+                
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                });
+                
+                console.log('Request sent successfully');
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers.get('content-type'));
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('Delete result:', result);
+                
+                if (result.success) {
+                    // Remove photo from display
+                    const photoElement = buttonElement.closest('.relative.group');
+                    photoElement.remove();
+                    
+                    // Hide container if no photos left
+                    const existingPhotosContainer = document.getElementById('existing-photos');
+                    if (existingPhotosContainer.children.length === 0) {
+                        document.getElementById('existing-photos-container').classList.add('hidden');
+                    }
+                    
+                    console.log('Photo successfully deleted from UI');
+                } else {
+                    console.error('Delete failed:', result.message);
+                    alert(result.message || 'Gagal menghapus foto');
+                }
+            } catch (error) {
+                console.error('Error deleting photo:', error);
+                alert('Terjadi kesalahan saat menghapus foto: ' + error.message);
+            }
+        }
 
         // Add some utility styles
         const style = document.createElement('style');

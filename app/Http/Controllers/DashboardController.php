@@ -20,8 +20,8 @@ class DashboardController extends Controller
         if (!Auth::user()->is_admin) {
             return redirect()->route('home')->with('error', 'Akses ditolak. Halaman ini hanya untuk admin.');
         }
-        // Get latest 8 products with their categories
-        $products = Product::with('category')
+        // Get latest products with their categories and photos
+        $products = Product::with(['category', 'photos'])
             ->latest()
             ->limit(100)
             ->get();
