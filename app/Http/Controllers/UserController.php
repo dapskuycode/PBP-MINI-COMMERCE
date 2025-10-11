@@ -185,7 +185,7 @@ class UserController extends Controller
      */
     public function showChangePasswordForm()
     {
-    return view('changePassword'); // atau 'changepassword' sesuai nama file
+        return view('changePassword'); // atau 'changepassword' sesuai nama file
     }
 
 
@@ -303,5 +303,11 @@ class UserController extends Controller
         $user->delete();
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus!');
+    }
+
+    public function showUsers()
+    {
+        $users = User::all();
+        return view('admin.adminuser', compact('users'));
     }
 }

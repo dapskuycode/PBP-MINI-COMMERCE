@@ -10,7 +10,7 @@
 <body class="bg-gray-50">
     @include('components.navbar', ['isAdmin' => true])
     <div>
-        INI HALAMAN CATEGORY ADMIN
+        INI HALAMAN ORDER ADMIN
     </div>
 </body>
 </html>

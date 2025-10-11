@@ -7,12 +7,17 @@ use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware(['auth', 'admin']);
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $orders = Order::all();
+        return view('admin.adminorders', compact('orders'));
     }
 
     /**

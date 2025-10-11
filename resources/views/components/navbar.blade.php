@@ -31,16 +31,16 @@
              class="relative py-2 text-gray-700 hover:text-emerald-600">
             Produk
           </a>
-          <a href="{{ route('admin.categories.index') }}"
-             class="relative py-2 {{ request()->routeIs('admin.categories.index') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}">
+          <a href="{{ route('admin.managecategories.index') }}"
+             class="relative py-2 {{ request()->routeIs('admin.managecategories.index') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}">
             Kategori
           </a>
-          <a href="#"
-             class="relative py-2 text-gray-700 hover:text-emerald-600">
+          <a href="{{ route('admin.manageorders.index') }}"
+             class="relative py-2 {{ request()->routeIs('admin.manageorders.index') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}">
             Pesanan
           </a>
-          <a href="#"
-             class="relative py-2 text-gray-700 hover:text-emerald-600">
+          <a href="{{ route('admin.manageusers.showUsers') }}"
+             class="relative py-2 {{ request()->routeIs('admin.manageusers.showUsers') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}">
             Pengguna
           </a>
         @else

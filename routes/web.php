@@ -151,8 +151,20 @@ Route::middleware('auth')->group(function () {
         ]);
 
         //Category management
-        Route::get('/admin/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('admin.categories.index');
-        Route::resource('admin/categories', App\Http\Controllers\CategoryController::class, [
+        Route::get('/admin/managecategories', [App\Http\Controllers\CategoryController::class, 'index'])->name('admin.managecategories.index');
+        Route::resource('admin/managecategories', App\Http\Controllers\CategoryController::class, [
+            'as' => 'admin'
+        ]);
+
+        //order management
+        Route::get('/admin/manageorders', [App\Http\Controllers\OrderController::class, 'index'])->name('admin.manageorders.index');
+        Route::resource('admin/manageorders', App\Http\Controllers\OrderController::class, [
+            'as' => 'admin'
+        ]);
+
+        //user management
+        Route::get('/admin/manageusers/all', [App\Http\Controllers\UserController::class, 'showUsers'])->name('admin.manageusers.showUsers');
+        Route::resource('admin/manageusers', App\Http\Controllers\UserController::class, [
             'as' => 'admin'
         ]);
 
