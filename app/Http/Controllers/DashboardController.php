@@ -23,8 +23,7 @@ class DashboardController extends Controller
         // Get latest products with their categories and photos
         $products = Product::with(['category', 'photos'])
             ->latest()
-            ->limit(100)
-            ->get();
+            ->paginate(12);
 
         // Get some basic stats
         $totalProducts = Product::count();

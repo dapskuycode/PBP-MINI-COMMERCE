@@ -146,19 +146,9 @@
         </div>
 
         <!-- Pagination -->
-        @if($totalProducts > 12)
-            <div class="flex justify-center mt-8">
-                <nav class="flex items-center space-x-2">
-                    <button class="px-3 py-2 text-sm text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        Sebelumnya
-                    </button>
-                    <button class="px-3 py-2 text-sm text-white bg-emerald-600 border border-emerald-600 rounded-lg">1</button>
-                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">2</button>
-                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">3</button>
-                    <button class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
-                        Selanjutnya
-                    </button>
-                </nav>
+        @if($products->hasPages())
+            <div class="mt-8">
+                {{ $products->links('vendor.pagination.tailwind') }}
             </div>
         @endif
     </main>
