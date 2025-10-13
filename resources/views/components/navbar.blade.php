@@ -1,5 +1,15 @@
 {{-- resources/views/components/navbar.blade.php --}}
-@props(['isAdmin' => false])
+@php
+  // Auto-detect admin status if not explicitly provided
+  if (!isset($isAdmin)) {
+    $isAdmin = auth()->check() && auth()->user()->is_admin;
+  }
+  
+  // Ensure we have categories for navigation
+  if (!isset($categories)) {
+    $categories = \App\Models\Category::all();
+  }
+@endphp
 
 <nav class="bg-white shadow-lg sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -41,11 +51,6 @@
           </a>
         @else
           {{-- Public Links --}}
-          <a href="{{ route('home') }}"
-             class="relative py-2 {{ request()->routeIs('home') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
-             {{ request()->routeIs('home') ? 'aria-current=page' : '' }}>
-            Beranda
-          </a>
 
           <a href="{{ url('/products') }}"
              class="relative py-2 {{ request()->is('products*') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
@@ -80,15 +85,10 @@
         @endif
       </div>
 
-      {{-- Search --}}
-      @if(!$isAdmin)
-        
-      @endif
-
       {{-- Actions kanan --}}
       <div class="flex items-center gap-4">
         @if(!$isAdmin)
-          {{-- Cart (ikon basket baru) --}}
+          {{-- Cart untuk user biasa --}}
           @php $cartCount = session('cart.count', 0); @endphp
           <a href="{{ url('/cart') }}" class="relative p-2 text-gray-700 hover:text-emerald-600">
             <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -100,9 +100,6 @@
             </span>
           </a>
         @else
-
-          
-
           {{-- Admin: Link to store view --}}
           <a href="{{ route('home') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-emerald-600 bg-gray-50 rounded-lg hover:bg-gray-100">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -126,29 +123,23 @@
             </button>
             <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <div class="py-2">
-                <div class="px-4 py-2 text-sm text-gray-500 border-b">{{ Auth::user()->name }}</div>
-                @if(!$isAdmin && Auth::user()->is_admin)
-                  <a href="{{ route('dashboard') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    Dashboard
-                  </a>
-                @endif
+                <div class="px-4 py-2 text-sm text-gray-500 border-b">
+                  {{ Auth::user()->name }}
+                </div>
                 <a href="{{ route('user.profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                   <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                   </svg>
                   Akun Saya
                 </a>
-                <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
-                  </svg>
-                  Pesanan Saya
-                </a>
-
-
+                @if(!$isAdmin)
+                  <a href="{{ route('orders.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline mr-2 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
+                    </svg>
+                    Pesanan Saya
+                  </a>
+                @endif
                 <div class="border-t my-1"></div>
                 <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                   <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

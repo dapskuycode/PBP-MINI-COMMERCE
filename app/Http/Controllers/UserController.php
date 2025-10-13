@@ -185,7 +185,7 @@ class UserController extends Controller
      */
     public function showChangePasswordForm()
     {
-        return view('changePassword'); // atau 'changepassword' sesuai nama file
+        return view('changepassword');
     }
 
 
