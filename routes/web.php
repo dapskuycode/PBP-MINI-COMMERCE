@@ -49,8 +49,8 @@ Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::c
 // Halaman checkout (frontend only, tanpa middleware)
 Route::view('/checkout', 'checkout')->name('checkout');
 
-//Riwayat Pesanan
-Route::view('/Riwayat Pesanan', 'orders')->name('orders.index');
+//Riwayat Pesanan (public view - renamed to avoid conflict)
+Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
 
 
 

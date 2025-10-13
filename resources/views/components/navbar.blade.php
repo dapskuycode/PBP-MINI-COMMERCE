@@ -65,23 +65,24 @@
              {{ request()->routeIs('about') ? 'aria-current=page' : '' }}>
             Tentang Kami
           </a>
+          <div class="flex-1 max-w-lg mx-8 hidden md:block">
+            <form action="{{ route('search') }}" method="GET" class="relative">
+              <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari produk…"
+                    class="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+              <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-500 text-white p-2 rounded-full hover:bg-emerald-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
         @endif
       </div>
 
       {{-- Search --}}
       @if(!$isAdmin)
-        <div class="flex-1 max-w-lg mx-8 hidden md:block">
-          <form action="{{ route('search') }}" method="GET" class="relative">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari produk…"
-                   class="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-            <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 bg-emerald-500 text-white p-2 rounded-full hover:bg-emerald-600">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-            </button>
-          </form>
-        </div>
+        
       @endif
 
       {{-- Actions kanan --}}

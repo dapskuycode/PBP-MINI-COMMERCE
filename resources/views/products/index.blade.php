@@ -132,7 +132,7 @@
             .then(data => {
                 if (data === null) return;
                 if (data && data.success) {
-                    alert('Produk berhasil ditambahkan ke keranjang!');
+                    showModal('Produk berhasil ditambahkan ke keranjang!');
                 } else if (data && data.message) {
                     alert('Error: ' + data.message);
                 } else {
@@ -143,6 +143,24 @@
                 console.error('Cart error details:', error);
                 alert('Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.');
             });
+        }
+    </script>
+    <div id="addCartModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
+        <div class="bg-white rounded-lg p-6 shadow-lg max-w-sm mx-4">
+            <p id="modalMessage" class="text-gray-800 text-center mb-4"></p>
+            <div class="flex justify-center">
+                <button onclick="closeModal()" class="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Close</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showModal(message) {
+            document.getElementById('modalMessage').textContent = message;
+            document.getElementById('addCartModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('addCartModal').classList.add('hidden');
         }
     </script>
 </body>

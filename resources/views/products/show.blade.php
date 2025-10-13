@@ -27,9 +27,37 @@
   <div class="grid lg:grid-cols-2 gap-8">
     {{-- FOTO PRODUK --}}
     <section class="rounded-3xl bg-white border border-gray-100 shadow overflow-hidden">
-      @if(!empty($product->image))
-        <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="w-full h-[420px] object-cover">
+      @if($product->photos && $product->photos->count() > 0)
+        @php
+          // Get primary photo or first photo
+          $primaryPhoto = $product->photos->where('is_primary', true)->first() ?? $product->photos->first();
+        @endphp
+        <div class="relative">
+          <img src="{{ asset('storage/' . $primaryPhoto->url) }}" 
+               alt="{{ $primaryPhoto->alt_text ?? $product->name }}" 
+               class="w-full h-[420px] object-cover">
+          
+          @if($product->photos->count() > 1)
+            {{-- Photo counter badge --}}
+            <div class="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-full">
+              {{ $product->photos->count() }} foto
+            </div>
+            
+            {{-- Thumbnail navigation --}}
+            <div class="absolute bottom-4 left-4 right-4">
+              <div class="flex gap-2 overflow-x-auto pb-1">
+                @foreach($product->photos as $index => $photo)
+                  <img src="{{ asset('storage/' . $photo->url) }}" 
+                       alt="{{ $photo->alt_text ?? $product->name . ' - Foto ' . ($index + 1) }}"
+                       class="w-16 h-16 rounded-lg object-cover border-2 {{ $photo->id === $primaryPhoto->id ? 'border-white' : 'border-white/50' }} hover:border-white cursor-pointer transition-all"
+                       onclick="changeMainImage('{{ asset('storage/' . $photo->url) }}', '{{ $photo->alt_text ?? $product->name . ' - Foto ' . ($index + 1) }}', this)">
+                @endforeach
+              </div>
+            </div>
+          @endif
+        </div>
       @else
+        {{-- Fallback jika tidak ada foto --}}
         <div class="w-full h-[420px] flex items-center justify-center bg-gradient-to-br from-amber-100 via-rose-100 to-emerald-100">
           {{-- Placeholder icon (no emoji) --}}
           <svg xmlns="http://www.w3.org/2000/svg" class="w-24 h-24 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -145,8 +173,15 @@
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           @foreach($relatedProducts as $p)
             <a href="{{ route('products.show', $p) }}" class="rounded-2xl bg-white border border-gray-100 shadow hover:shadow-lg transition overflow-hidden">
-              @if(!empty($p->image))
-                <img src="{{ asset('storage/'.$p->image) }}" alt="{{ $p->name }}" class="w-full h-40 object-cover">
+              @php
+                $relatedPrimaryPhoto = $p->photos && $p->photos->count() > 0 
+                  ? ($p->photos->where('is_primary', true)->first() ?? $p->photos->first())
+                  : null;
+              @endphp
+              @if($relatedPrimaryPhoto)
+                <img src="{{ asset('storage/' . $relatedPrimaryPhoto->url) }}" 
+                     alt="{{ $relatedPrimaryPhoto->alt_text ?? $p->name }}" 
+                     class="w-full h-40 object-cover">
               @else
                 <div class="w-full h-40 flex items-center justify-center bg-gradient-to-br from-emerald-100 via-rose-100 to-amber-100">
                   {{-- cart placeholder --}}
@@ -190,6 +225,27 @@
       favOutline.classList.toggle('hidden', active);
       favSolid.classList.toggle('hidden', !active);
     });
+  }
+
+  // change main product image
+  function changeMainImage(newSrc, newAlt, clickedThumb) {
+    const mainImg = document.querySelector('section img');
+    if (mainImg && newSrc && newAlt) {
+      mainImg.src = newSrc;
+      mainImg.alt = newAlt;
+      
+      // Update thumbnail borders
+      const allThumbs = document.querySelectorAll('.absolute.bottom-4 img');
+      allThumbs.forEach(thumb => {
+        thumb.classList.remove('border-white');
+        thumb.classList.add('border-white/50');
+      });
+      
+      if (clickedThumb) {
+        clickedThumb.classList.remove('border-white/50');
+        clickedThumb.classList.add('border-white');
+      }
+    }
   }
 </script>
 </body>
