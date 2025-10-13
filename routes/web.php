@@ -200,7 +200,7 @@ Route::middleware('auth')->group(function () {
     })->name('test.auth');
 
     //Orders
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders', [OrderController::class, 'userOrders'])->name('orders.index');
 
 });
 
