@@ -24,6 +24,10 @@ class OrderController extends Controller
             $orders = Order::with(['user', 'orderItems.product'])
                 ->latest()
                 ->get();
+            $totPending = $orders->where('status', 'pending')->count();
+            $totProcessing = $orders->where('status', 'processing')->count();
+            $totCompleted = $orders->where('status', 'completed')->count();
+            $totCancelled = $orders->where('status', 'cancelled')->count();
                 
             if (request()->expectsJson()) {
                 return response()->json([
@@ -32,8 +36,8 @@ class OrderController extends Controller
                     'message' => 'Orders retrieved successfully for admin'
                 ]);
             }
-            
-            return view('admin.adminorders', compact('orders'));
+
+            return view('admin.adminorders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled'));
         } else {
             $orders = Order::with(['orderItems.product'])
                 ->where('user_id', $user->id)
