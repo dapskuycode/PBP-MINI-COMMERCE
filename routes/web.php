@@ -15,42 +15,45 @@ use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
-| Public routes
+| Public routes (Admin restrictions applied where needed)
 |--------------------------------------------------------------------------
 */
-Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Routes that admin should not access - apply no-admin middleware
+Route::middleware('no-admin')->group(function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    
+    // Product browsing
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+    
+    // Search
+    Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
+
+    // Category browsing
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+    
+    // Checkout
+    Route::view('/checkout', 'checkout')->name('checkout');
+    
+    //Riwayat Pesanan
+    Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
+    
+    //tentang kami
+    Route::view('/about', 'about')->name('about');
+});
+
 
 Route::get('/welcome', function () {
     return view('welcome');
 })->name('welcome');
 
-//Auth (Login/Register) 
-
+//Auth (Login/Register) - both can access
 Route::get('/login', [UserController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [UserController::class, 'login'])->name('login.submit');
 Route::get('/register', [UserController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [UserController::class, 'register'])->name('register.submit');
-
-//tentang kami
-Route::view('/about', 'about')->name('about');
-
-// Product routes
-Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-
-// Search route
-Route::get('/search', [App\Http\Controllers\SearchController::class, 'index'])->name('search');
-
-// Category routes
-Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
-
-
-// Halaman checkout (frontend only, tanpa middleware)
-Route::view('/checkout', 'checkout')->name('checkout');
-
-//Riwayat Pesanan (public view - renamed to avoid conflict)
-Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
 
 
 
@@ -119,13 +122,13 @@ Route::middleware('guest')->group(function () {
 */
 
 
-//syarat dan ketentuan
+//syarat dan ketentuan - available to all
 Route::view('/terms', 'terms')->name('terms');
 Route::view('/privacy', 'privacy')->name('privacy'); 
 
 Route::middleware('auth')->group(function () {
     
-    // User account management
+    // User account management - both admin and users can access their profiles
     Route::get('/logout', [UserController::class, 'logout'])->name('logout');
     Route::get('/profile', [UserController::class, 'profile'])->name('user.profile');
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('user.profile.edit');
@@ -133,6 +136,22 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/change-password', [UserController::class, 'showChangePasswordForm'])->name('user.change-password');
     Route::put('/profile/change-password', [UserController::class, 'changepassword'])->name('user.change-password.update');
     Route::delete('/profile/delete-account', [UserController::class, 'deleteAccount'])->name('user.delete-account');
+    
+    // Routes restricted to regular users only (not admin)
+    Route::middleware('no-admin')->group(function () {
+        // Cart functionality - only for customers
+        Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
+        Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
+        Route::patch('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
+        Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
+        Route::post('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
+        
+        //Orders - for customers only
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        
+        // Favorites - for customers only
+        Route::view('/favorites', 'favorites')->name('favorites');
+    });
 
 
     // Admin routes
@@ -186,15 +205,7 @@ Route::middleware('auth')->group(function () {
             ->name('admin.photos.bulk-delete');
     });
     
-
-    // Cart functionality
-    Route::get('/cart', [App\Http\Controllers\CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart/add', [App\Http\Controllers\CartController::class, 'add'])->name('cart.add');
-    Route::patch('/cart/update/{id}', [App\Http\Controllers\CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/remove/{id}', [App\Http\Controllers\CartController::class, 'remove'])->name('cart.remove');
-    Route::post('/cart/clear', [App\Http\Controllers\CartController::class, 'clear'])->name('cart.clear');
-    
-    // Test route for debugging
+    // Test route for debugging - available to all authenticated users
     Route::get('/test-auth', function () {
         return view('test-auth');
     })->name('test.auth');
