@@ -49,8 +49,8 @@ Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::c
 // Halaman checkout (frontend only, tanpa middleware)
 Route::view('/checkout', 'checkout')->name('checkout');
 
-//Riwayat Pesanan
-Route::view('/Riwayat Pesanan', 'orders')->name('orders.index');
+//Riwayat Pesanan (public view - renamed to avoid conflict)
+Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
 
 
 
@@ -131,7 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile/edit', [UserController::class, 'editProfile'])->name('user.profile.edit');
     Route::put('/profile', [UserController::class, 'updateProfile'])->name('user.profile.update');
     Route::get('/profile/change-password', [UserController::class, 'showChangePasswordForm'])->name('user.change-password');
-    Route::put('/profile/change-password', [UserController::class, 'changePassword'])->name('user.change-password.update');
+    Route::put('/profile/change-password', [UserController::class, 'changepassword'])->name('user.change-password.update');
     Route::delete('/profile/delete-account', [UserController::class, 'deleteAccount'])->name('user.delete-account');
 
 

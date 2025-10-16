@@ -9,15 +9,47 @@ class OrderController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'admin']);
+        $this->middleware('auth');
     }
+    
     /**
      * Display a listing of the resource.
+     * Shows different views based on user role.
      */
     public function index()
     {
-        $orders = Order::all();
-        return view('admin.adminorders', compact('orders'));
+        $user = auth()->user();
+        
+        if ($user->is_admin) {
+            $orders = Order::with(['user', 'orderItems.product'])
+                ->latest()
+                ->get();
+                
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $orders,
+                    'message' => 'Orders retrieved successfully for admin'
+                ]);
+            }
+            
+            return view('admin.adminorders', compact('orders'));
+        } else {
+            $orders = Order::with(['orderItems.product'])
+                ->where('user_id', $user->id)
+                ->latest()
+                ->get();
+                
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => $orders,
+                    'message' => 'Your orders retrieved successfully'
+                ]);
+            }
+            
+            return view('orders', compact('orders'));
+        }
     }
 
     /**
@@ -25,7 +57,7 @@ class OrderController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -33,7 +65,7 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -41,7 +73,19 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        $user = auth()->user();
+        
+        if (!$user->is_admin && $order->user_id !== $user->id) {
+            abort(403, 'Unauthorized to view this order');
+        }
+        
+        $order->load(['user', 'orderItems.product']);
+        
+        if ($user->is_admin) {
+            return view('admin.orders.show', compact('order'));
+        } else {
+            return view('orders.show', compact('order'));
+        }
     }
 
     /**
@@ -49,7 +93,7 @@ class OrderController extends Controller
      */
     public function edit(Order $order)
     {
-        //
+
     }
 
     /**
@@ -57,7 +101,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        //
+
     }
 
     /**
@@ -65,6 +109,6 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+
     }
 }
