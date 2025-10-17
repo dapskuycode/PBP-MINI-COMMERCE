@@ -15,17 +15,42 @@
       <p class="text-xs text-gray-500">UMKM Mini-Commerce</p>
     </div>
     <nav class="p-4 space-y-2 text-sm">
-      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-emerald-100 text-emerald-700 font-medium">
-        <i class="lucide lucide-home"></i> Dashboard
+      <a href="{{ route('dashboard') }}"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
+        {{ request()->routeIs('dashboard') 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'text-gray-700 hover:bg-gray-100 hover:text-emerald-700' }}">
+          <i class="lucide lucide-home"></i> Dashboard
       </a>
-      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
-        <i class="lucide lucide-box"></i> Manajemen Produk
+
+      <a href="{{ route('admin.managecategories.index') }}"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
+        {{ request()->routeIs('admin.managecategories.index') 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'text-gray-700 hover:bg-gray-100 hover:text-emerald-700' }}">
+          <i class="lucide lucide-box"></i> Manajemen Produk
       </a>
-      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
-        <i class="lucide lucide-shopping-bag"></i> Manajemen Pesanan
+
+      <a href="{{ route('admin.manageorders.index') }}"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
+        {{ request()->routeIs('admin.manageorders.index') 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'text-gray-700 hover:bg-gray-100 hover:text-emerald-700' }}">
+          <i class="lucide lucide-shopping-bag"></i> Manajemen Pesanan
       </a>
-      <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100">
-        <i class="lucide lucide-file-chart"></i> Laporan
+
+      <a href="{{ route('admin.manageusers.showUsers') }}"
+        class="flex items-center gap-3 px-3 py-2 rounded-lg font-medium 
+        {{ request()->routeIs('admin.manageusers.showUsers') 
+              ? 'bg-emerald-100 text-emerald-700' 
+              : 'text-gray-700 hover:bg-gray-100 hover:text-emerald-700' }}">
+          <i class="lucide lucide-file-chart"></i> Pengguna
+      </a>
+      <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+        <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+        </svg>
+        Logout
       </a>
     </nav>
   </aside>
@@ -95,7 +120,7 @@
               <th class="px-4 py-2">Pelanggan</th>
               <th class="px-4 py-2">Total</th>
               <th class="px-4 py-2">Status</th>
-              <th class="px-4 py-2">Aksi</th>
+              <th class="px-4 py-2">Tanggal</th>
             </tr>
           </thead>
           <tbody>
@@ -104,28 +129,28 @@
               <td class="px-4 py-2">Budi Santoso</td>
               <td class="px-4 py-2">Rp100.000,00</td>
               <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">Menunggu Diproses</span></td>
-              <td class="px-4 py-2"><button class="text-sm px-3 py-1 border rounded-lg hover:bg-gray-50">Detail</button></td>
+              <td class="px-4 py-2">2023-03-01</td>
             </tr>
             <tr class="border-b">
               <td class="px-4 py-2">ORD-002</td>
               <td class="px-4 py-2">Adi Wijaya</td>
               <td class="px-4 py-2">Rp72.000,00</td>
               <td class="px-4 py-2"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Dikirim</span></td>
-              <td class="px-4 py-2"><button class="text-sm px-3 py-1 border rounded-lg hover:bg-gray-50">Detail</button></td>
+              <td class="px-4 py-2">2023-03-01</td>
             </tr>
             <tr class="border-b">
               <td class="px-4 py-2">ORD-003</td>
-              <td class="px-4 py-2">Citra Lestari</td>
+              <td class="px-4 py-2">Citra Lestari</td>  
               <td class="px-4 py-2">Rp30.000,00</td>
               <td class="px-4 py-2"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span></td>
-              <td class="px-4 py-2"><button class="text-sm px-3 py-1 border rounded-lg hover:bg-gray-50">Detail</button></td>
+              <td class="px-4 py-2">2023-03-01</td>
             </tr>
             <tr>
               <td class="px-4 py-2">ORD-004</td>
               <td class="px-4 py-2">Doni Setiawan</td>
               <td class="px-4 py-2">Rp55.000,00</td>
               <td class="px-4 py-2"><span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">Batal</span></td>
-              <td class="px-4 py-2"><button class="text-sm px-3 py-1 border rounded-lg hover:bg-gray-50">Detail</button></td>
+              <td class="px-4 py-2">2023-03-01</td>
             </tr>
           </tbody>
         </table>

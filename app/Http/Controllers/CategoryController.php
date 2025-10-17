@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -16,8 +18,15 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        if (!Auth::user()->is_admin) {
+            return redirect()->route('home')->with('error', 'Akses ditolak. Halaman ini hanya untuk admin.');
+        }
+        $products = Product::with(['category', 'photos'])->paginate(10);
+        $totalProducts = Product::count();
+        $totalCategories = Category::count();
+        $categoriesAll = Category::all();
         $categories = Category::with('products')->get();
-        return view('admin.admincategory', compact('categories'));
+        return view('admin.admincategory', compact('products', 'categories', 'totalProducts', 'totalCategories', 'categoriesAll'));
     }
 
     /**

@@ -35,7 +35,7 @@ Route::middleware('no-admin')->group(function () {
     Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
     
     // Checkout
-    Route::view('/checkout', 'checkout')->name('checkout');
+    Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
     
     //Riwayat Pesanan
     Route::view('/riwayat-pesanan', 'orders')->name('orders.history');

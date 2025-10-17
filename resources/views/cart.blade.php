@@ -136,7 +136,7 @@
             </div>
           </dl>
 
-          <a href="{{ url('/checkout') }}"
+          <a href="{{ route('checkout.index') }}"
              class="mt-5 w-full inline-flex items-center justify-center bg-emerald-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-emerald-700">
             Lanjut ke Pembayaran
           </a>
@@ -437,7 +437,7 @@
       document.querySelectorAll('input[id^="qty-"]').forEach(input => {
         input.setAttribute('data-original-qty', input.value);
         
-        // Initialize decrease button state
+        // Initialize decrease button state 
         const itemId = input.id.replace('qty-', '');
         const currentQty = parseInt(input.value) || 1;
         const decreaseBtn = document.getElementById(`decrease-${itemId}`);

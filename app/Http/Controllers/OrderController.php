@@ -43,7 +43,10 @@ class OrderController extends Controller
                 ->where('user_id', $user->id)
                 ->latest()
                 ->get();
-                
+            $totPending = $orders->where('status', 'pending')->count();
+            $totProcessing = $orders->where('status', 'processing')->count();
+            $totCompleted = $orders->where('status', 'completed')->count();
+            $totCancelled = $orders->where('status', 'cancelled')->count();
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => true,
@@ -52,7 +55,7 @@ class OrderController extends Controller
                 ]);
             }
             
-            return view('orders', compact('orders'));
+            return view('orders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled'));
         }
     }
 
