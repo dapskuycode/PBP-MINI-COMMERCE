@@ -130,22 +130,20 @@
         </div>
 
         {{-- KUANTITAS + ADD TO CART --}}
-        <form action="{{ route('cart.add') }}" method="POST" class="mt-6">
-          @csrf
-          <input type="hidden" name="product_id" value="{{ $product->id }}">
-
+        <div class="mt-6">
           <div class="flex items-center gap-4">
             <div class="flex items-center rounded-2xl border border-gray-200 overflow-hidden">
               <button type="button" class="px-3 py-2 text-lg disabled:text-gray-400" id="minus" {{ $stock<=0 ? 'disabled' : '' }}>−</button>
-              <input type="number" name="quantity" id="qty" value="1" min="1" max="{{ max($stock,1) }}"
+              <input type="number" id="qty" value="1" min="1" max="{{ max($stock,1) }}"
                      class="w-16 text-center focus:outline-none" {{ $stock<=0 ? 'disabled' : '' }}>
               <button type="button" class="px-3 py-2 text-lg disabled:text-gray-400" id="plus" {{ $stock<=0 ? 'disabled' : '' }}>+</button>
             </div>
 
-            <button {{ $stock<=0 ? 'disabled' : '' }}
+            <button type="button" id="addToCartBtn" {{ $stock<=0 ? 'disabled' : '' }}
               class="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl
                      {{ $stock>0 ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-gray-200 text-gray-500 cursor-not-allowed' }}
-                     px-5 py-3 font-semibold">
+                     px-5 py-3 font-semibold"
+              onclick="addToCart({{ $product->id }})">
               {{-- cart icon --}}
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
@@ -153,7 +151,7 @@
               {{ $stock>0 ? 'Tambah ke Keranjang' : 'Stok Habis' }}
             </button>
           </div>
-        </form>
+        </div>
 
         {{-- Info singkat --}}
         <div class="mt-6 grid sm:grid-cols-3 gap-4 text-sm">
@@ -204,6 +202,22 @@
 
 @include('components.footer')
 
+{{-- Modal untuk feedback --}}
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl">
+    <div class="p-6 text-center">
+      <div id="modal-icon" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center">
+        <!-- Icon akan diatur via JavaScript -->
+      </div>
+      <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+      <p id="modal-message" class="text-gray-600 mb-6"></p>
+      <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
   // qty stepper
   const qty  = document.getElementById('qty');
@@ -245,6 +259,88 @@
         clickedThumb.classList.remove('border-white/50');
         clickedThumb.classList.add('border-white');
       }
+    }
+  }
+
+  // Modal functions
+  function showModal(title, message, type = 'success') {
+    const modal = document.getElementById('modal');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+
+    // Set icon and colors based on type
+    if (type === 'success') {
+      modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-emerald-100';
+      modalIcon.innerHTML = '<svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+    } else if (type === 'warning') {
+      modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-amber-100';
+      modalIcon.innerHTML = '<svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 13.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
+    } else if (type === 'error') {
+      modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-100';
+      modalIcon.innerHTML = '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+    }
+
+    modalTitle.textContent = title;
+    modalMessage.textContent = message;
+    modal.classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+  }
+
+  // Close modal when clicking outside
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeModal();
+    }
+  });
+
+  // Add to cart function
+  async function addToCart(productId) {
+    const quantityInput = document.getElementById('qty');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const quantity = parseInt(quantityInput.value) || 1;
+
+    // Disable button during request
+    addToCartBtn.disabled = true;
+    addToCartBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>Menambahkan...';
+
+    try {
+      const response = await fetch('{{ route('cart.add') }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+          product_id: productId,
+          quantity: quantity
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showModal('Berhasil!', 'Produk berhasil ditambahkan ke keranjang', 'success');
+      } else if (data.already_exists) {
+        showModal('Produk Sudah Ada', 'Produk ini sudah ada di keranjang Anda', 'warning');
+      } else {
+        showModal('Gagal', data.message || 'Terjadi kesalahan saat menambahkan produk', 'error');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      showModal('Error', 'Terjadi kesalahan jaringan. Silakan coba lagi.', 'error');
+    } finally {
+      // Restore button
+      addToCartBtn.disabled = false;
+      addToCartBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
+        </svg>
+        Tambah ke Keranjang
+      `;
     }
   }
 </script>

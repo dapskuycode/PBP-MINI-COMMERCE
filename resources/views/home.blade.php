@@ -18,28 +18,24 @@
         .banner-slider {
             display: flex;
             transition: transform 0.6s ease-in-out;
-            width: 400%; /* 4 slides × 100% */
+            width: 200%; /* 2 slides × 100% */
             height: 100%;
         }
 
         .banner-slide {
-            width: 25%; /* 100% / 4 slides */
+            width: 50%; /* 100% / 2 slides */
             height: 100%;
-            color: white;
             position: relative;
             flex-shrink: 0;
-            background-size: cover;
-            background-position: center;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .banner-slide::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.3);
+        .banner-slide img {
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .product-slider {
@@ -77,56 +73,18 @@
     <!-- Hero Banner Section -->
     <section class="relative h-64 md:h-80 overflow-hidden rounded-lg mx-4 mt-4 shadow-lg">
         <div class="banner-slider" id="bannerSlider">
-            <!-- Banner 1: Diskon Besar -->
-            <div class="banner-slide bg-gradient-to-r from-red-500 to-red-600">
-                <div class="relative z-10 flex items-center h-full px-8">
-                    <div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-4">DISKON BESAR 50%</h2>
-                        <p class="text-lg md:text-xl mb-6 opacity-90">Semua Produk Makanan & Minuman</p>
-                        <button class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
-                            BELANJA SEKARANG
-                        </button>
-                    </div>
-                </div>
+            <!-- Banner 1: Produk Baru -->
+            <div class="banner-slide">
+                <img src="{{ asset('images/Produk Terbaru.png') }}" 
+                     alt="Produk Terbaru" 
+                     class="w-full h-full object-contain md:object-cover">
             </div>
 
-            <!-- Banner 2: Produk Baru -->
-            <div class="banner-slide bg-gradient-to-r from-emerald-500 to-emerald-600">
-                <div class="relative z-10 flex items-center h-full px-8">
-                    <div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-4">PRODUK TERBARU</h2>
-                        <p class="text-lg md:text-xl mb-6 opacity-90">Snack Organik Premium</p>
-                        <button class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
-                            LIHAT KOLEKSI
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Banner 3: Flash Sale -->
-            <div class="banner-slide bg-gradient-to-r from-orange-500 to-orange-600">
-                <div class="relative z-10 flex items-center h-full px-8">
-                    <div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-4">FLASH SALE</h2>
-                        <p class="text-lg md:text-xl mb-6 opacity-90">Hanya 12 Jam! Diskon hingga 70%</p>
-                        <button class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
-                            BELI SEKARANG
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Banner 4: Gratis Ongkir -->
-            <div class="banner-slide bg-gradient-to-r from-purple-500 to-purple-600">
-                <div class="relative z-10 flex items-center h-full px-8">
-                    <div>
-                        <h2 class="text-3xl md:text-5xl font-bold mb-4">GRATIS ONGKIR</h2>
-                        <p class="text-lg md:text-xl mb-6 opacity-90">Minimal Belanja Rp 50.000</p>
-                        <button class="bg-yellow-400 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
-                            MULAI BELANJA
-                        </button>
-                    </div>
-                </div>
+            <!-- Banner 2: Flash Sale -->
+            <div class="banner-slide">
+                <img src="{{ asset('images/Flash Sale.png') }}" 
+                     alt="Flash Sale" 
+                     class="w-full h-full object-contain md:object-cover">
             </div>
         </div>
 
@@ -142,8 +100,6 @@
         <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(1)"></span>
             <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(2)"></span>
-            <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(3)"></span>
-            <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(4)"></span>
         </div>
     </section>
 
@@ -323,7 +279,7 @@
 
     <script>
         let currentBannerIndex = 0;
-        const totalBanners = 4; // Total number of banner slides
+        const totalBanners = 2; // Total number of banner slides
         const bannerSlider = document.getElementById('bannerSlider');
         const bannerDots = document.querySelectorAll('.banner-dot');
         let autoBannerInterval;
@@ -349,7 +305,7 @@
 
         // Function to update banner slider position and dots
         function updateBannerSlider() {
-            const translateX = currentBannerIndex * -25; // 25% per slide
+            const translateX = currentBannerIndex * -50; // 50% per slide
             bannerSlider.style.transform = `translateX(${translateX}%)`;
 
             // Update dots
@@ -511,51 +467,95 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({
-                    product_id: productId,
-                    quantity: 1
-                })
+                body: JSON.stringify({ product_id: productId, quantity: 1 })
             })
             .then(response => {
-                console.log('Response status:', response.status);
-                console.log('Response URL:', response.url);
-                console.log('Response redirected:', response.redirected);
-                
-                // Check for authentication required (redirect to login)
                 if (response.status === 302 || response.redirected || response.url.includes('/login')) {
                     if (confirm('Anda perlu login untuk menambahkan produk ke keranjang. Login sekarang?')) {
                         window.location.href = '/login';
                     }
                     return null;
                 }
-                
-                // Check for other HTTP errors
                 if (!response.ok) {
                     if (response.status === 419) {
-                        alert('Session expired. Please refresh the page and try again.');
+                        showModal('Session Expired', 'Session expired. Please refresh the page and try again.', 'error');
                         return null;
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
                 return response.json();
             })
             .then(data => {
-                if (data === null) return; // Handle redirect case
+                if (data === null) return;
                 
                 if (data && data.success) {
-                    alert('Produk berhasil ditambahkan ke keranjang!');
+                    showModal('Berhasil!', 'Produk berhasil ditambahkan ke keranjang', 'success');
+                } else if (data && data.already_exists) {
+                    showModal('Produk Sudah Ada', 'Produk ini sudah ada di keranjang Anda', 'warning');
                 } else if (data && data.message) {
-                    alert('Error: ' + data.message);
+                    showModal('Error', data.message, 'error');
                 } else {
-                    alert('Unexpected response format');
+                    showModal('Error', 'Unexpected response format', 'error');
                 }
             })
             .catch(error => {
                 console.error('Cart error details:', error);
-                alert('Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.');
+                showModal('Error', 'Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.', 'error');
             });
         }
+    </script>
+    
+    {{-- Modal untuk feedback --}}
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl">
+            <div class="p-6 text-center">
+                <div id="modal-icon" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center">
+                    <!-- Icon akan diatur via JavaScript -->
+                </div>
+                <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+                <p id="modal-message" class="text-gray-600 mb-6"></p>
+                <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Modal functions
+        function showModal(title, message, type = 'success') {
+            const modal = document.getElementById('modal');
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+
+            // Set icon and colors based on type
+            if (type === 'success') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-emerald-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            } else if (type === 'warning') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-amber-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 13.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
+            } else if (type === 'error') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            }
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>

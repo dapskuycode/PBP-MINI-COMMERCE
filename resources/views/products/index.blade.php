@@ -122,7 +122,7 @@
                 }
                 if (!response.ok) {
                     if (response.status === 419) {
-                        alert('Session expired. Please refresh the page and try again.');
+                        showModal('Session Expired', 'Session expired. Please refresh the page and try again.', 'error');
                         return null;
                     }
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -131,37 +131,74 @@
             })
             .then(data => {
                 if (data === null) return;
+                
                 if (data && data.success) {
-                    showModal('Produk berhasil ditambahkan ke keranjang!');
+                    showModal('Berhasil!', 'Produk berhasil ditambahkan ke keranjang', 'success');
+                } else if (data && data.already_exists) {
+                    showModal('Produk Sudah Ada', 'Produk ini sudah ada di keranjang Anda', 'warning');
                 } else if (data && data.message) {
-                    alert('Error: ' + data.message);
+                    showModal('Error', data.message, 'error');
                 } else {
-                    alert('Unexpected response format');
+                    showModal('Error', 'Unexpected response format', 'error');
                 }
             })
             .catch(error => {
                 console.error('Cart error details:', error);
-                alert('Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.');
+                showModal('Error', 'Terjadi kesalahan saat menambahkan produk ke keranjang. Silakan coba lagi.', 'error');
             });
         }
     </script>
-    <div id="addCartModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden z-50">
-        <div class="bg-white rounded-lg p-6 shadow-lg max-w-sm mx-4">
-            <p id="modalMessage" class="text-gray-800 text-center mb-4"></p>
-            <div class="flex justify-center">
-                <button onclick="closeModal()" class="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">Close</button>
+    {{-- Modal untuk feedback --}}
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 shadow-2xl">
+            <div class="p-6 text-center">
+                <div id="modal-icon" class="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center">
+                    <!-- Icon akan diatur via JavaScript -->
+                </div>
+                <h3 id="modal-title" class="text-xl font-bold mb-2"></h3>
+                <p id="modal-message" class="text-gray-600 mb-6"></p>
+                <button onclick="closeModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-6 rounded-xl transition duration-200">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
+    
     <script>
-        function showModal(message) {
-            document.getElementById('modalMessage').textContent = message;
-            document.getElementById('addCartModal').classList.remove('hidden');
+        // Modal functions
+        function showModal(title, message, type = 'success') {
+            const modal = document.getElementById('modal');
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+
+            // Set icon and colors based on type
+            if (type === 'success') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-emerald-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+            } else if (type === 'warning') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-amber-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.268 13.5c-.77.833.192 2.5 1.732 2.5z"></path></svg>';
+            } else if (type === 'error') {
+                modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-red-100';
+                modalIcon.innerHTML = '<svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            }
+
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.remove('hidden');
         }
 
         function closeModal() {
-            document.getElementById('addCartModal').classList.add('hidden');
+            document.getElementById('modal').classList.add('hidden');
         }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>

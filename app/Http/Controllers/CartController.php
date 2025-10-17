@@ -56,48 +56,50 @@ class CartController extends Controller
                 ], 400);
             }
 
-        $cart = $this->getUserCart();
-        if (!$cart) {
-            $cart = Cart::create([
-                'user_id' => Auth::id()
-            ]);
-            \Log::info('New cart created', ['cart_id' => $cart->id]);
-        }            // Check if item already exists in cart
+            $cart = $this->getUserCart();
+            if (!$cart) {
+                $cart = Cart::create([
+                    'user_id' => Auth::id()
+                ]);
+                \Log::info('New cart created', ['cart_id' => $cart->id]);
+            }
+
+            // Check if item already exists in cart (NEW DUPLICATE CHECK)
             $cartItem = $cart->cartItems()->where('product_id', $request->product_id)->first();
             
-        if ($cartItem) {
-            // Update quantity
-            $newQuantity = $cartItem->quantity + $request->quantity;
-            if ($product->stock < $newQuantity) {
+            if ($cartItem) {
+                // Product already exists in cart
+                \Log::info('Product already in cart', [
+                    'cart_item_id' => $cartItem->id,
+                    'product_id' => $request->product_id,
+                    'existing_quantity' => $cartItem->quantity
+                ]);
+                
                 return response()->json([
                     'success' => false,
-                    'message' => 'Not enough stock available'
-                ], 400);
+                    'message' => 'Produk sudah ada di keranjang',
+                    'already_exists' => true
+                ]);
+            } else {
+                // Create new cart item
+                $cartItem = CartItem::create([
+                    'cart_id' => $cart->id,
+                    'product_id' => $request->product_id,
+                    'quantity' => $request->quantity
+                ]);
+                
+                \Log::info('New cart item created', ['cart_item_id' => $cartItem->id]);
+                
+                // Update cart total
+                $this->updateCartTotal($cart);
+
+                \Log::info('Cart operation successful', ['cart_id' => $cart->id]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Product added to cart successfully'
+                ]);
             }
-            
-            $cartItem->update([
-                'quantity' => $newQuantity
-            ]);
-            
-            \Log::info('Cart item updated', ['cart_item_id' => $cartItem->id, 'new_quantity' => $newQuantity]);
-        } else {
-            // Create new cart item
-            $cartItem = CartItem::create([
-                'cart_id' => $cart->id,
-                'product_id' => $request->product_id,
-                'quantity' => $request->quantity
-            ]);
-            
-            \Log::info('New cart item created', ['cart_item_id' => $cartItem->id]);
-        }            // Update cart total
-            $this->updateCartTotal($cart);
-
-            \Log::info('Cart operation successful', ['cart_id' => $cart->id]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Product added to cart successfully'
-            ]);
             
         } catch (\Exception $e) {
             \Log::error('Cart add error', [
