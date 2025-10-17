@@ -210,8 +210,7 @@ Route::middleware('auth')->group(function () {
         return view('test-auth');
     })->name('test.auth');
 
-    //Orders
-    Route::get('/orders', [OrderController::class, 'userOrders'])->name('orders.index');
+    // This is redundant - orders route already defined above in no-admin middleware group
 
 });
 
