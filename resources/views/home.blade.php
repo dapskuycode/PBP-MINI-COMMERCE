@@ -153,52 +153,82 @@
         <section class="mb-12">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-2xl md:text-3xl font-bold text-gray-800">PRODUK TERLARIS</h2>
-                <a href="#" class="text-emerald-600 hover:text-emerald-700 font-medium">Lihat Semua →</a>
+                <a href="{{ route('products.index') }}" class="text-emerald-600 hover:text-emerald-700 font-medium">Lihat Semua →</a>
             </div>
 
-            <!-- Check if there are products -->
-            @if(false) <!-- Change this condition based on your product data -->
+            <!-- Check if there are top selling products -->
+            @if($topSellingProducts && $topSellingProducts->count() > 0)
                 <!-- Product Grid -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                    <!-- Sample Products using the component -->
-                    @include('components.product-card', [
-                        'title' => 'Cimol Bojot Premium',
-                        'price' => 'Rp 20.000',
-                        'originalPrice' => 'Rp 25.000',
-                        'rating' => 4.3,
-                        'sold' => 294,
-                        'discount' => 20
-                    ])
-                    
-                    @include('components.product-card', [
-                        'title' => 'Keripik Buah Organik',
-                        'price' => 'Rp 12.500',
-                        'rating' => 4.8,
-                        'sold' => 189
-                    ])
-                    
-                    @include('components.product-card', [
-                        'title' => 'Pempek Ikan Asli Palembang',
-                        'price' => 'Rp 30.000',
-                        'rating' => 4.9,
-                        'sold' => 720
-                    ])
-                    
-                    @include('components.product-card', [
-                        'title' => 'Rendang Sapi Padang',
-                        'price' => 'Rp 40.000',
-                        'originalPrice' => 'Rp 50.000',
-                        'rating' => 4.8,
-                        'sold' => 186,
-                        'discount' => 20
-                    ])
-                    
-                    @include('components.product-card', [
-                        'title' => 'Lumpia Rebung Semarang',
-                        'price' => 'Rp 45.000',
-                        'rating' => 5.0,
-                        'sold' => 108
-                    ])
+                    @foreach($topSellingProducts as $product)
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+                            <!-- Product Image -->
+                            <div class="relative aspect-square overflow-hidden bg-gray-100">
+                                @if($product->image_url)
+                                    <img src="{{ asset('storage/' . $product->image_url) }}" 
+                                         alt="{{ $product->name }}" 
+                                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                @endif
+                                
+                                <!-- Bestseller Badge -->
+                                <div class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-medium">
+                                    <i class="bi bi-fire mr-1"></i>Terlaris
+                                </div>
+                                
+                                <!-- Total Sold Badge -->
+                                <div class="absolute top-2 right-2 bg-emerald-500 text-white px-2 py-1 rounded-md text-xs font-medium">
+                                    {{ $product->total_sold }} Terjual
+                                </div>
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="p-4">
+                                <!-- Product Title -->
+                                <h3 class="font-semibold text-gray-800 mb-2 line-clamp-2 text-sm md:text-base">
+                                    {{ $product->name }}
+                                </h3>
+
+                                <!-- Rating -->
+                                <div class="flex items-center mb-2">
+                                    <div class="flex text-yellow-400 text-sm">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            @if($i <= floor($product->average_rating))
+                                                <i class="bi bi-star-fill"></i>
+                                            @elseif($i <= ceil($product->average_rating))
+                                                <i class="bi bi-star-half"></i>
+                                            @else
+                                                <i class="bi bi-star"></i>
+                                            @endif
+                                        @endfor
+                                    </div>
+                                    <span class="text-gray-500 text-sm ml-1">({{ number_format($product->average_rating, 1) }})</span>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="mb-3">
+                                    <span class="text-emerald-600 font-bold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="flex gap-2">
+                                    <button onclick="addToCart({{ $product->id }})" 
+                                            class="flex-1 bg-emerald-500 text-white text-sm py-2 px-3 rounded-md hover:bg-emerald-600 transition-colors">
+                                        <i class="bi bi-cart-plus mr-1"></i>Keranjang
+                                    </button>
+                                    <a href="{{ route('products.show', $product->id) }}" 
+                                       class="bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-md hover:bg-gray-200 transition-colors">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @else
                 <!-- Empty State -->
@@ -208,9 +238,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Belum ada produk tersedia</h3>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-3">Belum ada produk terlaris</h3>
                     <p class="text-gray-600 mb-6 max-w-md mx-auto">
-                        Toko masih dalam tahap pengembangan. Silakan login sebagai admin untuk menambahkan produk.
+                        Produk terlaris akan muncul di sini berdasarkan data penjualan.
                     </p>
 
                     @guest
@@ -225,7 +255,7 @@
                     @else
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 inline-block">
                             <i class="bi bi-info-circle text-blue-500 mr-2"></i>
-                            <span class="text-blue-700">Selamat datang, {{ Auth::user()->name }}! Produk akan segera tersedia.</span>
+                            <span class="text-blue-700">Selamat datang, {{ Auth::user()->name }}! Produk terlaris akan segera tersedia.</span>
                         </div>
                     @endguest
                 </div>
