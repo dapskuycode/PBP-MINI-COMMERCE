@@ -149,6 +149,8 @@ Route::middleware('auth')->group(function () {
         
         //Orders - for customers only
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::patch('/orders/{order}/cancel', [OrderController::class, 'cancelOrder'])->name('orders.cancel');
+        Route::patch('/orders/{order}/complete', [OrderController::class, 'completeOrder'])->name('orders.complete');
         
         // Favorites - for customers only
         Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites');

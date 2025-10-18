@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Riwayat Pesanan — TokoKami</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-50"
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
     {{-- Navbar --}}
     @include('components.navbar', ['isAdmin' => false])
 
     {{-- Main Content --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         {{-- Alert Messages --}}
         @if(session('success'))
@@ -75,7 +77,7 @@
                 <div class="flex gap-2">
                     <select x-model="activeStatus" @change="updateActiveStatus()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                         <option value="all">Semua Status</option>
-                        <option value="processing">Processing</option>
+                        <option value="processing">Dikemas</option>
                         <option value="shipped">Dikirim</option>
                         <option value="completed">Selesai</option>
                         <option value="cancelled">Dibatalkan</option>
@@ -204,6 +206,43 @@
                                     <div class="text-lg font-semibold">
                                         Total: <span x-text="formatIDR(order.total)"></span>
                                     </div>
+                                    <div class="flex gap-2">
+                                        <!-- Tombol Batalkan untuk status processing -->
+                                        <template x-if="order.status === 'processing'">
+                                            <button 
+                                                @click="cancelOrder(order.id)"
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium transition-colors"
+                                                :disabled="order.isUpdating"
+                                            >
+                                                <span x-show="!order.isUpdating">Batalkan Pesanan</span>
+                                                <span x-show="order.isUpdating" class="flex items-center">
+                                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Membatalkan...
+                                                </span>
+                                            </button>
+                                        </template>
+                                        
+                                        <!-- Tombol Pesanan Selesai untuk status shipped -->
+                                        <template x-if="order.status === 'shipped'">
+                                            <button 
+                                                @click="completeOrder(order.id)"
+                                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
+                                                :disabled="order.isUpdating"
+                                            >
+                                                <span x-show="!order.isUpdating">Pesanan Selesai</span>
+                                                <span x-show="order.isUpdating" class="flex items-center">
+                                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Menyelesaikan...
+                                                </span>
+                                            </button>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -226,10 +265,12 @@
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     {{-- Footer --}}
-    @include('components.footer')
+    <footer class="mt-auto">
+        @include('components.footer')
+    </footer>
 
     <script>
         function ordersPage() {
@@ -243,7 +284,8 @@
                     // Initialize showDetails property for each order
                     this.orders = this.orders.map(order => ({
                         ...order,
-                        showDetails: false
+                        showDetails: false,
+                        isUpdating: false
                     }));
                     
                     // Log individual order structures for debugging
@@ -257,11 +299,20 @@
                 },
                 
                 updateStats() {
-                    // Update stats cards
-                    document.getElementById('pending-count').textContent = this.countByStatus('pending');
-                    document.getElementById('processing-count').textContent = this.countByStatus('processing');
-                    document.getElementById('shipped-count').textContent = this.countByStatus('shipped');
-                    document.getElementById('completed-count').textContent = this.countByStatus('completed');
+                    // Update stats cards - only update elements that exist
+                    const processingElement = document.getElementById('processing-count');
+                    const shippedElement = document.getElementById('shipped-count');
+                    const completedElement = document.getElementById('completed-count');
+                    
+                    if (processingElement) {
+                        processingElement.textContent = this.countByStatus('processing');
+                    }
+                    if (shippedElement) {
+                        shippedElement.textContent = this.countByStatus('shipped');
+                    }
+                    if (completedElement) {
+                        completedElement.textContent = this.countByStatus('completed');
+                    }
                 },
                 
                 countByStatus(status) {
@@ -372,6 +423,116 @@
                         console.log('Order items (order_items):', this.orders[orderIndex].order_items);
                         console.log('Order items (orderItems):', this.orders[orderIndex].orderItems);
                         console.log('Order total:', this.orders[orderIndex].total);
+                    }
+                },
+
+                async cancelOrder(orderId) {
+                    if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+                        return;
+                    }
+                    
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex === -1) {
+                        alert('Pesanan tidak ditemukan');
+                        return;
+                    }
+                    
+                    // Set loading state
+                    this.orders[orderIndex].isUpdating = true;
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (!csrfToken) {
+                            throw new Error('CSRF token tidak ditemukan');
+                        }
+                        
+                        const response = await fetch(`/orders/${orderId}/cancel`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Update order status
+                            this.orders[orderIndex].status = 'cancelled';
+                            this.updateStats();
+                            
+                            // Show success message
+                            alert('Pesanan berhasil dibatalkan');
+                        } else {
+                            throw new Error(data.message || 'Gagal membatalkan pesanan');
+                        }
+                    } catch (error) {
+                        console.error('Error canceling order:', error);
+                        alert('Gagal membatalkan pesanan: ' + error.message);
+                    } finally {
+                        // Reset loading state
+                        if (this.orders[orderIndex]) {
+                            this.orders[orderIndex].isUpdating = false;
+                        }
+                    }
+                },
+
+                async completeOrder(orderId) {
+                    if (!confirm('Apakah Anda yakin pesanan ini sudah selesai?')) {
+                        return;
+                    }
+                    
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex === -1) {
+                        alert('Pesanan tidak ditemukan');
+                        return;
+                    }
+                    
+                    // Set loading state
+                    this.orders[orderIndex].isUpdating = true;
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (!csrfToken) {
+                            throw new Error('CSRF token tidak ditemukan');
+                        }
+                        
+                        const response = await fetch(`/orders/${orderId}/complete`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Update order status
+                            this.orders[orderIndex].status = 'completed';
+                            this.updateStats();
+                            
+                            // Show success message
+                            alert('Pesanan berhasil diselesaikan');
+                        } else {
+                            throw new Error(data.message || 'Gagal menyelesaikan pesanan');
+                        }
+                    } catch (error) {
+                        console.error('Error completing order:', error);
+                        alert('Gagal menyelesaikan pesanan: ' + error.message);
+                    } finally {
+                        // Reset loading state
+                        if (this.orders[orderIndex]) {
+                            this.orders[orderIndex].isUpdating = false;
+                        }
                     }
                 }
             }
