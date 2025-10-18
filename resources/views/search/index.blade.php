@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@if($query) Hasil Pencarian "{{ $query }}" @else Cari Produk @endif • TokoKami</title>
+    <title>@if($query) Hasil Pencarian "{{ $query }}" @else Cari Produk @endif • TumbasLek</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>

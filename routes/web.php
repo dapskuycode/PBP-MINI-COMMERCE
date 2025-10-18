@@ -151,7 +151,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         
         // Favorites - for customers only
-        Route::view('/favorites', 'favorites')->name('favorites');
+        Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites');
+        Route::post('/favorites/toggle/{product}', [App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle');
+        Route::get('/favorites/check/{product}', [App\Http\Controllers\FavoriteController::class, 'checkStatus'])->name('favorites.check');
     });
 
 
@@ -218,8 +220,5 @@ Route::middleware('auth')->group(function () {
 
 });
 
-// Halaman Produk Favorit 
-Route::middleware('auth')->group(function () {
-    Route::view('/favorites', 'favorites')->name('favorites');
-});
+// Favorites route already defined above in no-admin middleware group
 

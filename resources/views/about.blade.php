@@ -3,7 +3,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Tentang Kami • TokoKami</title>
+  <title>Tentang Kami • TumbasLek</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {{-- Kalau beranda sudah load Tailwind/Vite global, baris di bawah boleh dihapus --}}
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,9 +27,9 @@
 
     {{-- HERO STRIP --}}
     <section class="rounded-xl bg-emerald-700 text-white p-6 sm:p-8 shadow-md">
-      <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Tentang TokoKami</h1>
+  <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Tentang TumbasLek</h1>
       <p class="mt-2 text-emerald-50 max-w-3xl">
-        <b>TokoKami</b> adalah platform e-commerce yang menyediakan berbagai <b>oleh-oleh khas daerah</b> dari seluruh Indonesia,
+  <b>TumbasLek</b> adalah platform e-commerce yang menyediakan berbagai <b>oleh-oleh khas daerah</b> dari seluruh Indonesia,
         mulai dari makanan tradisional hingga kerajinan tangan lokal. Kami berupaya memudahkan pelanggan menemukan produk
         berkualitas tanpa harus datang langsung ke tempat asalnya.
       </p>
@@ -71,7 +71,7 @@
         <div class="mt-4 grid md:grid-cols-2 gap-6">
           <div>
             <p class="text-gray-700">
-              TokoKami hadir sebagai solusi praktis bagi siapa pun yang ingin membeli oleh-oleh khas daerah tanpa repot.
+              TumbasLek hadir sebagai solusi praktis bagi siapa pun yang ingin membeli oleh-oleh khas daerah tanpa repot.
               Melalui platform ini, pelanggan dapat menjelajahi beragam produk lokal yang dikurasi langsung dan dikelola oleh admin toko.
             </p>
             <p class="mt-3 text-gray-700">
