@@ -55,17 +55,42 @@
       <a href="{{ route('dashboard') }}" class="text-emerald-700 font-semibold hover:underline">← Kembali ke Dashboard</a>
     </div>
 
-    {{-- Data fallback jika controller belum kirim $users --}}
+    {{-- Flash Messages --}}
+    @if(session('success'))
+      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        {{ session('success') }}
+      </div>
+    @endif
+
+    @if(session('error'))
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ session('error') }}
+      </div>
+    @endif
+
+    @if($errors->any())
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <ul class="list-disc list-inside">
+          @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    {{-- Data users dari controller --}}
     @php
-      $listUsers = isset($users) ? $users : collect([
-        (object)['id'=>1,'name'=>'Admin User','email'=>'admin@example.com','role'=>'admin','status'=>'active','created_at'=>now()->subDays(30)],
-        (object)['id'=>2,'name'=>'Test User','email'=>'test@example.com','role'=>'customer','status'=>'active','created_at'=>now()->subDays(1)],
-        (object)['id'=>3,'name'=>'Moderator User','email'=>'mod@example.com','role'=>'customer','status'=>'active','created_at'=>now()],
-      ]);
-      $totalUsers  = $listUsers instanceof \Illuminate\Pagination\AbstractPaginator ? $listUsers->total() : $listUsers->count();
-      $totalAdmins = $listUsers->where('role','admin')->count();
-      $totalActive = $listUsers->where('status','active')->count();
-      $totalBanned = $listUsers->where('status','banned')->count();
+      $listUsers = $users ?? collect([]);
+      
+      // Untuk statistik, ambil data dari seluruh database (tidak ter-filter)
+      $allUsers = \App\Models\User::all();
+      $totalUsers = $allUsers->count();
+      $totalAdmins = $allUsers->where('role','admin')->count();
+      $totalActive = $allUsers->where('status','active')->count();
+      $totalBanned = $allUsers->where('status','banned')->count();
+      
+      // Untuk tampilan filtered results
+      $filteredCount = $listUsers instanceof \Illuminate\Pagination\AbstractPaginator ? $listUsers->total() : $listUsers->count();
     @endphp
 
     {{-- Kartu ringkasan --}}
@@ -88,34 +113,100 @@
       </div>
     </div>
 
-    {{-- Filter (tanpa aksi massal) --}}
+    {{-- Filter --}}
     <div class="bg-white rounded-xl shadow p-4">
-      <form class="grid grid-cols-1 md:grid-cols-5 gap-3">
-        <input type="text" placeholder="Cari nama / email" class="rounded-lg border-gray-300 px-3 py-2 md:col-span-2">
-        <select class="rounded-lg border-gray-300">
-          <option value="">Peran: Semua</option><option value="admin">Admin</option><option value="customer">Customer</option>
-        </select>
-        <select class="rounded-lg border-gray-300">
-          <option value="">Status: Semua</option><option value="active">Aktif</option><option value="banned">Diblokir</option>
-        </select>
-        <div class="flex gap-2">
-          <button type="button" class="px-4 py-2 rounded-lg bg-gray-900 text-white">Terapkan</button>
-          <button type="button" class="px-4 py-2 rounded-lg border">Reset</button>
+      <div class="mb-3 flex items-center text-sm text-gray-600">
+      </div>
+      <form id="filterForm" method="GET" action="{{ route('admin.manageusers.showUsers') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="relative md:col-span-2">
+          <input 
+            type="text" 
+            name="search" 
+            id="searchInput"
+            placeholder="Ketik nama atau email untuk mencari..." 
+            value="{{ request('search') }}" 
+            class="w-full rounded-lg border-gray-300 px-3 py-2 pr-10">
+          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
         </div>
+        <select name="role" id="roleSelect" class="rounded-lg border-gray-300">
+          <option value="">Peran: Semua</option>
+          <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+          <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Customer</option>
+          <option value="moderator" {{ request('role') == 'moderator' ? 'selected' : '' }}>Moderator</option>
+        </select>
+        <select name="status" id="statusSelect" class="rounded-lg border-gray-300">
+          <option value="">Status: Semua</option>
+          <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+          <option value="banned" {{ request('status') == 'banned' ? 'selected' : '' }}>Diblokir</option>
+        </select>
       </form>
+      
+      {{-- Loading indicator and Reset button --}}
+      <div class="mt-3 flex justify-between items-center">
+        <div id="loadingIndicator" class="hidden">
+          <div class="flex items-center text-sm text-gray-600">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Memfilter data...
+          </div>
+        </div>
+        
+        @if(request()->hasAny(['search', 'role', 'status']))
+          <a href="{{ route('admin.manageusers.showUsers') }}" 
+             class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            Reset Filter
+          </a>
+        @endif
+      </div>
     </div>
 
     {{-- Tabel pengguna --}}
     <section class="bg-white rounded-xl shadow overflow-hidden">
-      <div class="p-4 flex items-center justify-between border-b">
-        <h2 class="font-semibold">Daftar Pengguna</h2>
-        <div class="text-sm text-gray-500">
-          @if($listUsers instanceof \Illuminate\Pagination\AbstractPaginator)
-            Menampilkan {{ $listUsers->count() }} dari {{ $listUsers->total() }}
-          @else
-            Total {{ $listUsers->count() }} pengguna
-          @endif
+      <div class="p-4 border-b">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-semibold">Daftar Pengguna</h2>
+          <div class="text-sm text-gray-500">
+            @if($listUsers instanceof \Illuminate\Pagination\AbstractPaginator)
+              Menampilkan {{ $listUsers->count() }} dari {{ $listUsers->total() }}
+            @else
+              Total {{ $filteredCount }} pengguna
+            @endif
+          </div>
         </div>
+        
+        {{-- Active Filters Display --}}
+        @if(request()->hasAny(['search', 'role', 'status']))
+          <div class="flex flex-wrap gap-2 text-sm">
+            <span class="text-gray-600">Filter aktif:</span>
+            @if(request('search'))
+              <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                Pencarian: "{{ request('search') }}"
+              </span>
+            @endif
+            @if(request('role'))
+              <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                Role: {{ ucfirst(request('role')) }}
+              </span>
+            @endif
+            @if(request('status'))
+              <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+                Status: {{ ucfirst(request('status')) }}
+              </span>
+            @endif
+            <a href="{{ route('admin.manageusers.showUsers') }}" class="text-red-600 hover:text-red-800">
+              ✕ Hapus semua filter
+            </a>
+          </div>
+        @endif
       </div>
 
       <div class="overflow-x-auto">
@@ -134,7 +225,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
-            @foreach($listUsers as $u)
+            @forelse($listUsers as $u)
               @php
                 $role   = $u->role   ?? (($u->is_admin ?? false) ? 'admin' : 'customer');
                 $status = $u->status ?? 'active';
@@ -147,6 +238,8 @@
                 <td class="px-6 py-4">
                   @if($role === 'admin')
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">Admin</span>
+                  @elseif($role === 'moderator')
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-purple-50 text-purple-700">Moderator</span>
                   @else
                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">Customer</span>
                   @endif
@@ -199,7 +292,31 @@
                   </div>
                 </td>
               </tr>
-            @endforeach
+            @empty
+              <tr>
+                <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                  <div class="flex flex-col items-center">
+                    <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33"></path>
+                    </svg>
+                    <p class="text-lg font-medium text-gray-900 mb-2">Tidak ada pengguna ditemukan</p>
+                    <p class="text-gray-600 mb-4">
+                      @if(request()->hasAny(['search', 'role', 'status']))
+                        Coba ubah filter atau hapus semua filter untuk melihat semua pengguna.
+                      @else
+                        Belum ada pengguna yang terdaftar di sistem.
+                      @endif
+                    </p>
+                    @if(request()->hasAny(['search', 'role', 'status']))
+                      <a href="{{ route('admin.manageusers.showUsers') }}" 
+                         class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
+                        Hapus Filter
+                      </a>
+                    @endif
+                  </div>
+                </td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
       </div>
@@ -230,7 +347,10 @@
           @if($listUsers instanceof \Illuminate\Pagination\AbstractPaginator)
             Menampilkan {{ $listUsers->count() }} dari {{ $listUsers->total() }}
           @else
-            Total {{ $listUsers->count() }} pengguna
+            Total {{ $filteredCount }} pengguna
+          @endif
+          @if(request()->hasAny(['search', 'role', 'status']))
+            <span class="text-blue-600">(Difilter dari {{ $totalUsers }} total)</span>
           @endif
         </div>
       </div>
@@ -261,8 +381,9 @@
               <div>
                 <label class="block text-sm text-gray-700 mb-1">Peran</label>
                 <select id="u-role" name="role" class="w-full border rounded-lg px-3 py-2">
-                  <option value="customer">Customer</option>
+                  <option value="user">Customer</option>
                   <option value="admin">Admin</option>
+                  <option value="moderator">Moderator</option>
                 </select>
               </div>
               <div>
@@ -280,7 +401,7 @@
           </div>
           <div class="bg-gray-50 p-4 flex justify-end gap-2">
             <button type="button" class="px-4 py-2 rounded-lg border" onclick="closeEdit()">Batal</button>
-            <button class="px-4 py-2 rounded-lg bg-emerald-600 text-white">Simpan</button>
+            <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-600 text-white">Simpan</button>
           </div>
         </form>
       </div>
@@ -306,15 +427,26 @@
     function wireEdit(){
       document.querySelectorAll('.js-edit').forEach(btn=>{
         btn.addEventListener('click', ()=>{
-          const u = { id:btn.dataset.id, name:btn.dataset.name, email:btn.dataset.email, role:btn.dataset.role, status:btn.dataset.status };
+          console.log('Edit button clicked'); // Debug log
+          const u = { 
+            id: btn.dataset.id, 
+            name: btn.dataset.name, 
+            email: btn.dataset.email, 
+            role: btn.dataset.role, 
+            status: btn.dataset.status 
+          };
+          console.log('User data:', u); // Debug log
+          
           document.getElementById('u-id').value     = u.id || '';
           document.getElementById('u-name').value   = u.name || '';
           document.getElementById('u-email').value  = u.email || '';
-          document.getElementById('u-role').value   = u.role || 'customer';
+          document.getElementById('u-role').value   = u.role || 'user';
           document.getElementById('u-status').value = u.status || 'active';
 
           const form = document.getElementById('editForm');
-          form.action = @json(route('admin.manageusers.update', ['manageuser' => '__ID__'])).replace('__ID__', u.id);
+          const actionUrl = @json(route('admin.manageusers.update', ['manageuser' => '__ID__'])).replace('__ID__', u.id);
+          form.action = actionUrl;
+          console.log('Form action set to:', actionUrl); // Debug log
 
           openEdit();
         });
@@ -326,7 +458,81 @@
     document.addEventListener('click', e=>{ if (e.target === document.getElementById('editModal')) closeEdit(); });
     document.addEventListener('keydown', e=>{ if (e.key === 'Escape') closeEdit(); });
 
-    document.addEventListener('DOMContentLoaded', ()=>{ wireEdit(); reflectMaster(); });
+    // Form submit handler with debugging
+    document.addEventListener('DOMContentLoaded', ()=>{ 
+      wireEdit(); 
+      reflectMaster();
+      
+      // Add form submit debugging
+      document.getElementById('editForm').addEventListener('submit', function(e) {
+        console.log('Form submit triggered');
+        console.log('Form action:', this.action);
+        console.log('Form method:', this.method);
+        
+        // Check if form data is valid
+        const formData = new FormData(this);
+        for (let [key, value] of formData.entries()) {
+          console.log(key + ':', value);
+        }
+      });
+
+      // Auto-submit filter form
+      setupAutoFilter();
+    });
+
+    // Setup auto-filtering functionality
+    function setupAutoFilter() {
+      const form = document.getElementById('filterForm');
+      const searchInput = document.getElementById('searchInput');
+      const roleSelect = document.getElementById('roleSelect');
+      const statusSelect = document.getElementById('statusSelect');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      
+      let searchTimeout;
+
+      // Show loading indicator
+      function showLoading() {
+        if (loadingIndicator) {
+          loadingIndicator.classList.remove('hidden');
+        }
+      }
+
+      // Auto-submit on search input (with debounce)
+      searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        
+        // Show loading immediately when typing
+        if (this.value.length > 0 || {{ request('search') ? 'true' : 'false' }}) {
+          showLoading();
+        }
+        
+        searchTimeout = setTimeout(() => {
+          form.submit();
+        }, 500); // Wait 500ms after user stops typing
+      });
+
+      // Auto-submit on dropdown change (immediate)
+      roleSelect.addEventListener('change', function() {
+        showLoading();
+        form.submit();
+      });
+
+      statusSelect.addEventListener('change', function() {
+        showLoading();
+        form.submit();
+      });
+
+      // Clear search timeout if form is submitted manually
+      form.addEventListener('submit', function() {
+        clearTimeout(searchTimeout);
+        showLoading();
+      });
+
+      // Add visual feedback for typing
+      searchInput.addEventListener('keydown', function() {
+        clearTimeout(searchTimeout);
+      });
+    }
   </script>
 </body>
 </html>

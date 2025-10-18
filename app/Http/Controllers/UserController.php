@@ -249,8 +249,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        $this->authorize('viewAny', User::class);
-        
         $users = User::latest()->paginate(10);
         return view('admin.users.index', compact('users'));
     }
@@ -260,8 +258,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $this->authorize('view', $user);
-        
         return view('admin.users.show', compact('user'));
     }
 
@@ -270,44 +266,98 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $this->authorize('update', $user);
-        
         return view('admin.users.edit', compact('user'));
     }
 
     /**
      * Update the specified user (for admin).
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $manageuser)
     {
-        $this->authorize('update', $user);
+        // Find user by ID
+        $user = User::findOrFail($manageuser);
+        
+        // Check if this is a status-only update (from Blokir/Aktifkan buttons)
+        if ($request->has('status') && !$request->has('name') && !$request->has('email')) {
+            // Status-only update - minimal validation
+            $request->validate([
+                'status' => 'required|in:active,banned',
+            ]);
 
+            $user->update(['status' => $request->status]);
+            
+            $message = $request->status === 'banned' 
+                ? "User {$user->name} berhasil diblokir!" 
+                : "User {$user->name} berhasil diaktifkan!";
+                
+            return redirect()->route('admin.manageusers.showUsers')->with('success', $message);
+        }
+        
+        // Full profile update (from Edit modal)
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'role' => 'required|in:user,admin,moderator',
+            'role' => 'required|in:user,customer,admin,moderator',
+            'status' => 'nullable|in:active,banned',
         ]);
 
-        $user->update($request->only(['name', 'email', 'role']));
+        $updateData = $request->only(['name', 'email', 'role']);
+        
+        // Add status if provided
+        if ($request->has('status')) {
+            $updateData['status'] = $request->status;
+        }
+        
+        // Update password if provided
+        if ($request->filled('password')) {
+            $request->validate([
+                'password' => 'required|min:8',
+            ]);
+            $updateData['password'] = Hash::make($request->password);
+        }
 
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil diupdate!');
+        $user->update($updateData);
+
+        return redirect()->route('admin.manageusers.showUsers')->with('success', 'User berhasil diupdate!');
     }
 
     /**
      * Remove the specified user (for admin).
      */
-    public function destroy(User $user)
+    public function destroy($manageuser)
     {
-        $this->authorize('delete', $user);
-        
+        $user = User::findOrFail($manageuser);
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil dihapus!');
+        return redirect()->route('admin.manageusers.showUsers')->with('success', 'User berhasil dihapus!');
     }
 
-    public function showUsers()
+    public function showUsers(Request $request)
     {
-        $users = User::all();
+        $query = User::query();
+
+        // Filter by search (name or email)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('email', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Order by latest and paginate
+        $users = $query->latest()->paginate(10)->withQueryString();
+        
         return view('admin.adminuser', compact('users'));
     }
 }
