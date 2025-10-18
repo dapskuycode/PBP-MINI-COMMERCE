@@ -10,13 +10,26 @@
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-50 text-gray-900" x-data="{
-      shipping: 'dikirim',
-      ongkir: 15000,
-      subtotal: 70000,
-      updateOngkir(){ this.ongkir = this.shipping === 'pickup' ? 0 : 15000 },
-      total(){ return this.subtotal + this.ongkir },
-      formatIDR(n){ return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(n) }
-  }">
+    shipping: 'regular',      // <-- PERUBAHAN 1: Nilai default pengiriman
+    ongkir: 15000,          // <-- PERUBAHAN 2: Ongkir awal sesuai default
+    updateOngkir(){           // <-- PERUBAHAN 3: Logika update ongkir
+        switch(this.shipping) {
+            case 'express':
+                this.ongkir = 50000;
+                break;
+            case 'regular':
+                this.ongkir = 25000;
+                break;
+            case 'cargo':
+                this.ongkir = 15000;
+                break;
+            default:
+                this.ongkir = 15000;
+        }
+    },
+    total(){ return {{ $total }} + this.ongkir },
+    formatIDR(n){ return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR', minimumFractionDigits: 0}).format(n) }
+}">
 
   {{-- Navbar --}}
   @include('components.navbar', ['isAdmin' => false])
@@ -35,39 +48,60 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+    {{-- Error Messages --}}
+    @if(session('error'))
+      <div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        {{ session('error') }}
+      </div>
+    @endif
+
+    @if($errors->any())
+      <div class="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <ul class="list-disc list-inside">
+          @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
+
+    <form action="{{ route('checkout.process') }}" method="POST" class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+      @csrf
+
       {{-- Kiri --}}
       <div class="lg:col-span-2 space-y-6">
-
         {{-- Alamat --}}
         <section class="bg-white border rounded-2xl p-6">
           <h2 class="text-xl font-semibold mb-4">Alamat Pengiriman</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="sm:col-span-2">
               <label class="block text-sm mb-1 text-gray-700">Nama Lengkap</label>
-              <input type="text" placeholder="Masukkan nama Anda"
-                     class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <input type="text" name="nama_pemesan" placeholder="Masukkan nama Anda" required
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
             </div>
+
             <div class="sm:col-span-2">
               <label class="block text-sm mb-1 text-gray-700">Alamat Lengkap</label>
-              <textarea rows="3"
-                        class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                        placeholder="Jl. Pahlawan No. 12, Kota, Provinsi, 12345"></textarea>
+              <textarea rows="3" name="address" required placeholder="Jl. Pahlawan No. 12, Kota, Provinsi, 12345"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
             </div>
+
             <div>
               <label class="block text-sm mb-1 text-gray-700">Kota/Kabupaten</label>
-              <input type="text" placeholder="Nama Kota/Kabupaten"
-                     class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <input type="text" name="kota" placeholder="Nama Kota/Kabupaten" required
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
             </div>
+
             <div>
               <label class="block text-sm mb-1 text-gray-700">Kode Pos</label>
-              <input type="text" placeholder="12345"
-                     class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <input type="text" name="kode_pos" placeholder="12345" required
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
             </div>
+
             <div class="sm:col-span-2">
               <label class="block text-sm mb-1 text-gray-700">Nomor Telepon</label>
-              <input type="text" placeholder="08xxxxxxxxxx"
-                     class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+              <input type="text" name="nomor_hp" placeholder="08xxxxxxxxxx" required
+                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
             </div>
           </div>
         </section>
@@ -80,16 +114,27 @@
               <h3 class="text-lg font-semibold mb-3">Metode Pengiriman</h3>
               <div class="space-y-2">
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input type="radio" name="pengiriman" value="dikirim" class="text-emerald-600"
-                         x-model="shipping" @change="updateOngkir()">
-                  <span class="text-gray-700">Dikirim</span>
-                  <span class="ml-auto text-sm text-gray-500">Estimasi 1–3 hari</span>
+                  <input type="radio" name="jenis_pengiriman" value="express" class="text-emerald-600" x-model="shipping" @change="updateOngkir()" required>
+                  <div>
+                    <div class="text-gray-700 font-medium">Express</div>
+                    <div class="text-xs text-gray-500">1–3 hari • <span class="font-semibold">Rp50.000</span></div>
+                  </div>
                 </label>
+
                 <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                  <input type="radio" name="pengiriman" value="pickup" class="text-emerald-600"
-                         x-model="shipping" @change="updateOngkir()">
-                  <span class="text-gray-700">Ambil di Tempat</span>
-                  <span class="ml-auto text-sm text-gray-500">Gratis ongkir</span>
+                  <input type="radio" name="jenis_pengiriman" value="regular" class="text-emerald-600" x-model="shipping" @change="updateOngkir()" required checked>
+                  <div>
+                    <div class="text-gray-700 font-medium">Regular</div>
+                    <div class="text-xs text-gray-500">3–5 hari • <span class="font-semibold">Rp25.000</span></div>
+                  </div>
+                </label>
+
+                <label class="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
+                  <input type="radio" name="jenis_pengiriman" value="cargo" class="text-emerald-600" x-model="shipping" @change="updateOngkir()" required>
+                  <div>
+                    <div class="text-gray-700 font-medium">Cargo</div>
+                    <div class="text-xs text-gray-500">5–14 hari • <span class="font-semibold">Rp15.000</span></div>
+                  </div>
                 </label>
               </div>
             </div>
@@ -99,15 +144,15 @@
               <h3 class="text-lg font-semibold mb-3">Metode Pembayaran</h3>
               <div class="space-y-2">
                 <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input type="radio" name="pembayaran" class="text-emerald-600" checked>
+                  <input type="radio" name="metode_pembayaran" value="Transfer Bank" class="text-emerald-600" required checked>
                   <span class="text-gray-700">Transfer Bank</span>
                 </label>
                 <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input type="radio" name="pembayaran" class="text-emerald-600">
+                  <input type="radio" name="metode_pembayaran" value="COD" class="text-emerald-600" required>
                   <span class="text-gray-700">COD</span>
                 </label>
                 <label class="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                  <input type="radio" name="pembayaran" class="text-emerald-600">
+                  <input type="radio" name="metode_pembayaran" value="E-Wallet" class="text-emerald-600" required>
                   <span class="text-gray-700">E-Wallet</span>
                 </label>
               </div>
@@ -116,39 +161,45 @@
 
           <div class="mt-6">
             <label class="block text-sm text-gray-700 mb-1">Catatan untuk Penjual (opsional)</label>
-            <textarea rows="2"
-                      class="w-full rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            <textarea rows="2" name="note"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                       placeholder="Contoh: kirim siang, jangan terlalu pedas, dll."></textarea>
           </div>
         </section>
       </div>
 
-      {{-- Kanan --}}
+      {{-- Kanan (Ringkasan) --}}
       <aside class="lg:col-span-1">
         <div class="bg-white border rounded-2xl p-6 lg:sticky lg:top-6">
           <h2 class="text-xl font-semibold mb-4">Ringkasan Pesanan</h2>
 
           <div class="divide-y">
-            <div class="py-3 flex justify-between">
-              <div>
-                <div class="font-medium">Cimol Bojot</div>
-                <div class="text-sm text-gray-500">Jumlah: 1</div>
+            @foreach ($cartItems as $item)
+              <div class="py-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="w-14 h-14 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                    @if($item->product->photos && $item->product->photos->count())
+                      <img src="{{ asset('storage/' . $item->product->photos->first()->url) }}" alt="{{ $item->product->name }}" class="w-full h-full object-cover">
+                    @else
+                      <svg class="w-6 h-6 text-gray-400 mx-auto my-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16"></path></svg>
+                    @endif
+                  </div>
+                  <div class="min-w-0">
+                    <div class="font-medium truncate">{{ $item->product->name }}</div>
+                    <div class="text-xs text-gray-500">Jumlah: {{ $item->quantity }}</div>
+                  </div>
+                </div>
+                <div class="text-gray-700 font-medium">
+                  Rp{{ number_format($item->quantity * $item->product->price, 0, ',', '.') }}
+                </div>
               </div>
-              <div class="text-gray-700">Rp20.000</div>
-            </div>
-            <div class="py-3 flex justify-between">
-              <div>
-                <div class="font-medium">Lumpia Rebung</div>
-                <div class="text-sm text-gray-500">Jumlah: 2</div>
-              </div>
-              <div class="text-gray-700">Rp50.000</div>
-            </div>
+            @endforeach
           </div>
 
           <dl class="mt-4 space-y-2 text-sm">
             <div class="flex justify-between">
               <dt class="text-gray-600">Subtotal</dt>
-              <dd class="text-gray-800" x-text="formatIDR(subtotal)"></dd>
+              <dd class="text-gray-800">Rp{{ number_format($total, 0, ',', '.') }}</dd>
             </div>
             <div class="flex justify-between">
               <dt class="text-gray-600">Ongkos Kirim</dt>
@@ -161,16 +212,8 @@
             <span class="text-xl font-bold text-gray-900" x-text="formatIDR(total())"></span>
           </div>
 
-          <div class="mt-4">
-            <label class="block text-sm text-gray-700 mb-1">Kode Voucher (opsional)</label>
-            <div class="flex gap-2">
-              <input type="text" placeholder="TOKOKAMIHEMAT"
-                     class="flex-1 rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-              <button class="px-3 py-2 rounded-lg border text-sm text-gray-700 hover:bg-gray-50">Terapkan</button>
-            </div>
-          </div>
 
-          <button class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-sm">
+          <button type="submit" class="mt-6 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl shadow-sm">
             Buat Pesanan
           </button>
 
@@ -179,11 +222,23 @@
             <a href="#" class="text-emerald-600 underline">Syarat & Ketentuan</a>.
           </p>
         </div>
+        <input type="hidden" name="total" :value="total()">
       </aside>
-    </div>
+    </form>
 
-    <div class="lg:hidden mt-4 text-xs text-gray-500">
-      * Total akan berubah sesuai metode pengiriman.
+    {{-- Sticky mobile bar --}}
+    <div class="lg:hidden fixed inset-x-0 bottom-0 bg-white border-t p-3 flex items-center justify-between gap-3">
+      <div>
+        <div class="text-xs text-gray-500">Subtotal</div>
+        <div class="font-semibold">
+          {{ 'Rp' . number_format($total, 0, ',', '.') }}
+        </div>
+      </div>
+
+      <button type="button" onclick="document.querySelector('form').submit()"
+              class="ml-2 bg-emerald-600 text-white px-5 py-3 rounded-lg font-semibold shadow-sm">
+        Buat Pesanan
+      </button>
     </div>
   </div>
 

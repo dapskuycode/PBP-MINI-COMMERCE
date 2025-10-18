@@ -36,6 +36,7 @@ Route::middleware('no-admin')->group(function () {
     
     // Checkout
     Route::get('/checkout', [App\Http\Controllers\CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'processCheckout'])->name('checkout.process');
     
     //Riwayat Pesanan
     Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
