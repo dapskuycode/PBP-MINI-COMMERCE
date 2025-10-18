@@ -1,17 +1,20 @@
+{{-- resources/views/orders/index.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Riwayat Pesanan — TokoKami</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>Riwayat Pesanan — TokoKami</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-50 flex flex-col min-h-screen">
+  {{-- Navbar --}}
+  @include('components.navbar', ['isAdmin' => false])
 
-    {{-- Navbar --}}
-    @include('components.navbar', ['isAdmin' => false])
+  {{-- Header strip --}}
+  <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
 
     {{-- Main Content --}}
     <main class="flex-1">
@@ -29,16 +32,16 @@
             </div>
         @endif
 
-        {{-- Header --}}
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
-                <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
+            {{-- Header --}}
+            <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
+                    <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
+                </div>
             </div>
-        </div>
 
-        {{-- Stats Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            {{-- Stats Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6 text-center">
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,10 +71,10 @@
                 <h3 class="text-lg font-semibold text-gray-900">Completed</h3>
                 <p class="text-3xl font-bold text-green-600" id="completed-count">0</p>
             </div>
-        </div>
+            </div>
 
-        {{-- Orders Section --}}
-        <div class="bg-white rounded-xl shadow-md p-6" x-data="ordersPage()">
+            {{-- Orders Section --}}
+            <div class="bg-white rounded-xl shadow-md p-6" x-data="ordersPage()">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold text-gray-900">Pesanan Anda</h2>
                 <div class="flex gap-2">
@@ -265,6 +268,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </main>
 
     {{-- Footer --}}

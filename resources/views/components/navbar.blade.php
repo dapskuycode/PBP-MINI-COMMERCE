@@ -16,13 +16,15 @@
     <div class="flex justify-between items-center h-16">
       {{-- Logo --}}
       <div class="flex items-center">
-                <a href="{{ route('home') }}" class="flex items-center space-x-3 rtl:space-x-reverse">
-            <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-8 h-8 rounded-full">
-            <div>
-              <div class="text-xl font-bold text-gray-900">
-                TumbasLek
-              </div>
-              <div class="text-xs text-gray-500">UMKM Mini-Commerce</div>
+        <a href="{{ route('home') }}" class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-emerald-500 rounded-full grid place-items-center">
+            <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-8 h-8 rounded-full">
+          </div>
+          <div>
+            <div class="text-xl font-bold text-gray-900">
+              TumbasLek
+            </div>
+            <div class="text-xs text-gray-500">UMKM Mini-Commerce</div>
           </div>
         </a>
       </div>
