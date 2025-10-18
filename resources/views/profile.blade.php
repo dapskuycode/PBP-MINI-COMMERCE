@@ -51,11 +51,6 @@
                               Profil Saya
                           </a>
                           @if(!$user->is_admin)
-                          <a href="{{ route('orders.index') }}"
-                             class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                              Riwayat Pesanan
-                          </a>
-                          
                             <a href="{{ route('favorites') }}"
                                 class="block px-4 py-2 rounded text-sm
                                         {{ request()->routeIs('profile.favorites') ? 'bg-emerald-100 text-emerald-800 font-medium' : 'text-gray-700 hover:bg-gray-100' }}">
