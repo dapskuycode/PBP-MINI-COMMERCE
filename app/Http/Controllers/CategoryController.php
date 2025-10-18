@@ -85,38 +85,9 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id
-        ], [
-            'name.required' => 'Nama kategori harus diisi',
-            'name.unique' => 'Nama kategori sudah digunakan',
-            'name.max' => 'Nama kategori maksimal 255 karakter'
-        ]);
-
-        try {
-            $oldName = $category->name;
-            $productCount = $category->products()->count();
-            
-            $category->update([
-                'name' => $request->name
-            ]);
-
-            // Pesan sukses dengan informasi tambahan tentang produk yang terpengaruh
-            $message = "Kategori berhasil diperbarui dari '{$oldName}' menjadi '{$request->name}'";
-            if ($productCount > 0) {
-                $message .= " dan {$productCount} produk ikut terupdate kategorinya.";
-            } else {
-                $message .= ".";
-            }
-
-            return redirect()->route('admin.managecategories.index')
-                ->with('success', $message);
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Gagal memperbarui kategori: ' . $e->getMessage());
-        }
+        //
     }
+
 
     /**
      * Remove the specified resource from storage.

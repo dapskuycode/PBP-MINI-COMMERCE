@@ -25,12 +25,17 @@
       </nav>
     </div>
 
-    {{-- HERO STRIP (gaya sama seperti banner kecil) --}}
+    {{-- HERO STRIP --}}
     <section class="rounded-xl bg-emerald-700 text-white p-6 sm:p-8 shadow-md">
       <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Tentang TokoKami</h1>
       <p class="mt-2 text-emerald-50 max-w-3xl">
-        Usaha rumahan satu orang yang menghadirkan <b>makanan khas daerah</b> dalam kemasan praktis & higienis.
-        Fokus pada rasa otentik, bahan lokal, dan pelayanan ramah.
+        <b>TokoKami</b> adalah platform e-commerce yang menyediakan berbagai <b>oleh-oleh khas daerah</b> dari seluruh Indonesia,
+        mulai dari makanan tradisional hingga kerajinan tangan lokal. Kami berupaya memudahkan pelanggan menemukan produk
+        berkualitas tanpa harus datang langsung ke tempat asalnya.
+      </p>
+      <p class="mt-2 text-emerald-50 max-w-3xl">
+        Semua proses dikelola oleh satu admin toko yang memastikan setiap pesanan diproses dengan cepat, aman, dan profesional.
+        Fokus kami adalah menghadirkan pengalaman belanja yang nyaman, terpercaya, dan mendukung pertumbuhan pelaku UMKM lokal.
       </p>
       <div class="mt-4 flex flex-wrap gap-3">
         <a href="{{ route('home') }}"
@@ -45,16 +50,16 @@
       <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900 mb-4">Kenapa Memilih Kami</h2>
       <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
-          <h3 class="font-semibold text-gray-900">Homemade & Segar</h3>
-          <p class="mt-2 text-gray-600">Diproduksi dalam batch kecil agar rasa konsisten dan selalu fresh.</p>
+          <h3 class="font-semibold text-gray-900">Produk Lokal Berkualitas</h3>
+          <p class="mt-2 text-gray-600">Setiap produk dipilih dari pelaku usaha lokal dengan kualitas yang terjamin.</p>
         </div>
         <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
-          <h3 class="font-semibold text-gray-900">Bahan Lokal Terpilih</h3>
-          <p class="mt-2 text-gray-600">Mengutamakan bahan dari produsen lokal untuk rasa otentik.</p>
+          <h3 class="font-semibold text-gray-900">Pilihan Oleh-oleh Lengkap</h3>
+          <p class="mt-2 text-gray-600">Mulai dari makanan khas, aksesoris, tas rajut, miniatur, hingga kerajinan tangan unik.</p>
         </div>
         <div class="bg-white rounded-xl shadow p-5 border border-gray-100">
-          <h3 class="font-semibold text-gray-900">Kemasan Beragam</h3>
-          <p class="mt-2 text-gray-600">Ukuran 50g–500g, beberapa varian <i>vacuum-sealed</i>, food-grade.</p>
+          <h3 class="font-semibold text-gray-900">Pelayanan Cepat & Aman</h3>
+          <p class="mt-2 text-gray-600">Pesanan diproses dengan sistem terkelola, pengemasan rapi, dan pengiriman tepat waktu.</p>
         </div>
       </div>
     </section>
@@ -62,30 +67,29 @@
     {{-- SECTION CERITA (gaya card besar) --}}
     <section class="mt-8">
       <div class="bg-white rounded-xl shadow p-6 border border-gray-100">
-        <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900">Cerita Singkat</h2>
+        <h2 class="text-xl sm:text-2xl font-extrabold text-gray-900">Profil Singkat</h2>
         <div class="mt-4 grid md:grid-cols-2 gap-6">
           <div>
             <p class="text-gray-700">
-              Berawal dari dapur rumah, saya mulai meracik camilan khas Nusantara seperti keripik, sambal, kue kering,
-              dan bumbu instan. Seiring waktu, saya menambah <b>varian kemasan</b> agar mudah dibawa dan disimpan.
+              TokoKami hadir sebagai solusi praktis bagi siapa pun yang ingin membeli oleh-oleh khas daerah tanpa repot.
+              Melalui platform ini, pelanggan dapat menjelajahi beragam produk lokal yang dikurasi langsung dan dikelola oleh admin toko.
             </p>
             <p class="mt-3 text-gray-700">
-              Kini pesanan bisa dikirim ke luar kota. Saya mengutamakan kualitas rasa, kebersihan,
-              dan pelayanan—walau dikerjakan seorang diri, pesanan tetap diusahakan rapi & tepat waktu.
+              Dengan dukungan pelaku UMKM di berbagai wilayah, kami membantu memperluas jangkauan produk lokal agar bisa dinikmati oleh lebih banyak orang di seluruh Indonesia.
             </p>
           </div>
           <ul class="space-y-3">
             <li class="flex items-start gap-3">
               <span class="mt-1 w-2 h-2 rounded-full bg-emerald-600"></span>
-              Fresh batch berkala, tanpa bahan berbahaya.
+              Dikelola secara profesional oleh 1 admin toko terpercaya.
             </li>
             <li class="flex items-start gap-3">
               <span class="mt-1 w-2 h-2 rounded-full bg-emerald-600"></span>
-              Pre-order & paket hampers (bisa custom isi).
+              Mendukung promosi produk pelaku UMKM daerah.
             </li>
             <li class="flex items-start gap-3">
               <span class="mt-1 w-2 h-2 rounded-full bg-emerald-600"></span>
-              Info masa simpan & saran penyajian jelas di label.
+              Pengiriman cepat, aman, dan dapat dilacak.
             </li>
           </ul>
         </div>

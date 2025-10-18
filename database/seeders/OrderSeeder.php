@@ -28,7 +28,8 @@ class OrderSeeder extends Seeder
             return;
         }
         
-        $statuses = ['pending', 'processing', 'shipped', 'completed', 'cancelled'];
+        // Demo flow: orders start at processing, skip pending
+        $statuses = ['processing', 'shipped', 'completed', 'cancelled'];
         $addresses = [
             'Jl. Sudirman No. 123, Jakarta Pusat, DKI Jakarta 10220',
             'Jl. Gatot Subroto Kav. 56, Jakarta Selatan, DKI Jakarta 12950',
@@ -50,20 +51,16 @@ class OrderSeeder extends Seeder
             // Create realistic order dates based on status
             $orderDate = null;
             switch ($status) {
-                case 'pending':
-                    // Pending orders are recent (last 2 days)
-                    $orderDate = Carbon::now()->subMinutes(rand(0, 2880)); // 0-48 hours ago
-                    break;
                 case 'processing':
-                    // Processing orders are 1-7 days old
-                    $orderDate = Carbon::now()->subDays(rand(1, 7));
+                    // Processing orders are recent (last 3 days)
+                    $orderDate = Carbon::now()->subMinutes(rand(0, 4320)); // 0-72 hours ago
                     break;
                 case 'shipped':
                     // Shipped orders are 2-14 days old
                     $orderDate = Carbon::now()->subDays(rand(2, 14));
                     break;
-                case 'delivered':
-                    // Delivered orders are 1-30 days old
+                case 'completed':
+                    // Completed orders are 1-30 days old
                     $orderDate = Carbon::now()->subDays(rand(1, 30));
                     break;
                 case 'cancelled':
@@ -122,13 +119,9 @@ class OrderSeeder extends Seeder
         $now = now();
         
         switch ($status) {
-            case 'pending':
+            case 'processing':
                 // Recent orders (last 3 days)
                 return $faker->dateTimeBetween('-3 days', 'now');
-                
-            case 'processing':
-                // Orders from last week
-                return $faker->dateTimeBetween('-7 days', '-1 day');
                 
             case 'shipped':
                 // Orders from last 2 weeks
@@ -175,7 +168,6 @@ class OrderSeeder extends Seeder
     private function getStatusEmoji(string $status): string
     {
         return match($status) {
-            'pending' => '⏳',
             'processing' => '🔄',
             'shipped' => '🚚',
             'completed' => '✅',

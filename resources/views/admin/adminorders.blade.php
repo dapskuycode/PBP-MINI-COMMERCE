@@ -75,11 +75,6 @@
             {{-- Tabs Status --}}
             <div class="bg-white rounded-2xl shadow-sm border p-4 mb-6">
               <div class="flex flex-wrap gap-2">
-                <button @click="active='belum_bayar'" :class="tabClass('belum_bayar')" class="px-4 py-2 rounded-full text-sm border">
-                  Belum Dibayar
-                  <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                        :class="badgeClass('belum_bayar')" x-text="count('belum_bayar')"></span>
-                </button>
                 <button @click="active='dikemas'" :class="tabClass('dikemas')" class="px-4 py-2 rounded-full text-sm border">
                   Dikemas
                   <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
@@ -158,17 +153,14 @@
                       </template>
                     </div>
                     <div class="flex flex-wrap gap-2 md:justify-end">
-                      <template x-if="ord.status==='belum_bayar'">
-                        <button @click="confirmPayment(ord)" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm">Konfirmasi Pembayaran</button>
-                      </template>
                       <template x-if="ord.status==='dikemas'">
                         <button @click="showShipModal(ord)" class="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 text-sm">Kirim Pesanan</button>
                       </template>
                       <template x-if="ord.status==='dikirim'">
-                        <button @click="completeOrder(ord)" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 text-sm">Tandai Selesai</button>
+                        <span class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 text-sm">Sedang Dikirim</span>
                       </template>
                       <template x-if="ord.status==='selesai'">
-                        <span class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm">Pesanan Selesai</span>
+                        <span class="px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm">Pesanan Selesai</span>
                       </template>
                       <template x-if="ord.status==='dibatalkan'">
                         <span class="px-4 py-2 rounded-lg bg-red-100 text-red-600 text-sm">Pesanan Dibatalkan</span>
@@ -318,7 +310,7 @@
 
     <script>
       const ordersData = {
-        active: 'belum_bayar',
+        active: 'dikemas',
         q: '',
         data: @json($transformedOrders ?? []),
         showModal: false,
@@ -334,12 +326,6 @@
         },
         
         // Status update methods
-        async confirmPayment(order) {
-          if (confirm('Konfirmasi pembayaran untuk pesanan ini?')) {
-            await this.updateOrderStatus(order, 'processing');
-          }
-        },
-        
         async shipOrder(order) {
           if (confirm('Kirim pesanan ini?')) {
             await this.updateOrderStatus(order, 'shipped');
@@ -396,12 +382,6 @@
           } catch (error) {
             console.error('Error shipping order:', error);
             this.showErrorMessage('Gagal mengirim pesanan: ' + error.message);
-          }
-        },
-        
-        async completeOrder(order) {
-          if (confirm('Tandai pesanan ini sebagai selesai?')) {
-            await this.updateOrderStatus(order, 'completed');
           }
         },
         
@@ -463,7 +443,6 @@
         
         label(s) {
           const labels = {
-            'belum_bayar': 'Belum Dibayar',
             'dikemas': 'Dikemas',
             'dikirim': 'Sedang Dikirim',
             'selesai': 'Selesai',
@@ -474,7 +453,6 @@
         
         chip(s) {
           const classes = {
-            'belum_bayar': 'bg-yellow-100 text-yellow-700',
             'dikemas': 'bg-purple-100 text-purple-700',
             'dikirim': 'bg-blue-100 text-blue-700',
             'selesai': 'bg-emerald-100 text-emerald-700',

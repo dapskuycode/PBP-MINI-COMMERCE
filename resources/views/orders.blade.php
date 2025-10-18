@@ -12,7 +12,7 @@
   <script>
     // ==== INJEKSI DATA (NANTI) ====
     // Opsi 1 (front-end inject): isi window.ORDERS dari script atau ajax-mu:
-    // window.ORDERS = [{ code:'INV...', date:'2025-10-09 09:00', status:'belum_bayar', total:85000, items:[{name:'...',qty:1}] }, ...];
+    // window.ORDERS = [{ code:'INV...', date:'2025-10-09 09:00', status:'dikemas', total:85000, items:[{name:'...',qty:1}] }, ...];
     //
     // Opsi 2 (backend Blade): kirim variabel $orders (array) dan biarkan script di bawah mengambilnya.
   </script>
@@ -42,11 +42,14 @@
     {{-- Tabs Status --}}
     <div class="bg-white rounded-2xl shadow-sm border p-4 mb-6">
       <div class="flex flex-wrap gap-2">
+<<<<<<< HEAD
         <button @click="active='belum_bayar'" :class="tabClass('belum_bayar')" class="px-4 py-2 rounded-full text-sm border">
           Pending
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('belum_bayar')" x-text="count('belum_bayar')"></span>
         </button>
+=======
+>>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
         <button @click="active='dikemas'" :class="tabClass('dikemas')" class="px-4 py-2 rounded-full text-sm border">
           Processing
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
@@ -113,9 +116,6 @@
               <div class="font-semibold" x-text="formatIDR(ord.total)"></div>
             </div>
             <div class="flex flex-wrap gap-2 md:justify-end">
-              <template x-if="ord.status==='belum_bayar'">
-                <button class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 text-sm">Bayar Sekarang</button>
-              </template>
               <template x-if="ord.status==='dikemas'">
                 <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Hubungi Penjual</button>
               </template>
@@ -149,12 +149,11 @@
   <script>
     function ordersPage({initial = []} = {}){
       return {
-        active: 'belum_bayar',
+        active: 'dikemas',
         q: '',
         data: Array.isArray(initial) ? initial : [],
         label(s){
           return ({
-            'belum_bayar':'Belum Dibayar',
             'dikemas':'Dikemas',
             'dikirim':'Sedang Dikirim',
             'selesai':'Selesai',
@@ -163,7 +162,6 @@
         },
         chip(s){
           return ({
-            'belum_bayar':'bg-yellow-100 text-yellow-700',
             'dikemas':'bg-purple-100 text-purple-700',
             'dikirim':'bg-blue-100 text-blue-700',
             'selesai':'bg-emerald-100 text-emerald-700',

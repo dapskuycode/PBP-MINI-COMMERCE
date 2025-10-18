@@ -59,15 +59,13 @@
                     </div>
                     <div class="text-right">
                         <span class="px-3 py-1 rounded-full text-sm 
-                            @if(($transformedOrder['status'] ?? '') === 'belum_bayar') bg-yellow-100 text-yellow-700
-                            @elseif(($transformedOrder['status'] ?? '') === 'dikemas') bg-purple-100 text-purple-700
+                            @if(($transformedOrder['status'] ?? '') === 'dikemas') bg-purple-100 text-purple-700
                             @elseif(($transformedOrder['status'] ?? '') === 'dikirim') bg-blue-100 text-blue-700
                             @elseif(($transformedOrder['status'] ?? '') === 'selesai') bg-emerald-100 text-emerald-700
                             @elseif(($transformedOrder['status'] ?? '') === 'dibatalkan') bg-red-100 text-red-700
                             @else bg-gray-100 text-gray-700
                             @endif">
                             @switch($transformedOrder['status'] ?? '')
-                                @case('belum_bayar') Belum Dibayar @break
                                 @case('dikemas') Dikemas @break
                                 @case('dikirim') Sedang Dikirim @break
                                 @case('selesai') Selesai @break
@@ -184,16 +182,7 @@
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border p-6">
                     <h2 class="text-lg font-semibold mb-4">Aksi Pesanan</h2>
                     <div class="flex flex-wrap gap-3">
-                        @if(($transformedOrder['status'] ?? '') === 'belum_bayar')
-                            <form method="POST" action="{{ route('admin.manageorders.updateStatus', $order->id) }}" class="inline">
-                                @csrf
-                                @method('PATCH')
-                                <input type="hidden" name="status" value="processing">
-                                <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onclick="return confirm('Konfirmasi pembayaran untuk pesanan ini?')">
-                                    Konfirmasi Pembayaran
-                                </button>
-                            </form>
-                        @elseif(($transformedOrder['status'] ?? '') === 'dikemas')
+                        @if(($transformedOrder['status'] ?? '') === 'dikemas')
                             <form method="POST" action="{{ route('admin.manageorders.shipOrder', $order->id) }}" class="inline" id="shipForm">
                                 @csrf
                                 @method('PATCH')
