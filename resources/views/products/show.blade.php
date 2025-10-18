@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>{{ $product->name ?? 'Produk' }} — TumbasLek</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-emerald-50 via-white to-rose-50 text-gray-900 antialiased">
