@@ -178,6 +178,9 @@ Route::middleware('auth')->group(function () {
 
         //order management
         Route::get('/admin/manageorders', [App\Http\Controllers\OrderController::class, 'index'])->name('admin.manageorders.index');
+        Route::patch('/admin/manageorders/{order}/status', [App\Http\Controllers\OrderController::class, 'updateStatus'])->name('admin.manageorders.updateStatus');
+        Route::patch('/admin/manageorders/{order}/ship', [App\Http\Controllers\OrderController::class, 'shipOrder'])->name('admin.manageorders.shipOrder');
+        Route::get('/admin/manageorders/{order}/detail', [App\Http\Controllers\OrderController::class, 'show'])->name('admin.manageorders.detail');
         Route::resource('admin/manageorders', App\Http\Controllers\OrderController::class, [
             'as' => 'admin'
         ]);
