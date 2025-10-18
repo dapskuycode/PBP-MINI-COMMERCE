@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\FavoriteItem;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
+
+class FavoriteController extends Controller
+{
+    /**
+     * Toggle favorite status for a product.
+     */
+    public function toggle(Request $request, $productId)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must be logged in to favorite products'
+            ], 401);
+        }
+
+        $product = Product::findOrFail($productId);
+        
+        $existingFavorite = FavoriteItem::where('user_id', $user->id)
+                                      ->where('product_id', $productId)
+                                      ->first();
+
+        if ($existingFavorite) {
+            // Remove from favorites
+            $existingFavorite->delete();
+            $isFavorited = false;
+            $message = 'Product removed from favorites';
+        } else {
+            // Add to favorites
+            FavoriteItem::create([
+                'user_id' => $user->id,
+                'product_id' => $productId
+            ]);
+            $isFavorited = true;
+            $message = 'Product added to favorites';
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_favorited' => $isFavorited,
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * Show user's favorite products.
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return redirect()->route('login');
+        }
+
+        $favorites = FavoriteItem::with(['product.photos'])
+                                ->where('user_id', $user->id)
+                                ->latest()
+                                ->paginate(12);
+
+        return view('favorites', compact('favorites'));
+    }
+
+    /**
+     * Check if a product is favorited by current user.
+     */
+    public function checkStatus($productId)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json(['is_favorited' => false]);
+        }
+
+        $isFavorited = FavoriteItem::where('user_id', $user->id)
+                                  ->where('product_id', $productId)
+                                  ->exists();
+
+        return response()->json(['is_favorited' => $isFavorited]);
+    }
+}

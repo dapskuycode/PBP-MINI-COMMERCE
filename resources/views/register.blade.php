@@ -36,7 +36,7 @@
       <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
         <i class="fas fa-shopping-cart text-2xl text-[#82D2BC]"></i>
       </div>
-      <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">Mini Commerce</h1>
+      <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">TumbasLek</h1>
       <p class="text-emerald-100">Bergabunglah dengan kami!</p>
     </div>
 
@@ -97,27 +97,6 @@
             </div>
           </div>
           @error('name')
-            <p class="mt-1 text-sm text-red-600 flex items-center">
-              <i class="fas fa-exclamation-triangle mr-1"></i>{{ $message }}
-            </p>
-          @enderror
-        </div>
-
-        <!-- 🔹 Username (baru ditambahkan) -->
-        <div>
-          <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-            <i class="fas fa-at mr-2 text-emerald-500"></i>Username
-          </label>
-          <div class="relative">
-            <input type="text" id="username" name="username" value="{{ old('username') }}"
-                   class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200 @error('username') border-red-500 @enderror"
-                   placeholder="contoh: jihan23" minlength="3" maxlength="20" pattern="[A-Za-z0-9]+"
-                   title="Gunakan 3–20 karakter alfanumerik (A–Z, a–z, 0–9)" required>
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <i class="fas fa-at text-gray-400"></i>
-            </div>
-          </div>
-          @error('username')
             <p class="mt-1 text-sm text-red-600 flex items-center">
               <i class="fas fa-exclamation-triangle mr-1"></i>{{ $message }}
             </p>

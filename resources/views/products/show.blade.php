@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ $product->name ?? 'Produk' }} — UMKM Mini-Commerce</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ $product->name ?? 'Produk' }} — TumbasLek</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gradient-to-br from-emerald-50 via-white to-rose-50 text-gray-900 antialiased">
@@ -99,18 +100,20 @@
           </div>
 
           {{-- WISHLIST tombol (tanpa emoji) --}}
-          <button id="fav" type="button"
+          @if(Auth::check() && !Auth::user()->is_admin)
+          <button id="fav" type="button" onclick="toggleFavorite({{ $product->id }}, event)"
                   class="h-11 w-11 rounded-full border border-gray-200 hover:bg-rose-50 grid place-items-center"
                   aria-label="Tambah ke favorit">
             {{-- heart outline --}}
-            <svg id="fav-outline" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg id="fav-outline" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-500 {{ $product->isFavoritedBy(Auth::user()) ? 'hidden' : '' }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21l-7.682-7.318a4.5 4.5 0 010-6.364z"/>
             </svg>
             {{-- heart solid --}}
-            <svg id="fav-solid" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white hidden" viewBox="0 0 24 24" fill="currentColor">
+            <svg id="fav-solid" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-rose-500 {{ $product->isFavoritedBy(Auth::user()) ? '' : 'hidden' }}" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.001 4.529c2.349-2.532 6.15-2.532 8.5 0 2.35 2.531 2.35 6.635 0 9.166l-7.07 7.622a2 2 0 0 1-2.86 0l-7.07-7.622c-2.35-2.531-2.35-6.635 0-9.166 2.35-2.532 6.151-2.532 8.5 0z"/>
             </svg>
           </button>
+          @endif
         </div>
 
         {{-- HARGA --}}
@@ -398,6 +401,93 @@
     };
 
     modal.classList.remove('hidden');
+  }
+
+  // Toggle favorite function
+  async function toggleFavorite(productId) {
+    console.log('Attempting to toggle favorite for product:', productId);
+    
+    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+    console.log('CSRF token element found:', csrfToken ? 'Yes' : 'No');
+    
+    if (!csrfToken) {
+      showNotification('CSRF token tidak ditemukan', 'error');
+      return;
+    }
+    
+    try {
+      const url = `/favorites/toggle/${productId}`;
+      console.log('Making request to:', url);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+        }
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        showNotification(`Error: ${response.status} - ${response.statusText}`, 'error');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      if (data.success) {
+        // Update heart icons based on favorite status
+        const outlineIcon = document.getElementById('fav-outline') || document.getElementById(`fav-outline-${productId}`);
+        const solidIcon = document.getElementById('fav-solid') || document.getElementById(`fav-solid-${productId}`);
+
+        console.log('Outline icon found:', outlineIcon ? 'Yes' : 'No');
+        console.log('Solid icon found:', solidIcon ? 'Yes' : 'No');
+        console.log('Is favorited:', data.is_favorited);
+
+        if (data.is_favorited) {
+          outlineIcon?.classList.add('hidden');
+          solidIcon?.classList.remove('hidden');
+        } else {
+          outlineIcon?.classList.remove('hidden');
+          solidIcon?.classList.add('hidden');
+        }
+
+        // Show notification
+        showNotification(data.message, data.is_favorited ? 'success' : 'info');
+      } else {
+        showNotification(data.message, 'error');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      showNotification('Terjadi kesalahan. Silakan coba lagi.', 'error');
+    }
+  }
+
+  // Show notification function
+  function showNotification(message, type = 'success') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transition-all duration-300 ${
+      type === 'success' ? 'bg-green-500' : 
+      type === 'error' ? 'bg-red-500' : 
+      'bg-blue-500'
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
   }
 </script>
 </body>

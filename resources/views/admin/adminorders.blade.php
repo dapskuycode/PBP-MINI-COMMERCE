@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin • TokoKami</title>
+  <title>Dashboard Admin • TumbasLek</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
@@ -16,8 +16,8 @@
         {{-- Sidebar --}}
       <aside class="w-64 bg-white border-r">
         <div class="p-4 text-center border-b">
-          <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="mx-auto w-16 mb-2">
-          <h1 class="text-lg font-semibold text-emerald-700">TokoKami</h1>
+          <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="mx-auto w-16 mb-2">
+          <h1 class="text-lg font-semibold text-emerald-700">TumbasLek</h1>
           <p class="text-xs text-gray-500">UMKM Mini-Commerce</p>
         </div>
         <nav class="p-4 space-y-2 text-sm">
@@ -65,7 +65,7 @@
           <main class="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {{-- Heading --}}
             <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6 flex items-center gap-4">
-              <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-12 h-12 rounded-full">
+              <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-12 h-12 rounded-full">
               <div>
                 <h1 class="text-2xl font-bold">Manajemen Pesanan</h1>
                 <p class="text-sm text-gray-500">Kelola semua pesanan customer di sini</p>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout — TokoKami</title>
+  <title>Checkout — TumbasLek</title>
 
   {{-- langsung tailwind tanpa vite --}}
   <script src="https://cdn.tailwindcss.com"></script>
@@ -41,7 +41,7 @@
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
     {{-- Header --}}
     <div class="bg-white rounded-2xl shadow-sm border p-6 flex items-center gap-4">
-      <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-12 h-12 rounded-full">
+  <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-12 h-12 rounded-full">
       <div>
         <h1 class="text-2xl font-bold">Checkout</h1>
         <p class="text-sm text-gray-500">UMKM Mini-Commerce</p>

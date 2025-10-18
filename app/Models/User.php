@@ -63,6 +63,16 @@ class User extends Authenticatable
         return $this->hasMany(Order::class);
     }
 
+    public function favoriteItems()
+    {
+        return $this->hasMany(FavoriteItem::class);
+    }
+
+    public function favoriteProducts()
+    {
+        return $this->belongsToMany(Product::class, 'favorite_items');
+    }
+
     /**
      * Check if user is admin
      */
