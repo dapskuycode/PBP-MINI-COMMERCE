@@ -43,27 +43,27 @@
     <div class="bg-white rounded-2xl shadow-sm border p-4 mb-6">
       <div class="flex flex-wrap gap-2">
         <button @click="active='belum_bayar'" :class="tabClass('belum_bayar')" class="px-4 py-2 rounded-full text-sm border">
-          Belum Dibayar
+          Pending
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('belum_bayar')" x-text="count('belum_bayar')"></span>
         </button>
         <button @click="active='dikemas'" :class="tabClass('dikemas')" class="px-4 py-2 rounded-full text-sm border">
-          Dikemas
+          Processing
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('dikemas')" x-text="count('dikemas')"></span>
         </button>
         <button @click="active='dikirim'" :class="tabClass('dikirim')" class="px-4 py-2 rounded-full text-sm border">
-          Sedang Dikirim
+          Shipped
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('dikirim')" x-text="count('dikirim')"></span>
         </button>
         <button @click="active='selesai'" :class="tabClass('selesai')" class="px-4 py-2 rounded-full text-sm border">
-          Selesai
+          Completed
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('selesai')" x-text="count('selesai')"></span>
         </button>
         <button @click="active='dibatalkan'" :class="tabClass('dibatalkan')" class="px-4 py-2 rounded-full text-sm border">
-          Dibatalkan
+          Cancelled
           <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
                 :class="badgeClass('dibatalkan')" x-text="count('dibatalkan')"></span>
         </button>
