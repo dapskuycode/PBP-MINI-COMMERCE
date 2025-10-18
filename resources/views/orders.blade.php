@@ -4,263 +4,543 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Riwayat Pesanan — TokoKami</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
   {{-- Navbar --}}
   @include('components.navbar', ['isAdmin' => false])
 
   {{-- Header strip --}}
   <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
 
-  {{-- Main --}}
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="ordersTabs()">
-    {{-- Alert --}}
-    @if(session('success'))
-      <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-        <div class="flex items-center">
-          <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-          </svg>
-          <p class="text-green-700 font-medium">{{ session('success') }}</p>
-        </div>
-      </div>
-    @endif
-
-    {{-- Header --}}
-    <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-6">
-      <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-16 h-16 rounded-full">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
-        <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
-      </div>
-    </div>
-
-    {{-- Pills kategori (menyamping) --}}
-    <div class="bg-white rounded-2xl shadow-md p-3 mb-6">
-      <div class="flex flex-wrap gap-3">
-        <template x-for="tab in tabs" :key="tab.key">
-          <button
-            class="group relative inline-flex items-center gap-2 rounded-full border px-4 py-2 transition"
-            :class="activeStatus===tab.key
-              ? 'bg-emerald-600 text-white border-emerald-600'
-              : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'"
-            @click="setActive(tab.key)"
-          >
-            <span x-text="tab.label"></span>
-            <span
-              class="inline-flex items-center justify-center text-xs font-bold rounded-full w-6 h-6"
-              :class="activeStatus===tab.key
-                ? 'bg-emerald-500/30 text-white'
-                : 'bg-gray-200 text-gray-700'"
-              x-text="count(tab.key)"
-            ></span>
-          </button>
-        </template>
-      </div>
-    </div>
-
-    {{-- Pencarian --}}
-    <div class="bg-white rounded-2xl shadow-md p-4 mb-6">
-      <div class="flex items-center gap-3">
-        <div class="flex-1 relative">
-          <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input x-model="searchQuery" type="text" placeholder="Cari kode pesanan / produk..."
-                 class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-        </div>
-        <button @click="searchQuery=''"
-                class="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">
-          Bersihkan
-        </button>
-      </div>
-    </div>
-
-    {{-- Daftar pesanan (sesuai tab aktif) --}}
-    <div class="bg-white rounded-2xl shadow-md p-4">
-      <div class="space-y-4">
-        <template x-for="order in filtered()" :key="order.id">
-          <div class="bg-gray-50 rounded-xl border border-gray-200 p-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <div class="w-11 h-11 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                  </svg>
+    {{-- Main Content --}}
+    <main class="flex-1">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {{-- Alert Messages --}}
+        @if(session('success'))
+            <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
                 </div>
+            </div>
+        @endif
+
+            {{-- Header --}}
+            <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
                 <div>
-                  <div class="font-semibold text-gray-900" x-text="getOrderCode(order)"></div>
-                  <div class="text-xs text-gray-500" x-text="formatDate(order.created_at)"></div>
-                  <div class="text-xs text-gray-500" x-text="`${getOrderItems(order).length} item(s)`"></div>
+                    <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
+                    <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
                 </div>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <span class="px-3 py-1 rounded-full text-xs"
-                      :class="statusClass(order.status)"
-                      x-text="statusLabel(order.status)"></span>
-                <button @click="order._open=!order._open"
-                        class="text-sm px-3 py-1 bg-white border rounded-lg hover:bg-gray-50">
-                  <span x-text="order._open ? 'Sembunyikan' : 'Detail'"></span>
-                </button>
-              </div>
             </div>
 
-            <div x-show="order._open" x-transition class="mt-3">
-              <div class="border-t pt-3">
-                <h4 class="font-medium mb-2">Informasi Pengiriman</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>
-                    <strong>Nama Pemesan:</strong> <span x-text="order.nama_pemesan || '-'"></span><br>
-                    <strong>Alamat:</strong> <span x-text="order.address || '-'"></span><br>
-                    <strong>Kota:</strong> <span x-text="order.kota || '-'"></span>
-                    <span x-text="order.kode_pos || ''"></span>
-                  </div>
-                  <div>
-                    <strong>No. HP:</strong> <span x-text="order.nomor_hp || '-'"></span><br>
-                    <strong>Pengiriman:</strong> <span x-text="order.jenis_pengiriman || '-'"></span><br>
-                    <strong>Pembayaran:</strong> <span x-text="order.metode_pembayaran || '-'"></span>
-                  </div>
+            {{-- Stats Cards --}}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
                 </div>
+                <h3 class="text-lg font-semibold text-gray-900">Processing</h3>
+                <p class="text-3xl font-bold text-blue-600" id="processing-count">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Shipped</h3>
+                <p class="text-3xl font-bold text-cyan-600" id="shipped-count">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Completed</h3>
+                <p class="text-3xl font-bold text-green-600" id="completed-count">0</p>
+            </div>
+            </div>
 
-                <h4 class="font-medium mt-4 mb-2">Item Pesanan</h4>
-                <div class="space-y-3">
-                  <template x-for="item in getOrderItems(order)" :key="item.id">
-                    <div class="flex items-start gap-4 p-3 bg-white rounded-lg border">
-                      <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                        <template x-if="item.product?.photos?.length">
-                          <img :src="`/storage/${item.product.photos[0].url}`" class="w-full h-full object-cover">
-                        </template>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-gray-900" x-text="item.product?.name || 'Produk tidak tersedia'"></div>
-                        <div class="text-xs text-gray-500 mb-1" x-show="item.product?.description" x-text="item.product?.description"></div>
-                        <div class="flex items-center justify-between">
-                          <div class="text-sm text-gray-600">Qty: <span x-text="item.quantity"></span></div>
-                          <div class="text-right">
-                            <div class="text-xs text-gray-500">
-                              <span x-text="formatIDR(item.price)"></span> × <span x-text="item.quantity"></span>
-                            </div>
-                            <div class="font-semibold text-blue-600" x-text="formatIDR(item.quantity * item.price)"></div>
-                          </div>
-                        </div>
-                      </div>
+            {{-- Orders Section --}}
+            <div class="bg-white rounded-xl shadow-md p-6" x-data="ordersPage()">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Pesanan Anda</h2>
+                <div class="flex gap-2">
+                    <select x-model="activeStatus" @change="updateActiveStatus()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="all">Semua Status</option>
+                        <option value="processing">Dikemas</option>
+                        <option value="shipped">Dikirim</option>
+                        <option value="completed">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                    </select>
+                </div>
+            </div>
+
+            {{-- Search --}}
+            <div class="mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 relative">
+                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input x-model="searchQuery" type="text" placeholder="Cari berdasarkan kode pesanan atau nama produk..."
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                     </div>
-                  </template>
-
-                  <template x-if="getOrderItems(order).length===0">
-                    <div class="text-center py-8 text-gray-500 text-sm">Tidak ada item dalam pesanan ini</div>
-                  </template>
+                    <button @click="searchQuery = ''" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Bersihkan
+                    </button>
                 </div>
-
-                <div class="mt-4 pt-3 border-t flex justify-between items-center">
-                  <div class="text-lg font-semibold">Total</div>
-                  <div class="text-lg font-bold" x-text="formatIDR(order.total)"></div>
-                </div>
-              </div>
             </div>
-          </div>
-        </template>
 
-        {{-- Empty state --}}
-        <div x-show="filtered().length===0" class="text-center py-12">
-          <svg class="w-14 h-14 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-          </svg>
-          <h3 class="text-lg font-semibold text-gray-900 mb-1">Tidak ada pesanan</h3>
-          <p class="text-gray-500">Coba ubah kategori atau kata kunci pencarian</p>
+            {{-- Orders List --}}
+            <div class="space-y-4">
+                <template x-for="order in filteredOrders()" :key="order.id">
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded flex items-center justify-center text-emerald-700 font-semibold text-lg">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-lg" x-text="getOrderCode(order)"></div>
+                                    <div class="text-xs text-gray-500" x-text="formatDate(order.created_at)"></div>
+                                    <div class="text-xs text-gray-500" x-text="`${order.order_items?.length || 0} item(s)`"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full text-sm" :class="getStatusClass(order.status)" x-text="getStatusLabel(order.status)"></span>
+                                <button @click="toggleDetails(order.id)" class="text-sm px-3 py-1 bg-white border rounded hover:bg-gray-50">
+                                    <span x-text="order.showDetails ? 'Sembunyikan' : 'Detail'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Order Details (collapsible) -->
+                        <div x-show="order.showDetails" x-transition class="mt-3">
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Informasi Pengiriman:</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div>
+                                        <strong>Nama Pemesan:</strong> <span x-text="order.nama_pemesan"></span><br>
+                                        <strong>Alamat:</strong> <span x-text="order.address"></span><br>
+                                        <strong>Kota:</strong> <span x-text="order.kota"></span> <span x-text="order.kode_pos"></span>
+                                    </div>
+                                    <div>
+                                        <strong>No. HP:</strong> <span x-text="order.nomor_hp"></span><br>
+                                        <strong>Metode Pengiriman:</strong> <span x-text="order.jenis_pengiriman"></span><br>
+                                        <strong>Metode Pembayaran:</strong> <span x-text="order.metode_pembayaran"></span>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="font-medium mt-4 mb-2">Item Pesanan:</h4>
+                                <div class="space-y-3">
+                                    <template x-for="item in getOrderItems(order)" :key="item.id">
+                                        <div class="flex items-start gap-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                            <!-- Product Image -->
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                <template x-if="item.product?.photos && item.product.photos.length > 0">
+                                                    <img 
+                                                        :src="`/storage/${item.product.photos[0].url}`" 
+                                                        :alt="item.product?.name || 'Product Image'" 
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-gray-400\'><svg class=\'w-8 h-8\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14\'></path></svg></div>'"
+                                                    >
+                                                </template>
+                                                <template x-if="!item.product?.photos || item.product.photos.length === 0">
+                                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path>
+                                                        </svg>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            
+                                            <!-- Product Details -->
+                                            <div class="flex-1 min-w-0">
+                                                <div class="font-semibold text-gray-900 mb-1" x-text="item.product?.name || 'Produk tidak tersedia'"></div>
+                                                
+                                                <template x-if="item.product?.description">
+                                                    <div class="text-sm text-gray-600 mb-2 truncate" x-text="item.product.description"></div>
+                                                </template>
+                                                
+                                                <div class="flex items-center justify-between">
+                                                    <div class="text-sm text-gray-500">
+                                                        <span class="font-medium">Qty:</span> 
+                                                        <span x-text="item.quantity"></span>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <div class="text-sm text-gray-500">
+                                                            <span x-text="formatIDR(item.price)"></span> × <span x-text="item.quantity"></span>
+                                                        </div>
+                                                        <div class="font-semibold text-blue-600" x-text="formatIDR(item.quantity * item.price)"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- No items message -->
+                                    <template x-if="getOrderItems(order).length === 0">
+                                        <div class="text-center py-8 text-gray-500">
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m8 0V4.5"></path>
+                                            </svg>
+                                            <p>Tidak ada item dalam pesanan ini</p>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                                    <div class="text-lg font-semibold">
+                                        Total: <span x-text="formatIDR(order.total)"></span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <!-- Tombol Batalkan untuk status processing -->
+                                        <template x-if="order.status === 'processing'">
+                                            <button 
+                                                @click="cancelOrder(order.id)"
+                                                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium transition-colors"
+                                                :disabled="order.isUpdating"
+                                            >
+                                                <span x-show="!order.isUpdating">Batalkan Pesanan</span>
+                                                <span x-show="order.isUpdating" class="flex items-center">
+                                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Membatalkan...
+                                                </span>
+                                            </button>
+                                        </template>
+                                        
+                                        <!-- Tombol Pesanan Selesai untuk status shipped -->
+                                        <template x-if="order.status === 'shipped'">
+                                            <button 
+                                                @click="completeOrder(order.id)"
+                                                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
+                                                :disabled="order.isUpdating"
+                                            >
+                                                <span x-show="!order.isUpdating">Pesanan Selesai</span>
+                                                <span x-show="order.isUpdating" class="flex items-center">
+                                                    <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Menyelesaikan...
+                                                </span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                {{-- Empty State --}}
+                <div x-show="filteredOrders().length === 0" class="text-center py-12">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada pesanan ditemukan</h3>
+                    <p class="text-gray-500 mb-4">Belum ada pesanan sesuai filter yang dipilih</p>
+                    <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Mulai Belanja
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+    </main>
 
-  {{-- Footer --}}
-  @include('components.footer')
+    {{-- Footer --}}
+    <footer class="mt-auto">
+        @include('components.footer')
+    </footer>
 
-  <script>
-    function ordersTabs() {
-      return {
-        // Data
-        searchQuery: '',
-        activeStatus: 'pending', // default tab
-        orders: @json($orders ?? []),
+    <script>
+        function ordersPage() {
+            return {
+                activeStatus: 'all',
+                searchQuery: '',
+                orders: @json($orders ?? []),
+                
+                init() {
+                    console.log('Orders data loaded:', this.orders);
+                    // Initialize showDetails property for each order
+                    this.orders = this.orders.map(order => ({
+                        ...order,
+                        showDetails: false,
+                        isUpdating: false
+                    }));
+                    
+                    // Log individual order structures for debugging
+                    if (this.orders.length > 0) {
+                        console.log('First order structure:', this.orders[0]);
+                        console.log('First order items (order_items):', this.orders[0].order_items);
+                        console.log('First order items (orderItems):', this.orders[0].orderItems);
+                        console.log('Available keys in first order:', Object.keys(this.orders[0]));
+                    }
+                    this.updateStats();
+                },
+                
+                updateStats() {
+                    // Update stats cards - only update elements that exist
+                    const processingElement = document.getElementById('processing-count');
+                    const shippedElement = document.getElementById('shipped-count');
+                    const completedElement = document.getElementById('completed-count');
+                    
+                    if (processingElement) {
+                        processingElement.textContent = this.countByStatus('processing');
+                    }
+                    if (shippedElement) {
+                        shippedElement.textContent = this.countByStatus('shipped');
+                    }
+                    if (completedElement) {
+                        completedElement.textContent = this.countByStatus('completed');
+                    }
+                },
+                
+                countByStatus(status) {
+                    return this.orders.filter(order => order.status === status).length;
+                },
+                
+                updateActiveStatus() {
+                    // Called when status filter changes
+                },
+                
+                filteredOrders() {
+                    let filtered = this.orders;
+                    
+                    // Filter by status
+                    if (this.activeStatus !== 'all') {
+                        filtered = filtered.filter(order => order.status === this.activeStatus);
+                    }
+                    
+                    // Filter by search query
+                    if (this.searchQuery.trim()) {
+                        const query = this.searchQuery.toLowerCase().trim();
+                        filtered = filtered.filter(order => {
+                            // Generate order code and search in it
+                            const orderCode = `ORD${String(order.id).padStart(4, '0')}`;
+                            if (orderCode.toLowerCase().includes(query)) {
+                                return true;
+                            }
+                            // Search in product names
+                            if (order.order_items && order.order_items.some(item => 
+                                item.product && item.product.name && 
+                                item.product.name.toLowerCase().includes(query)
+                            )) {
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                    
+                    return filtered;
+                },
+                
+                getOrderCode(order) {
+                    return `ORD${String(order.id).padStart(4, '0')}`;
+                },
+                
+                getStatusClass(status) {
+                    const classes = {
+                        'pending': 'bg-yellow-100 text-yellow-800',
+                        'processing': 'bg-blue-100 text-blue-800',
+                        'shipped': 'bg-cyan-100 text-cyan-800',
+                        'completed': 'bg-green-100 text-green-800',
+                        'cancelled': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getStatusLabel(status) {
+                    const labels = {
+                        'pending': 'Pending',
+                        'processing': 'Dikemas',
+                        'shipped': 'Dikirim',
+                        'completed': 'Selesai',
+                        'cancelled': 'Dibatalkan'
+                    };
+                    return labels[status] || status;
+                },
+                
+                formatIDR(amount) {
+                    return new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0
+                    }).format(Number(amount) || 0);
+                },
+                
+                formatDate(dateString) {
+                    if (!dateString) return '-';
+                    try {
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        }) + ' • ' + date.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } catch (e) {
+                        return dateString;
+                    }
+                },
+                
+                generateOrderCode(orderId) {
+                    return `ORD${String(orderId).padStart(4, '0')}`;
+                },
+                
+                getOrderItems(order) {
+                    return order.order_items || order.orderItems || [];
+                },
+                
+                toggleDetails(orderId) {
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex !== -1) {
+                        this.orders[orderIndex].showDetails = !this.orders[orderIndex].showDetails;
+                        
+                        // Debug: Log order details when toggled
+                        console.log('Toggling order details for order:', this.orders[orderIndex]);
+                        console.log('Order items (order_items):', this.orders[orderIndex].order_items);
+                        console.log('Order items (orderItems):', this.orders[orderIndex].orderItems);
+                        console.log('Order total:', this.orders[orderIndex].total);
+                    }
+                },
 
-        // Definisi tab + pemetaan label
-        tabs: [
-          { key: 'pending',    label: 'Belum Dibayar' },
-          { key: 'processing', label: 'Dikemas' },
-          { key: 'shipped',    label: 'Sedang Dikirim' },
-          { key: 'completed',  label: 'Selesai' },
-          { key: 'cancelled',  label: 'Dibatalkan' },
-        ],
+                async cancelOrder(orderId) {
+                    if (!confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')) {
+                        return;
+                    }
+                    
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex === -1) {
+                        alert('Pesanan tidak ditemukan');
+                        return;
+                    }
+                    
+                    // Set loading state
+                    this.orders[orderIndex].isUpdating = true;
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (!csrfToken) {
+                            throw new Error('CSRF token tidak ditemukan');
+                        }
+                        
+                        const response = await fetch(`/orders/${orderId}/cancel`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Update order status
+                            this.orders[orderIndex].status = 'cancelled';
+                            this.updateStats();
+                            
+                            // Show success message
+                            alert('Pesanan berhasil dibatalkan');
+                        } else {
+                            throw new Error(data.message || 'Gagal membatalkan pesanan');
+                        }
+                    } catch (error) {
+                        console.error('Error canceling order:', error);
+                        alert('Gagal membatalkan pesanan: ' + error.message);
+                    } finally {
+                        // Reset loading state
+                        if (this.orders[orderIndex]) {
+                            this.orders[orderIndex].isUpdating = false;
+                        }
+                    }
+                },
 
-        init() {
-          this.orders = (this.orders || []).map(o => ({ ...o, _open: false }));
-        },
-
-        setActive(key) { this.activeStatus = key; },
-
-        // Helpers
-        getOrderItems(order) { return order.order_items || order.orderItems || []; },
-
-        getOrderCode(order) { return `ORD${String(order.id).padStart(4,'0')}`; },
-
-        formatIDR(amount) {
-          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 })
-            .format(Number(amount) || 0);
-        },
-
-        formatDate(s) {
-          if (!s) return '-';
-          const d = new Date(s);
-          if (isNaN(d)) return s;
-          return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) +
-                 ' • ' + d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-        },
-
-        statusLabel(s) {
-          return ({
-            pending: 'Belum Dibayar',
-            processing: 'Dikemas',
-            shipped: 'Sedang Dikirim',
-            completed: 'Selesai',
-            cancelled: 'Dibatalkan'
-          })[s] || s;
-        },
-
-        statusClass(s) {
-          const map = {
-            pending:   'bg-yellow-100 text-yellow-800',
-            processing:'bg-blue-100 text-blue-800',
-            shipped:   'bg-cyan-100 text-cyan-800',
-            completed: 'bg-green-100 text-green-800',
-            cancelled: 'bg-red-100 text-red-800'
-          };
-          return map[s] || 'bg-gray-100 text-gray-800';
-        },
-
-        // Filter & hitung
-        matchesSearch(order) {
-          const q = this.searchQuery.trim().toLowerCase();
-          if (!q) return true;
-          if (this.getOrderCode(order).toLowerCase().includes(q)) return true;
-          return this.getOrderItems(order)?.some(it => it.product?.name?.toLowerCase().includes(q));
-        },
-
-        filtered() {
-          return (this.orders || [])
-            .filter(o => o.status === this.activeStatus)
-            .filter(o => this.matchesSearch(o));
-        },
-
-        count(statusKey) {
-          return (this.orders || []).filter(o => o.status === statusKey).length;
-        },
-      }
-    }
-  </script>
+                async completeOrder(orderId) {
+                    if (!confirm('Apakah Anda yakin pesanan ini sudah selesai?')) {
+                        return;
+                    }
+                    
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex === -1) {
+                        alert('Pesanan tidak ditemukan');
+                        return;
+                    }
+                    
+                    // Set loading state
+                    this.orders[orderIndex].isUpdating = true;
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                        if (!csrfToken) {
+                            throw new Error('CSRF token tidak ditemukan');
+                        }
+                        
+                        const response = await fetch(`/orders/${orderId}/complete`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            }
+                        });
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Update order status
+                            this.orders[orderIndex].status = 'completed';
+                            this.updateStats();
+                            
+                            // Show success message
+                            alert('Pesanan berhasil diselesaikan');
+                        } else {
+                            throw new Error(data.message || 'Gagal menyelesaikan pesanan');
+                        }
+                    } catch (error) {
+                        console.error('Error completing order:', error);
+                        alert('Gagal menyelesaikan pesanan: ' + error.message);
+                    } finally {
+                        // Reset loading state
+                        if (this.orders[orderIndex]) {
+                            this.orders[orderIndex].isUpdating = false;
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>

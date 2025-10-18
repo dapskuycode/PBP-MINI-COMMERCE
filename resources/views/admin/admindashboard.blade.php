@@ -59,18 +59,25 @@
   <main class="flex-1 p-8 space-y-6">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
+<<<<<<< HEAD
       {{-- <a href="#" class="text-emerald-700 font-semibold hover:underline">Logout</a> --}}
+=======
+      <div class="text-right">
+        <div class="text-lg font-semibold text-gray-700" id="currentDate"></div>
+        <div class="text-sm text-gray-500">{{ date('l') }}</div>
+      </div>
+>>>>>>> 24d47397d66fb7ddb33c20118aed86151d0c465b
     </div>
 
     {{-- Kartu ringkasan --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-emerald-100 grid place-items-center">
-          🛒
+        <div class="w-12 h-12 rounded-lg bg-amber-100 grid place-items-center">
+          �
         </div>
         <div>
-          <p class="text-sm text-gray-600">Pesanan Hari Ini</p>
-          <p class="text-2xl font-semibold">12</p>
+          <p class="text-sm text-gray-600">Pesanan Belum Dikirim</p>
+          <p class="text-2xl font-semibold text-amber-600">{{ $pendingShippedOrders }}</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
@@ -78,34 +85,58 @@
           💰
         </div>
         <div>
-          <p class="text-sm text-gray-600">Pendapatan Hari Ini</p>
-          <p class="text-2xl font-semibold text-green-700">Rp1.000.000,00</p>
+          <p class="text-sm text-gray-600">Pendapatan Bulan Ini</p>
+          <p class="text-2xl font-semibold text-green-700">Rp{{ number_format($monthlyRevenue, 0, ',', '.') }}</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-amber-100 grid place-items-center">
-          🔄
+        <div class="w-12 h-12 rounded-lg bg-blue-100 grid place-items-center">
+          �
         </div>
         <div>
-          <p class="text-sm text-gray-600">Perlu Diproses</p>
-          <p class="text-2xl font-semibold text-amber-600">4</p>
-        </div>
-      </div>
-      <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-red-100 grid place-items-center">
-          ⚠️
-        </div>
-        <div>
-          <p class="text-sm text-gray-600">Stok Menipis</p>
-          <p class="text-2xl font-semibold text-red-600">3</p>
+          <p class="text-sm text-gray-600">User Aktif</p>
+          <p class="text-2xl font-semibold text-blue-600">{{ $activeUsers }}</p>
         </div>
       </div>
     </div>
 
-    {{-- Grafik Penjualan --}}
-    <div class="bg-white rounded-xl shadow p-5">
-      <h2 class="font-semibold mb-3">Rekap Pesanan Mingguan</h2>
-      <canvas id="salesChart" height="100"></canvas>
+    {{-- Layout dengan Stok Produk di kiri dan Grafik di kanan --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {{-- Stok Produk Hampir Habis (memanjang ke bawah) --}}
+      <div class="bg-white rounded-xl shadow p-5">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-red-100 grid place-items-center">⚠️</div>
+          Stok Produk Hampir Habis
+        </h2>
+        <div class="space-y-3">
+          @if($lowStockProducts->count() > 0)
+            @foreach($lowStockProducts as $product)
+              <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+                <div>
+                  <div class="font-medium text-red-800">{{ $product->name }}</div>
+                  <div class="text-sm text-red-600">Kategori: {{ $product->category->name }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-red-700">{{ $product->stock }}</div>
+                  <div class="text-xs text-red-500">tersisa</div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="text-center text-gray-500 py-4">
+              <p>Tidak ada produk dengan stok rendah</p>
+            </div>
+          @endif
+          
+          
+        </div>
+      </div>
+
+      {{-- Grafik Penjualan 12 bulan --}}
+      <div class="lg:col-span-2 bg-white rounded-xl shadow p-5">
+        <h2 class="font-semibold mb-3">Rekap Penjualan 12 Bulan Terakhir</h2>
+        <canvas id="salesChart" height="100"></canvas>
+      </div>
     </div>
 
     {{-- Tabel Pesanan Terbaru & Produk Terlaris --}}
@@ -124,33 +155,31 @@
             </tr>
           </thead>
           <tbody>
+            @forelse($recentOrders as $order)
             <tr class="border-b">
-              <td class="px-4 py-2">ORD-001</td>
-              <td class="px-4 py-2">Budi Santoso</td>
-              <td class="px-4 py-2">Rp100.000,00</td>
-              <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">Menunggu Diproses</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
+              <td class="px-4 py-2">{{ $order->formatted_id }}</td>
+              <td class="px-4 py-2">{{ $order->user->name }}</td>
+              <td class="px-4 py-2">Rp{{ number_format($order->total, 0, ',', '.') }}</td>
+              <td class="px-4 py-2">
+                @if($order->status == 'pending')
+                  <span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">Menunggu Diproses</span>
+                @elseif($order->status == 'processing')
+                  <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Diproses</span>
+                @elseif($order->status == 'shipped')
+                  <span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">Dikirim</span>
+                @elseif($order->status == 'completed')
+                  <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span>
+                @elseif($order->status == 'cancelled')
+                  <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">Batal</span>
+                @endif
+              </td>
+              <td class="px-4 py-2">{{ $order->created_at->format('Y-m-d') }}</td>
             </tr>
-            <tr class="border-b">
-              <td class="px-4 py-2">ORD-002</td>
-              <td class="px-4 py-2">Adi Wijaya</td>
-              <td class="px-4 py-2">Rp72.000,00</td>
-              <td class="px-4 py-2"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Dikirim</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
-            </tr>
-            <tr class="border-b">
-              <td class="px-4 py-2">ORD-003</td>
-              <td class="px-4 py-2">Citra Lestari</td>  
-              <td class="px-4 py-2">Rp30.000,00</td>
-              <td class="px-4 py-2"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
-            </tr>
+            @empty
             <tr>
-              <td class="px-4 py-2">ORD-004</td>
-              <td class="px-4 py-2">Doni Setiawan</td>
-              <td class="px-4 py-2">Rp55.000,00</td>
-              <td class="px-4 py-2"><span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">Batal</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
+              <td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada pesanan terbaru</td>
+            </tr>
+            @endforelse
             </tr>
           </tbody>
         </table>
@@ -159,36 +188,97 @@
       {{-- Produk Terlaris --}}
       <div class="bg-white rounded-xl shadow p-5">
         <h2 class="font-semibold mb-3 flex items-center gap-2">⭐ Produk Terlaris</h2>
-        <table class="w-full text-sm border">
-          <tbody>
-            <tr class="border-b"><td class="px-3 py-2">Cimol Bojot</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">50</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Seblak Kuah</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">45</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Pempek Ikan</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">39</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Keripik Buah</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">35</td></tr>
-            <tr><td class="px-3 py-2">Rendang Sapi</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">32</td></tr>
-          </tbody>
-        </table>
+        <div class="space-y-3">
+          @if($topProducts->count() > 0)
+            @foreach($topProducts as $index => $product)
+              @php
+                $colors = ['yellow', 'blue', 'green', 'purple', 'red'];
+                $color = $colors[$index % count($colors)];
+              @endphp
+              <div class="flex justify-between items-center p-3 bg-{{ $color }}-50 rounded-lg border-l-4 border-{{ $color }}-400">
+                <div>
+                  <div class="font-medium text-{{ $color }}-800">{{ $product->name }}</div>
+                  <div class="text-sm text-{{ $color }}-600">{{ $product->category->name }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-{{ $color }}-700">{{ $product->total_sold }}</div>
+                  <div class="text-xs text-{{ $color }}-500">terjual</div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="text-center text-gray-500 py-4">
+              <p>Tidak ada data penjualan produk</p>
+            </div>
+          @endif
+          
+          
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Set current date
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const options = { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+    });
+
+    // Chart for 12 months sales data
     const ctx = document.getElementById('salesChart');
     new Chart(ctx, {
-      type: 'bar',
+      type: 'line',
       data: {
-        labels: ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'],
+        labels: @json($monthLabels),
         datasets: [{
-          label: 'Jumlah Terjual',
-          data: [20, 35, 40, 55, 70, 90, 75],
-          backgroundColor: '#10b981'
+          label: 'Penjualan (Rupiah)',
+          data: @json($salesData),
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderColor: '#10b981',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#10b981',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 6
         }]
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
         scales: {
-          y: { beginAtZero: true }
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'Rp' + new Intl.NumberFormat('id-ID').format(value);
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        elements: {
+          point: {
+            hoverRadius: 8
+          }
         }
       }
     });

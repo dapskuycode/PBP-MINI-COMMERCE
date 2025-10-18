@@ -403,4 +403,102 @@ class OrderController extends Controller
         
         return $statusMap[$status] ?? $status;
     }
+
+    /**
+     * Cancel order (customer can cancel processing orders)
+     */
+    public function cancelOrder(Order $order)
+    {
+        $user = auth()->user();
+        
+        // Check if user owns this order
+        if ($order->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to cancel this order'
+            ], 403);
+        }
+        
+        // Check if order can be cancelled (only processing orders)
+        if ($order->status !== 'processing') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya pesanan yang sedang dikemas yang dapat dibatalkan'
+            ], 400);
+        }
+        
+        try {
+            $order->update(['status' => 'cancelled']);
+            
+            Log::info('Order cancelled by customer', [
+                'order_id' => $order->id,
+                'user_id' => $user->id
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil dibatalkan'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error cancelling order: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'user_id' => $user->id
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal membatalkan pesanan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Complete order (customer can mark shipped orders as completed)
+     */
+    public function completeOrder(Order $order)
+    {
+        $user = auth()->user();
+        
+        // Check if user owns this order
+        if ($order->user_id !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized to complete this order'
+            ], 403);
+        }
+        
+        // Check if order can be completed (only shipped orders)
+        if ($order->status !== 'shipped') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Hanya pesanan yang sedang dikirim yang dapat diselesaikan'
+            ], 400);
+        }
+        
+        try {
+            $order->update(['status' => 'completed']);
+            
+            Log::info('Order completed by customer', [
+                'order_id' => $order->id,
+                'user_id' => $user->id
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Pesanan berhasil diselesaikan'
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error completing order: ' . $e->getMessage(), [
+                'order_id' => $order->id,
+                'user_id' => $user->id
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyelesaikan pesanan: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
