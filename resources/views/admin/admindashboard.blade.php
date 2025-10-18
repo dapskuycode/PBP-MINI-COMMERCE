@@ -10,8 +10,6 @@
   {{-- Sidebar --}}
   <aside class="w-64 bg-white border-r">
     <div class="p-4 text-center border-b">
-      <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="mx-auto w-16 mb-2">
-      <h1 class="text-lg font-semibold text-emerald-700">TumbasLek</h1>
   <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="mx-auto w-16 mb-2">
   <h1 class="text-lg font-semibold text-emerald-700">TumbasLek</h1>
       <p class="text-xs text-gray-500">UMKM Mini-Commerce</p>

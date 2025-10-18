@@ -12,7 +12,9 @@
   {{-- Navbar --}}
   @include('components.navbar', ['isAdmin' => false])
 
-<<<<<<< HEAD
+  {{-- Header strip --}}
+  <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
+
   {{-- Main --}}
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="ordersTabs()">
     {{-- Alert --}}
@@ -23,37 +25,10 @@
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
           </svg>
           <p class="text-green-700 font-medium">{{ session('success') }}</p>
-=======
-    {{-- Navbar --}}
-    @include('components.navbar', ['isAdmin' => false])
-
-    {{-- Main Content --}}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {{-- Alert Messages --}}
-        @if(session('success'))
-            <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                    </svg>
-                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-        {{-- Header --}}
-        <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
-                <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
-            </div>
->>>>>>> 9537a445ae0414a3fdee832627177c5bfb6645f8
         </div>
       </div>
     @endif
 
-<<<<<<< HEAD
     {{-- Header --}}
     <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-6">
       <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-16 h-16 rounded-full">
@@ -61,199 +36,6 @@
         <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
         <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
       </div>
-=======
-        {{-- Stats Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900">Processing</h3>
-                <p class="text-3xl font-bold text-blue-600" id="processing-count">0</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900">Shipped</h3>
-                <p class="text-3xl font-bold text-cyan-600" id="shipped-count">0</p>
-            </div>
-            
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900">Completed</h3>
-                <p class="text-3xl font-bold text-green-600" id="completed-count">0</p>
-            </div>
-        </div>
-
-        {{-- Orders Section --}}
-        <div class="bg-white rounded-xl shadow-md p-6" x-data="ordersPage()">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-900">Pesanan Anda</h2>
-                <div class="flex gap-2">
-                    <select x-model="activeStatus" @change="updateActiveStatus()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="all">Semua Status</option>
-                        <option value="processing">Processing</option>
-                        <option value="shipped">Dikirim</option>
-                        <option value="completed">Selesai</option>
-                        <option value="cancelled">Dibatalkan</option>
-                    </select>
-                </div>
-            </div>
-
-            {{-- Search --}}
-            <div class="mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="flex-1 relative">
-                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
-                        <input x-model="searchQuery" type="text" placeholder="Cari berdasarkan kode pesanan atau nama produk..."
-                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-                    <button @click="searchQuery = ''" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
-                        Bersihkan
-                    </button>
-                </div>
-            </div>
-
-            {{-- Orders List --}}
-            <div class="space-y-4">
-                <template x-for="order in filteredOrders()" :key="order.id">
-                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 bg-emerald-100 rounded flex items-center justify-center text-emerald-700 font-semibold text-lg">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="font-medium text-lg" x-text="getOrderCode(order)"></div>
-                                    <div class="text-xs text-gray-500" x-text="formatDate(order.created_at)"></div>
-                                    <div class="text-xs text-gray-500" x-text="`${order.order_items?.length || 0} item(s)`"></div>
-                                </div>
-                            </div>
-
-                            <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full text-sm" :class="getStatusClass(order.status)" x-text="getStatusLabel(order.status)"></span>
-                                <button @click="toggleDetails(order.id)" class="text-sm px-3 py-1 bg-white border rounded hover:bg-gray-50">
-                                    <span x-text="order.showDetails ? 'Sembunyikan' : 'Detail'"></span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Order Details (collapsible) -->
-                        <div x-show="order.showDetails" x-transition class="mt-3">
-                            <div class="border-t pt-3">
-                                <h4 class="font-medium mb-2">Informasi Pengiriman:</h4>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                                    <div>
-                                        <strong>Nama Pemesan:</strong> <span x-text="order.nama_pemesan"></span><br>
-                                        <strong>Alamat:</strong> <span x-text="order.address"></span><br>
-                                        <strong>Kota:</strong> <span x-text="order.kota"></span> <span x-text="order.kode_pos"></span>
-                                    </div>
-                                    <div>
-                                        <strong>No. HP:</strong> <span x-text="order.nomor_hp"></span><br>
-                                        <strong>Metode Pengiriman:</strong> <span x-text="order.jenis_pengiriman"></span><br>
-                                        <strong>Metode Pembayaran:</strong> <span x-text="order.metode_pembayaran"></span>
-                                    </div>
-                                </div>
-                                
-                                <h4 class="font-medium mt-4 mb-2">Item Pesanan:</h4>
-                                <div class="space-y-3">
-                                    <template x-for="item in getOrderItems(order)" :key="item.id">
-                                        <div class="flex items-start gap-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
-                                            <!-- Product Image -->
-                                            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                                <template x-if="item.product?.photos && item.product.photos.length > 0">
-                                                    <img 
-                                                        :src="`/storage/${item.product.photos[0].url}`" 
-                                                        :alt="item.product?.name || 'Product Image'" 
-                                                        class="w-full h-full object-cover"
-                                                        onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-gray-400\'><svg class=\'w-8 h-8\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14\'></path></svg></div>'"
-                                                    >
-                                                </template>
-                                                <template x-if="!item.product?.photos || item.product.photos.length === 0">
-                                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
-                                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path>
-                                                        </svg>
-                                                    </div>
-                                                </template>
-                                            </div>
-                                            
-                                            <!-- Product Details -->
-                                            <div class="flex-1 min-w-0">
-                                                <div class="font-semibold text-gray-900 mb-1" x-text="item.product?.name || 'Produk tidak tersedia'"></div>
-                                                
-                                                <template x-if="item.product?.description">
-                                                    <div class="text-sm text-gray-600 mb-2 truncate" x-text="item.product.description"></div>
-                                                </template>
-                                                
-                                                <div class="flex items-center justify-between">
-                                                    <div class="text-sm text-gray-500">
-                                                        <span class="font-medium">Qty:</span> 
-                                                        <span x-text="item.quantity"></span>
-                                                    </div>
-                                                    <div class="text-right">
-                                                        <div class="text-sm text-gray-500">
-                                                            <span x-text="formatIDR(item.price)"></span> × <span x-text="item.quantity"></span>
-                                                        </div>
-                                                        <div class="font-semibold text-blue-600" x-text="formatIDR(item.quantity * item.price)"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    
-                                    <!-- No items message -->
-                                    <template x-if="getOrderItems(order).length === 0">
-                                        <div class="text-center py-8 text-gray-500">
-                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m8 0V4.5"></path>
-                                            </svg>
-                                            <p>Tidak ada item dalam pesanan ini</p>
-                                        </div>
-                                    </template>
-                                </div>
-
-                                <div class="mt-4 pt-3 border-t flex justify-between items-center">
-                                    <div class="text-lg font-semibold">
-                                        Total: <span x-text="formatIDR(order.total)"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-
-                {{-- Empty State --}}
-                <div x-show="filteredOrders().length === 0" class="text-center py-12">
-                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                    </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada pesanan ditemukan</h3>
-                    <p class="text-gray-500 mb-4">Belum ada pesanan sesuai filter yang dipilih</p>
-                    <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Mulai Belanja
-                    </a>
-                </div>
-            </div>
-        </div>
->>>>>>> 9537a445ae0414a3fdee832627177c5bfb6645f8
     </div>
 
     {{-- Pills kategori (menyamping) --}}
