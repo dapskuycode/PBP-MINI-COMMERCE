@@ -148,7 +148,15 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
               </svg>
-              {{ $stock>0 ? 'Tambah ke Keranjang' : 'Stok Habis' }}
+              @if($stock <= 0)
+                Stok Habis
+              @else
+                @guest
+                  Login untuk Beli
+                @else
+                  Tambah ke Keranjang
+                @endguest
+              @endif
             </button>
           </div>
         </div>
@@ -299,6 +307,13 @@
 
   // Add to cart function
   async function addToCart(productId) {
+    // Check if user is authenticated
+    @guest
+      // User not logged in - show login modal
+      showLoginModal();
+      return;
+    @endguest
+
     const quantityInput = document.getElementById('qty');
     const addToCartBtn = document.getElementById('addToCartBtn');
     const quantity = parseInt(quantityInput.value) || 1;
@@ -320,6 +335,19 @@
         })
       });
 
+      // Check if response redirects to login (unauthorized)
+      if (response.status === 302 || response.redirected || response.url.includes('/login')) {
+        showModal('Login Diperlukan', 'Anda perlu login untuk menambahkan produk ke keranjang', 'warning');
+        setTimeout(() => {
+          window.location.href = '{{ route('login') }}';
+        }, 2000);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.success) {
@@ -339,9 +367,37 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
         </svg>
-        Tambah ke Keranjang
+        @auth
+          Tambah ke Keranjang
+        @else
+          Login untuk Beli
+        @endauth
       `;
     }
+  }
+
+  // Show login required modal
+  function showLoginModal() {
+    const modal = document.getElementById('modal');
+    const modalIcon = document.getElementById('modal-icon');
+    const modalTitle = document.getElementById('modal-title');
+    const modalMessage = document.getElementById('modal-message');
+    const modalButton = modal.querySelector('button');
+
+    // Set login required style
+    modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-blue-100';
+    modalIcon.innerHTML = '<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
+
+    modalTitle.textContent = 'Login Diperlukan';
+    modalMessage.textContent = 'Anda perlu login untuk menambahkan produk ke keranjang';
+    
+    // Change button to redirect to login
+    modalButton.textContent = 'Login Sekarang';
+    modalButton.onclick = function() {
+      window.location.href = '{{ route('login') }}';
+    };
+
+    modal.classList.remove('hidden');
   }
 </script>
 </body>

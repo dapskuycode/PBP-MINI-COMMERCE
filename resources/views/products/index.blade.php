@@ -136,9 +136,7 @@
             })
             .then(response => {
                 if (response.status === 302 || response.redirected || response.url.includes('/login')) {
-                    if (confirm('Anda perlu login untuk menambahkan produk ke keranjang. Login sekarang?')) {
-                        window.location.href = '/login';
-                    }
+                    showLoginModal();
                     return null;
                 }
                 if (!response.ok) {
@@ -212,6 +210,30 @@
 
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
+        }
+
+        // Show login required modal
+        function showLoginModal() {
+            const modal = document.getElementById('modal');
+            const modalIcon = document.getElementById('modal-icon');
+            const modalTitle = document.getElementById('modal-title');
+            const modalMessage = document.getElementById('modal-message');
+            const modalButton = modal.querySelector('button');
+
+            // Set login required style
+            modalIcon.className = 'w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-blue-100';
+            modalIcon.innerHTML = '<svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>';
+
+            modalTitle.textContent = 'Login Diperlukan';
+            modalMessage.textContent = 'Anda perlu login untuk menambahkan produk ke keranjang';
+            
+            // Change button to redirect to login
+            modalButton.textContent = 'Login Sekarang';
+            modalButton.onclick = function() {
+                window.location.href = '/login';
+            };
+
+            modal.classList.remove('hidden');
         }
 
         // Close modal when clicking outside
