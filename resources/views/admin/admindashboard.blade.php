@@ -124,27 +124,7 @@
             </div>
           @endif
           
-          <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
-            <div>
-              <div class="font-medium text-orange-800">Kerupuk Udang Asli</div>
-              <div class="text-sm text-orange-600">Kategori: Makanan Ringan</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-orange-700">6</div>
-              <div class="text-xs text-orange-500">tersisa</div>
-            </div>
-          </div>
           
-          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-            <div>
-              <div class="font-medium text-yellow-800">Gudeg Jogja Original</div>
-              <div class="text-sm text-yellow-600">Kategori: Makanan Tradisional</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-yellow-700">8</div>
-              <div class="text-xs text-yellow-500">tersisa</div>
-            </div>
-          </div>
         </div>
       </div>
 
