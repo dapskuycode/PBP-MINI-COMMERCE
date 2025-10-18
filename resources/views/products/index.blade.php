@@ -39,14 +39,16 @@
                 // Kalau tidak, bangun dari $products (yang sudah include relasi category).
                 $cats = isset($categories)
                     ? collect($categories)->map(function ($c) {
-                        return (object)[ 'name' => data_get($c,'name'), 'slug' => data_get($c,'slug') ];
+                        $slug = \Illuminate\Support\Str::slug(data_get($c, 'name', ''));
+                        return (object)[ 'name' => data_get($c,'name'), 'slug' => $slug ];
                     })
                     : collect($products)
                         ->pluck('category')            // ambil relasi category
                         ->filter()                     // buang null
-                        ->unique('slug')               // unik berdasarkan slug
+                        ->unique('name')               // unik berdasarkan name (bukan slug)
                         ->map(function ($c) {          // normalisasi bentuk object {name, slug}
-                        return (object)[ 'name' => data_get($c,'name'), 'slug' => data_get($c,'slug') ];
+                            $slug = \Illuminate\Support\Str::slug(data_get($c, 'name', ''));
+                            return (object)[ 'name' => data_get($c,'name'), 'slug' => $slug ];
                         })
                         ->values();
 

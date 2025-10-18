@@ -16,22 +16,38 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['category', 'photos', 'reviews', 'orderItems'])
-            ->where('stock', '>', 0)
-            ->latest()
-            ->paginate(12);
+        $query = Product::with(['category', 'photos', 'reviews', 'orderItems'])
+            ->where('stock', '>', 0);
+
+        // Filter by category if category parameter exists
+        if (request('category')) {
+            $categorySlug = request('category');
+            // Convert slug back to name for filtering
+            $categoryName = str_replace('-', ' ', $categorySlug);
+            $categoryName = \Illuminate\Support\Str::title($categoryName);
+            
+            $query->whereHas('category', function($q) use ($categoryName) {
+                $q->where('name', 'like', '%' . $categoryName . '%');
+            });
+        }
+
+        $products = $query->latest()->paginate(12);
+
+        // Get all categories for sidebar
+        $categories = Category::all();
 
         // If this is an API request, return JSON
         if (request()->expectsJson()) {
             return response()->json([
                 'success' => true,
                 'data' => $products,
+                'categories' => $categories,
                 'message' => 'Products retrieved successfully'
             ]);
         }
 
         // Otherwise return view for web
-        return view('products.index', compact('products'));
+        return view('products.index', compact('products', 'categories'));
     }
 
     /**

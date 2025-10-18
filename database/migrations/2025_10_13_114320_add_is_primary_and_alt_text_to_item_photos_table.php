@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('item_photos', function (Blueprint $table) {
-            // Only add is_primary column since alt_text already exists
+            $table->string('alt_text')->nullable()->after('url');
             $table->boolean('is_primary')->default(false)->after('alt_text');
         });
     }
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('item_photos', function (Blueprint $table) {
-            $table->dropColumn('is_primary');
+            $table->dropColumn(['alt_text', 'is_primary']);
         });
     }
 };
