@@ -39,7 +39,7 @@
                 <i class="fas fa-shopping-cart text-2xl text-[#82D2BC]"></i>
             </div>
             <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">
-                Mini Commerce
+                TumbasLek
             </h1>
             <p class="text-white/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)]">
             Selamat datang kembali!

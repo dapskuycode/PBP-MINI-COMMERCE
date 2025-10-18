@@ -36,7 +36,7 @@
       <div class="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
         <i class="fas fa-shopping-cart text-2xl text-[#82D2BC]"></i>
       </div>
-      <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">Mini Commerce</h1>
+      <h1 class="text-4xl font-extrabold text-white drop-shadow-[0_4px_16px_rgba(0,0,0,0.45)]">TumbasLek</h1>
       <p class="text-emerald-100">Bergabunglah dengan kami!</p>
     </div>
 

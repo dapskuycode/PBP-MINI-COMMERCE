@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Riwayat Pesanan — TokoKami</title>
+  <title>Riwayat Pesanan — TumbasLek</title>
 
   {{-- TANPA VITE: pakai CDN agar langsung tampil --}}
   <script src="https://cdn.tailwindcss.com"></script>
@@ -32,7 +32,7 @@
   <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
     {{-- Heading --}}
     <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6 flex items-center gap-4">
-      <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-12 h-12 rounded-full">
+  <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-12 h-12 rounded-full">
       <div>
         <h1 class="text-2xl font-bold">Riwayat Pesanan</h1>
         <p class="text-sm text-gray-500">Pantau status pesananmu di sini</p>

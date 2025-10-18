@@ -21,27 +21,6 @@
   @endphp
 
   <div class="min-h-screen bg-rose-50">
-      {{-- Top bar judul --}}
-      <header class="bg-emerald-400">
-          <div class="mx-auto max-w-7xl px-6 py-3 flex items-center justify-between">
-              <div class="text-white font-semibold text-lg">UMKM Mini-Commerce</div>
-
-              <div class="flex items-center gap-4">
-                  <div class="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.33 0-8 2.17-8 4.5V21h16v-2.5C20 16.17 16.33 14 12 14Z"/>
-                      </svg>
-                  </div>
-
-                  {{-- Logout GET (sesuai web.php kamu) --}}
-                  <a href="{{ route('logout') }}"
-                     class="rounded-md bg-rose-100 px-4 py-1.5 text-rose-600 text-sm font-medium hover:bg-rose-200">
-                      Logout
-                  </a>
-              </div>
-          </div>
-      </header>
-
       <div class="mx-auto max-w-7xl px-6">
           <div class="py-6 text-gray-800">
               <h1 class="text-2xl font-bold">Profil Pengguna</h1>

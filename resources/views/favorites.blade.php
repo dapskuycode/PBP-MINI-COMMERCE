@@ -3,19 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Produk Favorit — TokoKami</title>
+  <title>Produk Favorit — TumbasLek</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 text-gray-900">
 
   @include('components.navbar', ['isAdmin' => false])
-
-  <div class="bg-emerald-500/80 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-12 flex items-center text-sm">
-      UMKM Mini-Commerce
-    </div>
-  </div>
-
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <h1 class="text-2xl font-bold mb-6">Profil Pengguna</h1>
 
