@@ -59,18 +59,21 @@
   <main class="flex-1 p-8 space-y-6">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
-      <a href="#" class="text-emerald-700 font-semibold hover:underline">Logout</a>
+      <div class="text-right">
+        <div class="text-lg font-semibold text-gray-700" id="currentDate"></div>
+        <div class="text-sm text-gray-500">{{ date('l') }}</div>
+      </div>
     </div>
 
     {{-- Kartu ringkasan --}}
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-emerald-100 grid place-items-center">
-          🛒
+        <div class="w-12 h-12 rounded-lg bg-amber-100 grid place-items-center">
+          �
         </div>
         <div>
-          <p class="text-sm text-gray-600">Pesanan Hari Ini</p>
-          <p class="text-2xl font-semibold">12</p>
+          <p class="text-sm text-gray-600">Pesanan Belum Dikirim</p>
+          <p class="text-2xl font-semibold text-amber-600">8</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
@@ -78,34 +81,103 @@
           💰
         </div>
         <div>
-          <p class="text-sm text-gray-600">Pendapatan Hari Ini</p>
-          <p class="text-2xl font-semibold text-green-700">Rp1.000.000,00</p>
+          <p class="text-sm text-gray-600">Pendapatan Bulan Ini</p>
+          <p class="text-2xl font-semibold text-green-700">Rp25.350.000</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-amber-100 grid place-items-center">
-          🔄
+        <div class="w-12 h-12 rounded-lg bg-blue-100 grid place-items-center">
+          �
         </div>
         <div>
-          <p class="text-sm text-gray-600">Perlu Diproses</p>
-          <p class="text-2xl font-semibold text-amber-600">4</p>
-        </div>
-      </div>
-      <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-red-100 grid place-items-center">
-          ⚠️
-        </div>
-        <div>
-          <p class="text-sm text-gray-600">Stok Menipis</p>
-          <p class="text-2xl font-semibold text-red-600">3</p>
+          <p class="text-sm text-gray-600">User Aktif</p>
+          <p class="text-2xl font-semibold text-blue-600">127</p>
         </div>
       </div>
     </div>
 
-    {{-- Grafik Penjualan --}}
-    <div class="bg-white rounded-xl shadow p-5">
-      <h2 class="font-semibold mb-3">Rekap Pesanan Mingguan</h2>
-      <canvas id="salesChart" height="100"></canvas>
+    {{-- Layout dengan Stok Produk di kiri dan Grafik di kanan --}}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {{-- Stok Produk Hampir Habis (memanjang ke bawah) --}}
+      <div class="bg-white rounded-xl shadow p-5">
+        <h2 class="font-semibold mb-3 flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-red-100 grid place-items-center">⚠️</div>
+          Stok Produk Hampir Habis
+        </h2>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+            <div>
+              <div class="font-medium text-red-800">Keripik Singkong Pedas</div>
+              <div class="text-sm text-red-600">Kategori: Makanan Ringan</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-red-700">2</div>
+              <div class="text-xs text-red-500">tersisa</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+            <div>
+              <div class="font-medium text-orange-800">Rendang Sapi Premium</div>
+              <div class="text-sm text-orange-600">Kategori: Makanan Siap Saji</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-orange-700">5</div>
+              <div class="text-xs text-orange-500">tersisa</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+            <div>
+              <div class="font-medium text-yellow-800">Seblak Kuah Seafood</div>
+              <div class="text-sm text-yellow-600">Kategori: Makanan Basah</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-yellow-700">7</div>
+              <div class="text-xs text-yellow-500">tersisa</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+            <div>
+              <div class="font-medium text-red-800">Pempek Ikan Tenggiri</div>
+              <div class="text-sm text-red-600">Kategori: Makanan Tradisional</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-red-700">3</div>
+              <div class="text-xs text-red-500">tersisa</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
+            <div>
+              <div class="font-medium text-orange-800">Kerupuk Udang Asli</div>
+              <div class="text-sm text-orange-600">Kategori: Makanan Ringan</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-orange-700">6</div>
+              <div class="text-xs text-orange-500">tersisa</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
+            <div>
+              <div class="font-medium text-yellow-800">Gudeg Jogja Original</div>
+              <div class="text-sm text-yellow-600">Kategori: Makanan Tradisional</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-yellow-700">8</div>
+              <div class="text-xs text-yellow-500">tersisa</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {{-- Grafik Penjualan 12 bulan --}}
+      <div class="lg:col-span-2 bg-white rounded-xl shadow p-5">
+        <h2 class="font-semibold mb-3">Rekap Penjualan 12 Bulan Terakhir</h2>
+        <canvas id="salesChart" height="100"></canvas>
+      </div>
     </div>
 
     {{-- Tabel Pesanan Terbaru & Produk Terlaris --}}
@@ -159,36 +231,126 @@
       {{-- Produk Terlaris --}}
       <div class="bg-white rounded-xl shadow p-5">
         <h2 class="font-semibold mb-3 flex items-center gap-2">⭐ Produk Terlaris</h2>
-        <table class="w-full text-sm border">
-          <tbody>
-            <tr class="border-b"><td class="px-3 py-2">Cimol Bojot</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">50</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Seblak Kuah</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">45</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Pempek Ikan</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">39</td></tr>
-            <tr class="border-b"><td class="px-3 py-2">Keripik Buah</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">35</td></tr>
-            <tr><td class="px-3 py-2">Rendang Sapi</td><td class="px-3 py-2 text-right text-blue-700 font-semibold">32</td></tr>
-          </tbody>
-        </table>
+        <div class="space-y-3">
+          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
+            <div>
+              <div class="font-medium text-yellow-800">Cimol Bojot</div>
+              <div class="text-sm text-yellow-600">Makanan Ringan</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-yellow-700">50</div>
+              <div class="text-xs text-yellow-500">terjual</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+            <div>
+              <div class="font-medium text-blue-800">Seblak Kuah</div>
+              <div class="text-sm text-blue-600">Makanan Basah</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-blue-700">45</div>
+              <div class="text-xs text-blue-500">terjual</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
+            <div>
+              <div class="font-medium text-green-800">Pempek Ikan</div>
+              <div class="text-sm text-green-600">Makanan Tradisional</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-green-700">39</div>
+              <div class="text-xs text-green-500">terjual</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+            <div>
+              <div class="font-medium text-purple-800">Keripik Buah</div>
+              <div class="text-sm text-purple-600">Makanan Ringan</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-purple-700">35</div>
+              <div class="text-xs text-purple-500">terjual</div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
+            <div>
+              <div class="font-medium text-red-800">Rendang Sapi</div>
+              <div class="text-sm text-red-600">Makanan Siap Saji</div>
+            </div>
+            <div class="text-right">
+              <div class="text-lg font-bold text-red-700">32</div>
+              <div class="text-xs text-red-500">terjual</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
+    // Set current date
+    document.addEventListener('DOMContentLoaded', function() {
+      const now = new Date();
+      const options = { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+    });
+
+    // Chart for 12 months sales data
     const ctx = document.getElementById('salesChart');
     new Chart(ctx, {
-      type: 'bar',
+      type: 'line',
       data: {
-        labels: ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'],
+        labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
         datasets: [{
-          label: 'Jumlah Terjual',
-          data: [20, 35, 40, 55, 70, 90, 75],
-          backgroundColor: '#10b981'
+          label: 'Penjualan (Juta Rupiah)',
+          data: [15.2, 18.5, 22.1, 19.8, 25.3, 28.7, 31.2, 29.6, 26.8, 32.1, 35.4, 38.9],
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderColor: '#10b981',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#10b981',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 6
         }]
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'top'
+          }
+        },
         scales: {
-          y: { beginAtZero: true }
+          y: { 
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return 'Rp' + value + 'jt';
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            }
+          }
+        },
+        elements: {
+          point: {
+            hoverRadius: 8
+          }
         }
       }
     });
