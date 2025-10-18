@@ -1,1 +1,4 @@
-!.gitignore
+# Allow all files in public storage to be tracked
+# This folder contains uploaded images that should be in repository
+!*
+!*/
