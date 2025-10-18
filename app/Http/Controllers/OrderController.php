@@ -26,8 +26,14 @@ class OrderController extends Controller
                 ->get();
             $totPending = $orders->where('status', 'pending')->count();
             $totProcessing = $orders->where('status', 'processing')->count();
+            $totShipped = $orders->where('status', 'shipped')->count();
             $totCompleted = $orders->where('status', 'completed')->count();
             $totCancelled = $orders->where('status', 'cancelled')->count();
+            $orderPending = $orders->where('status', 'pending');
+            $orderProcessing = $orders->where('status', 'processing');
+            $orderShipped = $orders->where('status', 'shipped');
+            $orderCompleted = $orders->where('status', 'completed');
+            $orderCancelled = $orders->where('status', 'cancelled');
                 
             if (request()->expectsJson()) {
                 return response()->json([
@@ -37,7 +43,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            return view('admin.adminorders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled'));
+            return view('admin.adminorders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderPending', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
         } else {
             $orders = Order::with(['orderItems.product'])
                 ->where('user_id', $user->id)
@@ -45,8 +51,14 @@ class OrderController extends Controller
                 ->get();
             $totPending = $orders->where('status', 'pending')->count();
             $totProcessing = $orders->where('status', 'processing')->count();
+            $totShipped = $orders->where('status', 'shipped')->count();
             $totCompleted = $orders->where('status', 'completed')->count();
             $totCancelled = $orders->where('status', 'cancelled')->count();
+            $orderPending = $orders->where('status', 'pending');
+            $orderProcessing = $orders->where('status', 'processing');
+            $orderShipped = $orders->where('status', 'shipped');
+            $orderCompleted = $orders->where('status', 'completed');
+            $orderCancelled = $orders->where('status', 'cancelled');
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => true,
@@ -55,7 +67,7 @@ class OrderController extends Controller
                 ]);
             }
             
-            return view('orders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled'));
+            return view('orders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderPending', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
         }
     }
 
