@@ -139,12 +139,12 @@
 				</svg>
 				Tambah Produk
 			</button>
-			<a href="{{ route('admin.managecategories.create') }}" 
-			   class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
-				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-				Tambah Kategori
-			</a>
+            <button onclick="openCategoryModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Tambah Kategori
+            </button>
 		</div>
 	</div>
 
@@ -421,6 +421,31 @@
         </div>
     </div>
 
+    <!-- Modal Tambah Kategori -->
+    <div id="categoryModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+            <h2 class="text-lg font-semibold mb-4">Tambah Kategori Baru</h2>
+
+            <form action="{{ route('admin.managecategories.store') }}" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 font-medium mb-1">Nama Kategori</label>
+                    <input type="text" id="name" name="name" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeCategoryModal()" class="px-4 py-2 rounded-lg border">Batal</button>
+                    <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">Tambah</button>
+                </div>
+            </form>
+
+            <!-- Tombol close (X) -->
+            <button onclick="closeCategoryModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+    </div>
 
     <script>
         // Modal Functions
@@ -434,6 +459,16 @@
             // Clear photo previews
             document.getElementById('create-photo-preview').innerHTML = '';
             document.getElementById('create-photo-preview').classList.add('hidden');
+        }
+
+        function openCategoryModal() {
+		document.getElementById('categoryModal').classList.remove('hidden');
+		document.getElementById('categoryModal').classList.add('flex');
+        }
+        
+        function closeCategoryModal() {
+            document.getElementById('categoryModal').classList.add('hidden');
+            document.getElementById('categoryModal').classList.remove('flex');
         }
 
         function openEditModal(product) {
