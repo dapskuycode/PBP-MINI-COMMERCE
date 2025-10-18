@@ -55,7 +55,6 @@
         <h1 class="text-3xl font-bold text-gray-800">Manajemen Pengguna</h1>
         <p class="text-gray-600">Kelola akun admin & pelanggan.</p>
       </div>
-      <a href="{{ route('dashboard') }}" class="text-emerald-700 font-semibold hover:underline">← Kembali ke Dashboard</a>
     </div>
 
     {{-- Flash Messages --}}
