@@ -18,12 +18,12 @@
         .banner-slider {
             display: flex;
             transition: transform 0.6s ease-in-out;
-            width: 200%; /* 2 slides × 100% */
+            width: 400%; /* 4 slides × 100% */
             height: 100%;
         }
 
         .banner-slide {
-            width: 50%; /* 100% / 2 slides */
+            width: 25%; /* 100% / 4 slides */
             height: 100%;
             position: relative;
             flex-shrink: 0;
@@ -86,6 +86,20 @@
                      alt="Flash Sale" 
                      class="w-full h-full object-contain md:object-cover">
             </div>
+            
+            <!-- Banner 3: Promo Spesial -->
+            <div class="banner-slide">
+                <img src="{{ asset('images/Promo Spesial.png') }}" 
+                     alt="Promo Spesial" 
+                     class="w-full h-full object-contain md:object-cover">
+            </div>
+
+            <!-- Banner 4: Gratis Ongkir -->
+            <div class="banner-slide">
+                <img src="{{ asset('images/Gratis Ongkir.png') }}" 
+                     alt="Gratis Ongkir" 
+                     class="w-full h-full object-contain md:object-cover">
+            </div>
         </div>
 
         <!-- Navigation buttons -->
@@ -100,6 +114,8 @@
         <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
             <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(1)"></span>
             <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(2)"></span>
+            <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(3)"></span>
+            <span class="banner-dot w-3 h-3 bg-white bg-opacity-50 rounded-full cursor-pointer transition-all hover:bg-opacity-100" onclick="currentBannerSlide(4)"></span>
         </div>
     </section>
 
@@ -279,7 +295,7 @@
 
     <script>
         let currentBannerIndex = 0;
-        const totalBanners = 2; // Total number of banner slides
+        const totalBanners = 4; // Total number of banner slides
         const bannerSlider = document.getElementById('bannerSlider');
         const bannerDots = document.querySelectorAll('.banner-dot');
         let autoBannerInterval;
@@ -305,7 +321,7 @@
 
         // Function to update banner slider position and dots
         function updateBannerSlider() {
-            const translateX = currentBannerIndex * -50; // 50% per slide
+            const translateX = currentBannerIndex * -25; // 25% per slide (100% / 4 slides)
             bannerSlider.style.transform = `translateX(${translateX}%)`;
 
             // Update dots
