@@ -242,6 +242,93 @@
                 closeModal();
             }
         });
+
+        // Toggle favorite function
+        async function toggleFavorite(productId, event) {
+            console.log('Toggling favorite for product:', productId);
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                showNotification('CSRF token tidak ditemukan', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/favorites/toggle/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    if (response.status === 302 || response.redirected || response.url.includes('/login')) {
+                        showLoginModal();
+                        return;
+                    }
+                    const errorText = await response.text();
+                    console.error('Response error:', errorText);
+                    showNotification(`Error: ${response.status} - ${response.statusText}`, 'error');
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    // Update heart icons based on favorite status
+                    const outlineIcon = document.getElementById(`fav-outline-${productId}`);
+                    const solidIcon = document.getElementById(`fav-solid-${productId}`);
+
+                    console.log('Outline icon found:', outlineIcon ? 'Yes' : 'No');
+                    console.log('Solid icon found:', solidIcon ? 'Yes' : 'No');
+                    console.log('Is favorited:', data.is_favorited);
+
+                    if (outlineIcon && solidIcon) {
+                        if (data.is_favorited) {
+                            outlineIcon.classList.add('hidden');
+                            solidIcon.classList.remove('hidden');
+                        } else {
+                            outlineIcon.classList.remove('hidden');
+                            solidIcon.classList.add('hidden');
+                        }
+                    }
+
+                    // Show notification
+                    showNotification(data.message, data.is_favorited ? 'success' : 'info');
+                } else {
+                    showNotification(data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error toggling favorite:', error);
+                showNotification('Terjadi kesalahan. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // Show notification function
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                type === 'info' ? 'bg-blue-500' :
+                'bg-gray-500'
+            }`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Remove notification after 3 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
     </script>
 </body>
 </html>
