@@ -12,7 +12,7 @@
 @endphp
 
 <nav class="bg-white shadow-lg sticky top-0 z-50">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-12 xl:px-16">
     <div class="flex justify-between items-center h-16">
       {{-- Logo --}}
       <div class="flex items-center">
@@ -30,7 +30,7 @@
       </div>
 
       {{-- Links (Desktop) --}}
-      <div class="hidden md:flex items-center gap-8">
+      <div class="hidden md:flex items-center gap-6 md:flex-1 min-w-0 ml-11">
         @if($isAdmin)
           {{-- Admin Links --}}
           <a href="{{ route('dashboard') }}"
@@ -53,23 +53,23 @@
           {{-- Public Links --}}
 
           <a href="{{ route('home') }}"
-            class="relative py-2 {{ request()->routeIs('home') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
+            class="shrink-0 relative py-2 {{ request()->routeIs('home') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
             {{ request()->routeIs('home') ? 'aria-current=page' : '' }}>
             Home
           </a>
 
           <a href="{{ url('/products') }}"
-             class="relative py-2 {{ request()->is('products*') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
+             class="shrink-0 relative py-2 {{ request()->is('products*') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
              {{ request()->is('products*') ? 'aria-current=page' : '' }}>
             Produk
           </a>
           
           <a href="{{ route('about') }}"
-             class="relative py-2 {{ request()->routeIs('about') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
+             class="shrink-0 relative py-2 {{ request()->routeIs('about') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
              {{ request()->routeIs('about') ? 'aria-current=page' : '' }}>
             Tentang Kami
           </a>
-          <div class="flex-1 max-w-lg mx-8 hidden md:block">
+          <div class="flex-1 mx-4 md:mx-8 hidden md:block min-w-0">
             <form action="{{ route('search') }}" method="GET" class="relative">
               <input type="text" name="q" value="{{ request('q') }}" placeholder="Cari produk…"
                     class="w-full pl-4 pr-12 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
@@ -85,7 +85,7 @@
       </div>
 
       {{-- Actions kanan --}}
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 shrink-0">
         @if(!$isAdmin)
           {{-- Cart untuk user biasa --}}
           @php $cartCount = session('cart.count', 0); @endphp
