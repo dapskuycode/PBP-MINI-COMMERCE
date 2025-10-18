@@ -45,7 +45,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900">Processing</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Dikemas</h3>
           <p class="text-3xl font-bold text-blue-600" id="processing-count">0</p>
         </div>
 
@@ -55,7 +55,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900">Shipped</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Sedang Dikirim</h3>
           <p class="text-3xl font-bold text-cyan-600" id="shipped-count">0</p>
         </div>
 
@@ -65,7 +65,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900">Completed</h3>
+          <h3 class="text-lg font-semibold text-gray-900">Selesai</h3>
           <p class="text-3xl font-bold text-green-600" id="completed-count">0</p>
         </div>
       </div>
