@@ -59,7 +59,7 @@
   <main class="flex-1 p-8 space-y-6">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
-      <a href="#" class="text-emerald-700 font-semibold hover:underline">Logout</a>
+      {{-- <a href="#" class="text-emerald-700 font-semibold hover:underline">Logout</a> --}}
     </div>
 
     {{-- Kartu ringkasan --}}

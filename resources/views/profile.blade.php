@@ -23,7 +23,7 @@
   <div class="min-h-screen bg-rose-50">
       <div class="mx-auto max-w-7xl px-6">
           <div class="py-6 text-gray-800">
-              <h1 class="text-2xl font-bold">Profil Pengguna</h1>
+              <h1 class="text-2xl font-bold">Profil Saya</h1>
           </div>
 
           <div class="grid grid-cols-12 gap-6 pb-12">
