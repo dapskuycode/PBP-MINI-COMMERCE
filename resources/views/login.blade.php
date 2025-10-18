@@ -109,7 +109,7 @@
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email/Username
+                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email
                     </label>
                     <div class="relative">
                         <input type="email"
