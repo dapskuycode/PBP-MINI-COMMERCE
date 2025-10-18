@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pengguna • UMKM Mini-Commerce</title>
+  <title>Pengguna - TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>

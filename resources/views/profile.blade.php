@@ -4,6 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profil Pengguna — TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
 
   {{-- Pakai Tailwind via CDN supaya langsung tampil rapi tanpa build --}}
   <script src="https://cdn.tailwindcss.com"></script>
