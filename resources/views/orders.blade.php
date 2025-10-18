@@ -1,206 +1,396 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Riwayat Pesanan — TumbasLek</title>
-
-  {{-- TANPA VITE: pakai CDN agar langsung tampil --}}
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-  <script>
-    // ==== INJEKSI DATA (NANTI) ====
-    // Opsi 1 (front-end inject): isi window.ORDERS dari script atau ajax-mu:
-    // window.ORDERS = [{ code:'INV...', date:'2025-10-09 09:00', status:'dikemas', total:85000, items:[{name:'...',qty:1}] }, ...];
-    //
-    // Opsi 2 (backend Blade): kirim variabel $orders (array) dan biarkan script di bawah mengambilnya.
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Pesanan — TokoKami</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-900"
-      x-data="ordersPage({ 
-        // kalau backend kirim $orders, pakai itu; kalau tidak ada, fallback ke window.ORDERS; kalau tetap tidak ada, []
-        initial: (typeof @json(isset($orders)) !== 'undefined' && @json(isset($orders)) ? @json($orders ?? []) : (window.ORDERS || []))
-      })">
+<body class="bg-gray-50"
 
-  {{-- Navbar --}}
-  @include('components.navbar', ['isAdmin' => false])
+    {{-- Navbar --}}
+    @include('components.navbar', ['isAdmin' => false])
 
-  {{-- Header strip --}}
-  <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
+    {{-- Header strip --}}
+    <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
 
-  <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-    {{-- Heading --}}
-    <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6 flex items-center gap-4">
-  <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-12 h-12 rounded-full">
-      <div>
-        <h1 class="text-2xl font-bold">Riwayat Pesanan</h1>
-        <p class="text-sm text-gray-500">Pantau status pesananmu di sini</p>
-      </div>
-    </div>
+    {{-- Main Content --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        {{-- Alert Messages --}}
+        @if(session('success'))
+            <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <p class="text-green-700 font-medium">{{ session('success') }}</p>
+                </div>
+            </div>
+        @endif
 
-    {{-- Tabs Status --}}
-    <div class="bg-white rounded-2xl shadow-sm border p-4 mb-6">
-      <div class="flex flex-wrap gap-2">
-<<<<<<< HEAD
-        <button @click="active='belum_bayar'" :class="tabClass('belum_bayar')" class="px-4 py-2 rounded-full text-sm border">
-          Pending
-          <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                :class="badgeClass('belum_bayar')" x-text="count('belum_bayar')"></span>
-        </button>
-=======
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
-        <button @click="active='dikemas'" :class="tabClass('dikemas')" class="px-4 py-2 rounded-full text-sm border">
-          Processing
-          <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                :class="badgeClass('dikemas')" x-text="count('dikemas')"></span>
-        </button>
-        <button @click="active='dikirim'" :class="tabClass('dikirim')" class="px-4 py-2 rounded-full text-sm border">
-          Shipped
-          <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                :class="badgeClass('dikirim')" x-text="count('dikirim')"></span>
-        </button>
-        <button @click="active='selesai'" :class="tabClass('selesai')" class="px-4 py-2 rounded-full text-sm border">
-          Completed
-          <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                :class="badgeClass('selesai')" x-text="count('selesai')"></span>
-        </button>
-        <button @click="active='dibatalkan'" :class="tabClass('dibatalkan')" class="px-4 py-2 rounded-full text-sm border">
-          Cancelled
-          <span class="ml-2 inline-flex items-center justify-center min-w-5 h-5 text-xs rounded-full px-1"
-                :class="badgeClass('dibatalkan')" x-text="count('dibatalkan')"></span>
-        </button>
-      </div>
-    </div>
+        {{-- Header --}}
+        <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
+            <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-16 h-16 rounded-full">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
+                <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
+            </div>
+        </div>
 
-    {{-- Search --}}
-    <div class="mb-4">
-      <div class="bg-white rounded-2xl shadow-sm border p-4 flex items-center gap-3">
-        <input x-model="q" type="text" placeholder="Cari kode pesanan / produk…"
-               class="flex-1 rounded-lg border-gray-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 px-4 py-2">
-        <button @click="q=''" class="text-sm px-3 py-2 rounded-lg border hover:bg-gray-50">Bersihkan</button>
-      </div>
-    </div>
+        {{-- Stats Cards --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Pending</h3>
+                <p class="text-3xl font-bold text-yellow-600" id="pending-count">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Processing</h3>
+                <p class="text-3xl font-bold text-blue-600" id="processing-count">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Shipped</h3>
+                <p class="text-3xl font-bold text-cyan-600" id="shipped-count">0</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 text-center">
+                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900">Completed</h3>
+                <p class="text-3xl font-bold text-green-600" id="completed-count">0</p>
+            </div>
+        </div>
 
-    {{-- List Pesanan --}}
-    <section class="space-y-4">
-      <template x-for="ord in filtered()" :key="ord.code">
-        <article class="bg-white border rounded-2xl p-4 md:p-5 shadow-sm">
-          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-emerald-100 grid place-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
-                </svg>
-              </div>
-              <div>
-                <div class="font-semibold" x-text="`#${ord.code}`"></div>
-                <div class="text-xs text-gray-500" x-text="formatDate(ord.date)"></div>
-              </div>
+        {{-- Orders Section --}}
+        <div class="bg-white rounded-xl shadow-md p-6" x-data="ordersPage()">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900">Pesanan Anda</h2>
+                <div class="flex gap-2">
+                    <select x-model="activeStatus" @change="updateActiveStatus()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="all">Semua Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Dikirim</option>
+                        <option value="completed">Selesai</option>
+                        <option value="cancelled">Dibatalkan</option>
+                    </select>
+                </div>
             </div>
 
-            <span class="px-3 py-1 rounded-full text-sm" :class="chip(ord.status)" x-text="label(ord.status)"></span>
-          </div>
+            {{-- Search --}}
+            <div class="mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="flex-1 relative">
+                        <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                        <input x-model="searchQuery" type="text" placeholder="Cari berdasarkan kode pesanan atau nama produk..."
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+                    <button @click="searchQuery = ''" class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200">
+                        Bersihkan
+                    </button>
+                </div>
+            </div>
 
-          <div class="mt-4 border-t pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="space-y-1">
-              <div class="text-sm text-gray-500">Item</div>
-              <ul class="text-sm text-gray-800 list-disc pl-4">
-                <template x-for="it in ord.items" :key="it.name">
-                  <li x-text="`${it.name} × ${it.qty}`"></li>
+            {{-- Orders List --}}
+            <div class="space-y-4">
+                <template x-for="order in filteredOrders()" :key="order.id">
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-emerald-100 rounded flex items-center justify-center text-emerald-700 font-semibold text-lg">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <div class="font-medium text-lg" x-text="getOrderCode(order)"></div>
+                                    <div class="text-xs text-gray-500" x-text="formatDate(order.created_at)"></div>
+                                    <div class="text-xs text-gray-500" x-text="`${order.order_items?.length || 0} item(s)`"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full text-sm" :class="getStatusClass(order.status)" x-text="getStatusLabel(order.status)"></span>
+                                <button @click="toggleDetails(order.id)" class="text-sm px-3 py-1 bg-white border rounded hover:bg-gray-50">
+                                    <span x-text="order.showDetails ? 'Sembunyikan' : 'Detail'"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Order Details (collapsible) -->
+                        <div x-show="order.showDetails" x-transition class="mt-3">
+                            <div class="border-t pt-3">
+                                <h4 class="font-medium mb-2">Informasi Pengiriman:</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div>
+                                        <strong>Nama Pemesan:</strong> <span x-text="order.nama_pemesan"></span><br>
+                                        <strong>Alamat:</strong> <span x-text="order.address"></span><br>
+                                        <strong>Kota:</strong> <span x-text="order.kota"></span> <span x-text="order.kode_pos"></span>
+                                    </div>
+                                    <div>
+                                        <strong>No. HP:</strong> <span x-text="order.nomor_hp"></span><br>
+                                        <strong>Metode Pengiriman:</strong> <span x-text="order.jenis_pengiriman"></span><br>
+                                        <strong>Metode Pembayaran:</strong> <span x-text="order.metode_pembayaran"></span>
+                                    </div>
+                                </div>
+                                
+                                <h4 class="font-medium mt-4 mb-2">Item Pesanan:</h4>
+                                <div class="space-y-3">
+                                    <template x-for="item in getOrderItems(order)" :key="item.id">
+                                        <div class="flex items-start gap-4 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+                                            <!-- Product Image -->
+                                            <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                <template x-if="item.product?.photos && item.product.photos.length > 0">
+                                                    <img 
+                                                        :src="`/storage/${item.product.photos[0].url}`" 
+                                                        :alt="item.product?.name || 'Product Image'" 
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex items-center justify-center text-gray-400\'><svg class=\'w-8 h-8\' fill=\'none\' stroke=\'currentColor\' viewBox=\'0 0 24 24\'><path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14\'></path></svg></div>'"
+                                                    >
+                                                </template>
+                                                <template x-if="!item.product?.photos || item.product.photos.length === 0">
+                                                    <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14"></path>
+                                                        </svg>
+                                                    </div>
+                                                </template>
+                                            </div>
+                                            
+                                            <!-- Product Details -->
+                                            <div class="flex-1 min-w-0">
+                                                <div class="font-semibold text-gray-900 mb-1" x-text="item.product?.name || 'Produk tidak tersedia'"></div>
+                                                
+                                                <template x-if="item.product?.description">
+                                                    <div class="text-sm text-gray-600 mb-2 truncate" x-text="item.product.description"></div>
+                                                </template>
+                                                
+                                                <div class="flex items-center justify-between">
+                                                    <div class="text-sm text-gray-500">
+                                                        <span class="font-medium">Qty:</span> 
+                                                        <span x-text="item.quantity"></span>
+                                                    </div>
+                                                    <div class="text-right">
+                                                        <div class="text-sm text-gray-500">
+                                                            <span x-text="formatIDR(item.price)"></span> × <span x-text="item.quantity"></span>
+                                                        </div>
+                                                        <div class="font-semibold text-blue-600" x-text="formatIDR(item.quantity * item.price)"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- No items message -->
+                                    <template x-if="getOrderItems(order).length === 0">
+                                        <div class="text-center py-8 text-gray-500">
+                                            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m8 0V4.5"></path>
+                                            </svg>
+                                            <p>Tidak ada item dalam pesanan ini</p>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t flex justify-between items-center">
+                                    <div class="text-lg font-semibold">
+                                        Total: <span x-text="formatIDR(order.total)"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </template>
-              </ul>
+
+                {{-- Empty State --}}
+                <div x-show="filteredOrders().length === 0" class="text-center py-12">
+                    <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak ada pesanan ditemukan</h3>
+                    <p class="text-gray-500 mb-4">Belum ada pesanan sesuai filter yang dipilih</p>
+                    <a href="{{ route('home') }}" class="inline-flex items-center px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Mulai Belanja
+                    </a>
+                </div>
             </div>
-            <div class="space-y-1">
-              <div class="text-sm text-gray-500">Total</div>
-              <div class="font-semibold" x-text="formatIDR(ord.total)"></div>
-            </div>
-            <div class="flex flex-wrap gap-2 md:justify-end">
-              <template x-if="ord.status==='dikemas'">
-                <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Hubungi Penjual</button>
-              </template>
-              <template x-if="ord.status==='dikirim'">
-                <button class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 text-sm">Lacak Paket</button>
-              </template>
-              <template x-if="ord.status==='selesai'">
-                <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Beli Lagi</button>
-              </template>
-              <template x-if="ord.status==='dibatalkan'">
-                <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Beli Lagi</button>
-              </template>
-              <button class="px-4 py-2 rounded-lg border text-sm hover:bg-gray-50">Detail</button>
-            </div>
-          </div>
-        </article>
-      </template>
+        </div>
+    </div>
 
-      {{-- Empty state --}}
-      <div x-show="filtered().length===0" class="bg-white border rounded-2xl p-10 text-center text-gray-500">
-        Belum ada pesanan pada status ini.
-      </div>
-    </section>
+    {{-- Footer --}}
+    @include('components.footer')
 
-    <div class="h-6"></div>
-  </main>
-
-  {{-- Footer --}}
-  @include('components.footer')
-
-  <script>
-    function ordersPage({initial = []} = {}){
-      return {
-        active: 'dikemas',
-        q: '',
-        data: Array.isArray(initial) ? initial : [],
-        label(s){
-          return ({
-            'dikemas':'Dikemas',
-            'dikirim':'Sedang Dikirim',
-            'selesai':'Selesai',
-            'dibatalkan':'Dibatalkan'
-          })[s] || s;
-        },
-        chip(s){
-          return ({
-            'dikemas':'bg-purple-100 text-purple-700',
-            'dikirim':'bg-blue-100 text-blue-700',
-            'selesai':'bg-emerald-100 text-emerald-700',
-            'dibatalkan':'bg-red-100 text-red-700'
-          })[s] || 'bg-gray-100 text-gray-700';
-        },
-        tabClass(s){
-          return (this.active===s)
-            ? 'bg-emerald-600 text-white border-emerald-600'
-            : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-200';
-        },
-        badgeClass(s){
-          return (this.active===s)
-            ? 'bg-white/20 text-white'
-            : 'bg-gray-100 text-gray-700';
-        },
-        count(s){
-          return this.data.filter(d => d.status===s).length;
-        },
-        filtered(){
-          const term = this.q.toLowerCase().trim();
-          return this.data
-            .filter(d => d.status===this.active)
-            .filter(d => !term || d.code?.toLowerCase().includes(term)
-              || (d.items || []).some(it => (it.name||'').toLowerCase().includes(term)));
-        },
-        formatIDR(n){
-          return new Intl.NumberFormat('id-ID', {style:'currency', currency:'IDR', maximumFractionDigits:0}).format(Number(n||0));
-        },
-        formatDate(str){
-          if(!str) return '-';
-          try{
-            const d = new Date(String(str).replace(' ', 'T'));
-            return d.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'})
-                 + ' • ' + d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-          }catch{ return str; }
+    <script>
+        function ordersPage() {
+            return {
+                activeStatus: 'all',
+                searchQuery: '',
+                orders: @json($orders ?? []),
+                
+                init() {
+                    console.log('Orders data loaded:', this.orders);
+                    // Initialize showDetails property for each order
+                    this.orders = this.orders.map(order => ({
+                        ...order,
+                        showDetails: false
+                    }));
+                    
+                    // Log individual order structures for debugging
+                    if (this.orders.length > 0) {
+                        console.log('First order structure:', this.orders[0]);
+                        console.log('First order items (order_items):', this.orders[0].order_items);
+                        console.log('First order items (orderItems):', this.orders[0].orderItems);
+                        console.log('Available keys in first order:', Object.keys(this.orders[0]));
+                    }
+                    this.updateStats();
+                },
+                
+                updateStats() {
+                    // Update stats cards
+                    document.getElementById('pending-count').textContent = this.countByStatus('pending');
+                    document.getElementById('processing-count').textContent = this.countByStatus('processing');
+                    document.getElementById('shipped-count').textContent = this.countByStatus('shipped');
+                    document.getElementById('completed-count').textContent = this.countByStatus('completed');
+                },
+                
+                countByStatus(status) {
+                    return this.orders.filter(order => order.status === status).length;
+                },
+                
+                updateActiveStatus() {
+                    // Called when status filter changes
+                },
+                
+                filteredOrders() {
+                    let filtered = this.orders;
+                    
+                    // Filter by status
+                    if (this.activeStatus !== 'all') {
+                        filtered = filtered.filter(order => order.status === this.activeStatus);
+                    }
+                    
+                    // Filter by search query
+                    if (this.searchQuery.trim()) {
+                        const query = this.searchQuery.toLowerCase().trim();
+                        filtered = filtered.filter(order => {
+                            // Generate order code and search in it
+                            const orderCode = `ORD${String(order.id).padStart(4, '0')}`;
+                            if (orderCode.toLowerCase().includes(query)) {
+                                return true;
+                            }
+                            // Search in product names
+                            if (order.order_items && order.order_items.some(item => 
+                                item.product && item.product.name && 
+                                item.product.name.toLowerCase().includes(query)
+                            )) {
+                                return true;
+                            }
+                            return false;
+                        });
+                    }
+                    
+                    return filtered;
+                },
+                
+                getOrderCode(order) {
+                    return `ORD${String(order.id).padStart(4, '0')}`;
+                },
+                
+                getStatusClass(status) {
+                    const classes = {
+                        'pending': 'bg-yellow-100 text-yellow-800',
+                        'processing': 'bg-blue-100 text-blue-800',
+                        'shipped': 'bg-cyan-100 text-cyan-800',
+                        'completed': 'bg-green-100 text-green-800',
+                        'cancelled': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getStatusLabel(status) {
+                    const labels = {
+                        'pending': 'Pending',
+                        'processing': 'Dikemas',
+                        'shipped': 'Dikirim',
+                        'completed': 'Selesai',
+                        'cancelled': 'Dibatalkan'
+                    };
+                    return labels[status] || status;
+                },
+                
+                formatIDR(amount) {
+                    return new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0
+                    }).format(Number(amount) || 0);
+                },
+                
+                formatDate(dateString) {
+                    if (!dateString) return '-';
+                    try {
+                        const date = new Date(dateString);
+                        return date.toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                        }) + ' • ' + date.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                    } catch (e) {
+                        return dateString;
+                    }
+                },
+                
+                generateOrderCode(orderId) {
+                    return `ORD${String(orderId).padStart(4, '0')}`;
+                },
+                
+                getOrderItems(order) {
+                    return order.order_items || order.orderItems || [];
+                },
+                
+                toggleDetails(orderId) {
+                    const orderIndex = this.orders.findIndex(order => order.id === orderId);
+                    if (orderIndex !== -1) {
+                        this.orders[orderIndex].showDetails = !this.orders[orderIndex].showDetails;
+                        
+                        // Debug: Log order details when toggled
+                        console.log('Toggling order details for order:', this.orders[orderIndex]);
+                        console.log('Order items (order_items):', this.orders[orderIndex].order_items);
+                        console.log('Order items (orderItems):', this.orders[orderIndex].orderItems);
+                        console.log('Order total:', this.orders[orderIndex].total);
+                    }
+                }
+            }
         }
-      }
-    }
-  </script>
+    </script>
 </body>
 </html>
