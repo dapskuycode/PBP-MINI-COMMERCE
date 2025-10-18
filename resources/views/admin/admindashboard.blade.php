@@ -73,7 +73,7 @@
         </div>
         <div>
           <p class="text-sm text-gray-600">Pesanan Belum Dikirim</p>
-          <p class="text-2xl font-semibold text-amber-600">8</p>
+          <p class="text-2xl font-semibold text-amber-600">{{ $pendingShippedOrders }}</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
@@ -82,7 +82,7 @@
         </div>
         <div>
           <p class="text-sm text-gray-600">Pendapatan Bulan Ini</p>
-          <p class="text-2xl font-semibold text-green-700">Rp25.350.000</p>
+          <p class="text-2xl font-semibold text-green-700">Rp{{ number_format($monthlyRevenue, 0, ',', '.') }}</p>
         </div>
       </div>
       <div class="bg-white p-5 rounded-xl shadow flex items-center gap-4">
@@ -91,7 +91,7 @@
         </div>
         <div>
           <p class="text-sm text-gray-600">User Aktif</p>
-          <p class="text-2xl font-semibold text-blue-600">127</p>
+          <p class="text-2xl font-semibold text-blue-600">{{ $activeUsers }}</p>
         </div>
       </div>
     </div>
@@ -105,49 +105,24 @@
           Stok Produk Hampir Habis
         </h2>
         <div class="space-y-3">
-          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
-            <div>
-              <div class="font-medium text-red-800">Keripik Singkong Pedas</div>
-              <div class="text-sm text-red-600">Kategori: Makanan Ringan</div>
+          @if($lowStockProducts->count() > 0)
+            @foreach($lowStockProducts as $product)
+              <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
+                <div>
+                  <div class="font-medium text-red-800">{{ $product->name }}</div>
+                  <div class="text-sm text-red-600">Kategori: {{ $product->category->name }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-red-700">{{ $product->stock }}</div>
+                  <div class="text-xs text-red-500">tersisa</div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="text-center text-gray-500 py-4">
+              <p>Tidak ada produk dengan stok rendah</p>
             </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-red-700">2</div>
-              <div class="text-xs text-red-500">tersisa</div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
-            <div>
-              <div class="font-medium text-orange-800">Rendang Sapi Premium</div>
-              <div class="text-sm text-orange-600">Kategori: Makanan Siap Saji</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-orange-700">5</div>
-              <div class="text-xs text-orange-500">tersisa</div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-500">
-            <div>
-              <div class="font-medium text-yellow-800">Seblak Kuah Seafood</div>
-              <div class="text-sm text-yellow-600">Kategori: Makanan Basah</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-yellow-700">7</div>
-              <div class="text-xs text-yellow-500">tersisa</div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-500">
-            <div>
-              <div class="font-medium text-red-800">Pempek Ikan Tenggiri</div>
-              <div class="text-sm text-red-600">Kategori: Makanan Tradisional</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-red-700">3</div>
-              <div class="text-xs text-red-500">tersisa</div>
-            </div>
-          </div>
+          @endif
           
           <div class="flex justify-between items-center p-3 bg-orange-50 rounded-lg border-l-4 border-orange-500">
             <div>
@@ -196,33 +171,31 @@
             </tr>
           </thead>
           <tbody>
+            @forelse($recentOrders as $order)
             <tr class="border-b">
-              <td class="px-4 py-2">ORD-001</td>
-              <td class="px-4 py-2">Budi Santoso</td>
-              <td class="px-4 py-2">Rp100.000,00</td>
-              <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">Menunggu Diproses</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
+              <td class="px-4 py-2">{{ $order->formatted_id }}</td>
+              <td class="px-4 py-2">{{ $order->user->name }}</td>
+              <td class="px-4 py-2">Rp{{ number_format($order->total, 0, ',', '.') }}</td>
+              <td class="px-4 py-2">
+                @if($order->status == 'pending')
+                  <span class="bg-amber-100 text-amber-700 text-xs px-2 py-1 rounded">Menunggu Diproses</span>
+                @elseif($order->status == 'processing')
+                  <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Diproses</span>
+                @elseif($order->status == 'shipped')
+                  <span class="bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded">Dikirim</span>
+                @elseif($order->status == 'completed')
+                  <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span>
+                @elseif($order->status == 'cancelled')
+                  <span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">Batal</span>
+                @endif
+              </td>
+              <td class="px-4 py-2">{{ $order->created_at->format('Y-m-d') }}</td>
             </tr>
-            <tr class="border-b">
-              <td class="px-4 py-2">ORD-002</td>
-              <td class="px-4 py-2">Adi Wijaya</td>
-              <td class="px-4 py-2">Rp72.000,00</td>
-              <td class="px-4 py-2"><span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded">Dikirim</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
-            </tr>
-            <tr class="border-b">
-              <td class="px-4 py-2">ORD-003</td>
-              <td class="px-4 py-2">Citra Lestari</td>  
-              <td class="px-4 py-2">Rp30.000,00</td>
-              <td class="px-4 py-2"><span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">Selesai</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
-            </tr>
+            @empty
             <tr>
-              <td class="px-4 py-2">ORD-004</td>
-              <td class="px-4 py-2">Doni Setiawan</td>
-              <td class="px-4 py-2">Rp55.000,00</td>
-              <td class="px-4 py-2"><span class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded">Batal</span></td>
-              <td class="px-4 py-2">2023-03-01</td>
+              <td colspan="5" class="px-4 py-4 text-center text-gray-500">Tidak ada pesanan terbaru</td>
+            </tr>
+            @endforelse
             </tr>
           </tbody>
         </table>
@@ -232,59 +205,30 @@
       <div class="bg-white rounded-xl shadow p-5">
         <h2 class="font-semibold mb-3 flex items-center gap-2">⭐ Produk Terlaris</h2>
         <div class="space-y-3">
-          <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-            <div>
-              <div class="font-medium text-yellow-800">Cimol Bojot</div>
-              <div class="text-sm text-yellow-600">Makanan Ringan</div>
+          @if($topProducts->count() > 0)
+            @foreach($topProducts as $index => $product)
+              @php
+                $colors = ['yellow', 'blue', 'green', 'purple', 'red'];
+                $color = $colors[$index % count($colors)];
+              @endphp
+              <div class="flex justify-between items-center p-3 bg-{{ $color }}-50 rounded-lg border-l-4 border-{{ $color }}-400">
+                <div>
+                  <div class="font-medium text-{{ $color }}-800">{{ $product->name }}</div>
+                  <div class="text-sm text-{{ $color }}-600">{{ $product->category->name }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-lg font-bold text-{{ $color }}-700">{{ $product->total_sold }}</div>
+                  <div class="text-xs text-{{ $color }}-500">terjual</div>
+                </div>
+              </div>
+            @endforeach
+          @else
+            <div class="text-center text-gray-500 py-4">
+              <p>Tidak ada data penjualan produk</p>
             </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-yellow-700">50</div>
-              <div class="text-xs text-yellow-500">terjual</div>
-            </div>
-          </div>
+          @endif
           
-          <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-            <div>
-              <div class="font-medium text-blue-800">Seblak Kuah</div>
-              <div class="text-sm text-blue-600">Makanan Basah</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-blue-700">45</div>
-              <div class="text-xs text-blue-500">terjual</div>
-            </div>
-          </div>
           
-          <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-400">
-            <div>
-              <div class="font-medium text-green-800">Pempek Ikan</div>
-              <div class="text-sm text-green-600">Makanan Tradisional</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-green-700">39</div>
-              <div class="text-xs text-green-500">terjual</div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg border-l-4 border-purple-400">
-            <div>
-              <div class="font-medium text-purple-800">Keripik Buah</div>
-              <div class="text-sm text-purple-600">Makanan Ringan</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-purple-700">35</div>
-              <div class="text-xs text-purple-500">terjual</div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg border-l-4 border-red-400">
-            <div>
-              <div class="font-medium text-red-800">Rendang Sapi</div>
-              <div class="text-sm text-red-600">Makanan Siap Saji</div>
-            </div>
-            <div class="text-right">
-              <div class="text-lg font-bold text-red-700">32</div>
-              <div class="text-xs text-red-500">terjual</div>
-            </div>
           </div>
         </div>
       </div>
@@ -309,10 +253,10 @@
     new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
+        labels: @json($monthLabels),
         datasets: [{
-          label: 'Penjualan (Juta Rupiah)',
-          data: [15.2, 18.5, 22.1, 19.8, 25.3, 28.7, 31.2, 29.6, 26.8, 32.1, 35.4, 38.9],
+          label: 'Penjualan (Rupiah)',
+          data: @json($salesData),
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           borderColor: '#10b981',
           borderWidth: 3,
@@ -337,7 +281,7 @@
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return 'Rp' + value + 'jt';
+                return 'Rp' + new Intl.NumberFormat('id-ID').format(value);
               }
             }
           },
