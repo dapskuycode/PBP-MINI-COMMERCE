@@ -39,7 +39,7 @@ Route::middleware('no-admin')->group(function () {
     Route::post('/checkout/process', [App\Http\Controllers\CheckoutController::class, 'processCheckout'])->name('checkout.process');
     
     //Riwayat Pesanan
-    Route::view('/riwayat-pesanan', 'orders')->name('orders.history');
+    Route::get('/riwayat-pesanan', [OrderController::class, 'index'])->name('orders.history');
     
     //tentang kami
     Route::view('/about', 'about')->name('about');

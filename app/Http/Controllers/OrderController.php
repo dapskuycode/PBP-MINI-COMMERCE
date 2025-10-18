@@ -82,6 +82,8 @@ class OrderController extends Controller
     {
         $user = auth()->user();
         
+        
+
         if (!$user->is_admin && $order->user_id !== $user->id) {
             abort(403, 'Unauthorized to view this order');
         }
