@@ -4,20 +4,29 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ItemPhoto;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class ProductSeeder extends Seeder
 {
     public function run()
     {
-        // Create categories for oleh-oleh (souvenir) shop
-        $makanan = Category::create(['name' => 'Makanan']);
-        $minumanManis = Category::create(['name' => 'Minuman Manis']);
-        $kemasan = Category::create(['name' => 'Kemasan']);
-        $makananKhas = Category::create(['name' => 'Makanan Khas Daerah']);
-        $aksesoris = Category::create(['name' => 'Aksesoris & Souvenir']);
+        // Get existing categories from CategorySeeder
+        $makanan = Category::where('name', 'Makanan')->first();
+        $minumanManis = Category::where('name', 'Minuman Manis')->first();
+        $kemasan = Category::where('name', 'Kemasan')->first();
+        $makananKhas = Category::where('name', 'Makanan Khas Daerah')->first();
+        $aksesoris = Category::where('name', 'Aksesoris & Souvenir')->first();
 
-        // Create products for each category
+        // Ensure categories exist
+        if (!$makanan || !$minumanManis || !$kemasan || !$makananKhas || !$aksesoris) {
+            $this->command->error('❌ Categories not found! Please run CategorySeeder first.');
+            return;
+        }
+
+        // Create products for each category with photos
         $products = [
             // Makanan
             [
@@ -26,7 +35,8 @@ class ProductSeeder extends Seeder
                 'price' => 15000,
                 'stock' => 50,
                 'discount' => 0,
-                'category_id' => $makanan->id
+                'category_id' => $makanan->id,
+                'photos' => ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800']
             ],
             [
                 'name' => 'Kacang Mete Madu',
@@ -34,7 +44,8 @@ class ProductSeeder extends Seeder
                 'price' => 45000,
                 'stock' => 30,
                 'discount' => 10,
-                'category_id' => $makanan->id
+                'category_id' => $makanan->id,
+                'photos' => ['https://images.unsplash.com/photo-1599599810769-bcde5a160d32?w=800']
             ],
             [
                 'name' => 'Rempeyek Kacang Tanah',
@@ -42,7 +53,8 @@ class ProductSeeder extends Seeder
                 'price' => 12000,
                 'stock' => 40,
                 'discount' => 0,
-                'category_id' => $makanan->id
+                'category_id' => $makanan->id,
+                'photos' => ['https://images.unsplash.com/photo-1544378730-6f3a9b7f6d78?w=800']
             ],
             [
                 'name' => 'Kerupuk Udang Sidoarjo',
@@ -50,7 +62,8 @@ class ProductSeeder extends Seeder
                 'price' => 25000,
                 'stock' => 35,
                 'discount' => 5,
-                'category_id' => $makanan->id
+                'category_id' => $makanan->id,
+                'photos' => ['https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=800']
             ],
 
             // Minuman Manis
@@ -60,7 +73,8 @@ class ProductSeeder extends Seeder
                 'price' => 18000,
                 'stock' => 25,
                 'discount' => 0,
-                'category_id' => $minumanManis->id
+                'category_id' => $minumanManis->id,
+                'photos' => ['https://images.unsplash.com/photo-1570197788417-0e82375c9371?w=800']
             ],
             [
                 'name' => 'Madu Murni Hutan',
@@ -68,7 +82,8 @@ class ProductSeeder extends Seeder
                 'price' => 75000,
                 'stock' => 20,
                 'discount' => 15,
-                'category_id' => $minumanManis->id
+                'category_id' => $minumanManis->id,
+                'photos' => ['https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=800']
             ],
             [
                 'name' => 'Sirup Markisa',
@@ -76,7 +91,8 @@ class ProductSeeder extends Seeder
                 'price' => 22000,
                 'stock' => 30,
                 'discount' => 0,
-                'category_id' => $minumanManis->id
+                'category_id' => $minumanManis->id,
+                'photos' => ['https://images.unsplash.com/photo-1546173159-315724a31696?w=800']
             ],
             [
                 'name' => 'Wedang Jahe Instant',
@@ -84,7 +100,8 @@ class ProductSeeder extends Seeder
                 'price' => 28000,
                 'stock' => 45,
                 'discount' => 8,
-                'category_id' => $minumanManis->id
+                'category_id' => $minumanManis->id,
+                'photos' => ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800']
             ],
 
             // Kemasan
@@ -94,7 +111,8 @@ class ProductSeeder extends Seeder
                 'price' => 35000,
                 'stock' => 15,
                 'discount' => 0,
-                'category_id' => $kemasan->id
+                'category_id' => $kemasan->id,
+                'photos' => ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800']
             ],
             [
                 'name' => 'Kotak Kayu Jati',
@@ -102,7 +120,8 @@ class ProductSeeder extends Seeder
                 'price' => 85000,
                 'stock' => 12,
                 'discount' => 20,
-                'category_id' => $kemasan->id
+                'category_id' => $kemasan->id,
+                'photos' => ['https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800']
             ],
             [
                 'name' => 'Besek Bambu Mini',
@@ -110,7 +129,8 @@ class ProductSeeder extends Seeder
                 'price' => 15000,
                 'stock' => 25,
                 'discount' => 0,
-                'category_id' => $kemasan->id
+                'category_id' => $kemasan->id,
+                'photos' => ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800']
             ],
             [
                 'name' => 'Tas Anyaman Rotan',
@@ -118,7 +138,8 @@ class ProductSeeder extends Seeder
                 'price' => 55000,
                 'stock' => 18,
                 'discount' => 12,
-                'category_id' => $kemasan->id
+                'category_id' => $kemasan->id,
+                'photos' => ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800']
             ],
 
             // Makanan Khas Daerah
@@ -128,7 +149,8 @@ class ProductSeeder extends Seeder
                 'price' => 30000,
                 'stock' => 40,
                 'discount' => 0,
-                'category_id' => $makananKhas->id
+                'category_id' => $makananKhas->id,
+                'photos' => ['https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=800']
             ],
             [
                 'name' => 'Kerak Telor Kering',
@@ -136,7 +158,8 @@ class ProductSeeder extends Seeder
                 'price' => 25000,
                 'stock' => 35,
                 'discount' => 5,
-                'category_id' => $makananKhas->id
+                'category_id' => $makananKhas->id,
+                'photos' => ['https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800']
             ],
             [
                 'name' => 'Serundeng Kelapa Surabaya',
@@ -144,7 +167,8 @@ class ProductSeeder extends Seeder
                 'price' => 20000,
                 'stock' => 30,
                 'discount' => 0,
-                'category_id' => $makananKhas->id
+                'category_id' => $makananKhas->id,
+                'photos' => ['https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800']
             ],
             [
                 'name' => 'Abon Sapi Malang',
@@ -152,7 +176,8 @@ class ProductSeeder extends Seeder
                 'price' => 45000,
                 'stock' => 25,
                 'discount' => 15,
-                'category_id' => $makananKhas->id
+                'category_id' => $makananKhas->id,
+                'photos' => ['https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800']
             ],
             [
                 'name' => 'Kue Lumpur Sidoarjo',
@@ -160,7 +185,8 @@ class ProductSeeder extends Seeder
                 'price' => 35000,
                 'stock' => 20,
                 'discount' => 10,
-                'category_id' => $makananKhas->id
+                'category_id' => $makananKhas->id,
+                'photos' => ['https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800']
             ],
 
             // Aksesoris & Souvenir
@@ -170,7 +196,8 @@ class ProductSeeder extends Seeder
                 'price' => 8000,
                 'stock' => 60,
                 'discount' => 0,
-                'category_id' => $aksesoris->id
+                'category_id' => $aksesoris->id,
+                'photos' => ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800']
             ],
             [
                 'name' => 'Magnet Kulkas Batik',
@@ -178,7 +205,8 @@ class ProductSeeder extends Seeder
                 'price' => 12000,
                 'stock' => 50,
                 'discount' => 0,
-                'category_id' => $aksesoris->id
+                'category_id' => $aksesoris->id,
+                'photos' => ['https://images.unsplash.com/photo-1596026045320-4d1b6543df5d?w=800']
             ],
             [
                 'name' => 'Miniatur Becak Jakarta',
@@ -186,7 +214,8 @@ class ProductSeeder extends Seeder
                 'price' => 65000,
                 'stock' => 15,
                 'discount' => 18,
-                'category_id' => $aksesoris->id
+                'category_id' => $aksesoris->id,
+                'photos' => ['https://images.unsplash.com/photo-1544378730-6f3a9b7f6d78?w=800']
             ],
             [
                 'name' => 'Kipas Batik Tradisional',
@@ -194,7 +223,8 @@ class ProductSeeder extends Seeder
                 'price' => 25000,
                 'stock' => 35,
                 'discount' => 8,
-                'category_id' => $aksesoris->id
+                'category_id' => $aksesoris->id,
+                'photos' => ['https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=800']
             ],
             [
                 'name' => 'Kaos Jakarta Heritage',
@@ -202,12 +232,58 @@ class ProductSeeder extends Seeder
                 'price' => 85000,
                 'stock' => 40,
                 'discount' => 25,
-                'category_id' => $aksesoris->id
+                'category_id' => $aksesoris->id,
+                'photos' => ['https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800']
             ],
         ];
 
-        foreach ($products as $product) {
-            Product::create($product);
+        foreach ($products as $productData) {
+            // Extract photos from product data
+            $photos = $productData['photos'] ?? [];
+            unset($productData['photos']);
+            
+            // Create the product
+            $product = Product::create($productData);
+            
+            // Download and save photos
+            foreach ($photos as $index => $photoUrl) {
+                $this->downloadAndSavePhoto($product, $photoUrl, $index);
+            }
+        }
+    }
+    
+    /**
+     * Download photo from URL and save to storage
+     */
+    private function downloadAndSavePhoto(Product $product, string $url, int $index = 0)
+    {
+        try {
+            // Download image from URL
+            $response = Http::timeout(30)->get($url);
+            
+            if ($response->successful()) {
+                // Generate filename
+                $extension = 'jpg'; // Default to jpg
+                $filename = "product_{$product->id}_photo_{$index}.{$extension}";
+                $path = "products/{$filename}";
+                
+                // Save to storage
+                Storage::disk('public')->put($path, $response->body());
+                
+                // Create ItemPhoto record
+                ItemPhoto::create([
+                    'product_id' => $product->id,
+                    'url' => $path,
+                    'alt_text' => $product->name . ' - Photo ' . ($index + 1),
+                    'is_primary' => $index === 0, // First photo is primary
+                ]);
+                
+                $this->command->info("✅ Downloaded photo for: {$product->name}");
+            } else {
+                $this->command->warn("⚠️ Failed to download photo for: {$product->name} from {$url}");
+            }
+        } catch (\Exception $e) {
+            $this->command->error("❌ Error downloading photo for {$product->name}: " . $e->getMessage());
         }
     }
 }
