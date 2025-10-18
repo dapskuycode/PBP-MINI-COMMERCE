@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Produk Favorit — TumbasLek</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -47,34 +48,66 @@
             <h2 class="text-xl font-semibold">Produk Favorit</h2>
           </div>
 
-          {{-- Tampilan kosong (tanpa dummy) --}}
-          @php $favorites = $favorites ?? []; @endphp
-          @if(empty($favorites) || count($favorites) === 0)
+          @if($favorites->isEmpty())
             <div class="text-center p-10 text-gray-500 border-2 border-dashed rounded-xl">
-              Belum ada produk favorit.
-              <a href="{{ route('products.index') }}" class="text-emerald-600 hover:underline font-medium">Lihat Produk</a>
+              <div class="mb-4">
+                <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+              <p class="mb-2">Belum ada produk favorit.</p>
+              <a href="{{ route('products.index') }}" class="text-emerald-600 hover:underline font-medium">Jelajahi Produk</a>
             </div>
           @else
-            {{-- Kalau nanti sudah ada data, render grid ini --}}
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              @foreach($favorites as $product)
-                <a href="{{ route('products.show', $product) }}" class="bg-white border rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden">
-                  @if(!empty($product->image))
-                    <img src="{{ asset('storage/'.$product->image) }}" alt="{{ $product->name }}" class="w-full h-44 object-cover">
-                  @else
-                    <div class="w-full h-44 grid place-items-center bg-gray-50">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4L17 13M7 13H5.4m1.6 6a2 2 0 104 0m6 0a2 2 0 104 0"/>
-                      </svg>
+              @foreach($favorites as $favoriteItem)
+                @php $product = $favoriteItem->product; @endphp
+                <div class="bg-white border rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden relative">
+                  {{-- Remove from favorites button --}}
+                  <button onclick="toggleFavorite({{ $product->id }}, event)" 
+                          class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 z-10">
+                    <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.001 4.529c2.349-2.532 6.15-2.532 8.5 0 2.35 2.531 2.35 6.635 0 9.166l-7.07 7.622a2 2 0 0 1-2.86 0l-7.07-7.622c-2.35-2.531-2.35-6.635 0-9.166 2.35-2.532 6.151-2.532 8.5 0z"/>
+                    </svg>
+                  </button>
+
+                  <a href="{{ route('products.show', $product->id) }}">
+                    @if($product->photos && $product->photos->count() > 0)
+                      <img src="{{ asset('storage/' . $product->photos->first()->url) }}" alt="{{ $product->name }}" class="w-full h-44 object-cover">
+                    @else
+                      <div class="w-full h-44 grid place-items-center bg-gray-50">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                      </div>
+                    @endif
+                    
+                    <div class="p-4">
+                      <div class="font-medium truncate mb-2">{{ $product->name }}</div>
+                      <div class="text-emerald-700 font-bold">{{ $product->formatted_price }}</div>
+                      
+                      @if($product->has_discount)
+                        <div class="flex items-center space-x-2 mt-1">
+                          <span class="text-sm text-gray-400 line-through">{{ $product->formatted_price }}</span>
+                          <span class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">-{{ $product->discount }}%</span>
+                        </div>
+                      @endif
+
+                      <div class="text-xs text-gray-500 mt-2">
+                        Stok: {{ $product->stock }}
+                      </div>
                     </div>
-                  @endif
-                  <div class="p-4">
-                    <div class="font-medium truncate">{{ $product->name }}</div>
-                    <div class="text-emerald-700 font-bold">Rp {{ number_format((int)($product->price ?? 0), 0, ',', '.') }}</div>
-                  </div>
-                </a>
+                  </a>
+                </div>
               @endforeach
             </div>
+
+            {{-- Pagination --}}
+            @if($favorites->hasPages())
+              <div class="mt-6">
+                {{ $favorites->links() }}
+              </div>
+            @endif
           @endif
         </div>
       </section>
@@ -82,5 +115,107 @@
   </main>
 
   @include('components.footer')
+
+  <script>
+    // Toggle favorite function for favorites page
+    async function toggleFavorite(productId, event) {
+      console.log('Toggling favorite for product:', productId);
+      
+      const csrfToken = document.querySelector('meta[name="csrf-token"]');
+      if (!csrfToken) {
+        showNotification('CSRF token tidak ditemukan', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/favorites/toggle/${productId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken.getAttribute('content')
+          }
+        });
+
+        console.log('Response status:', response.status);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('Response error:', errorText);
+          showNotification(`Error: ${response.status} - ${response.statusText}`, 'error');
+          return;
+        }
+
+        const data = await response.json();
+        console.log('Response data:', data);
+
+        if (data.success) {
+          // If removed from favorites, remove the card from the page
+          if (!data.is_favorited) {
+            // Find the card and remove it using event if available
+            let button = null;
+            let card = null;
+
+            if (event && event.target) {
+              button = event.target.closest('button');
+              card = button ? button.closest('.relative') : null;
+            }
+
+            // Fallback: find by productId if event method fails
+            if (!card) {
+              const allCards = document.querySelectorAll('.grid .relative');
+              allCards.forEach(cardElement => {
+                const cardButton = cardElement.querySelector('button[onclick*="' + productId + '"]');
+                if (cardButton) {
+                  card = cardElement;
+                }
+              });
+            }
+            
+            if (card) {
+              card.style.opacity = '0';
+              card.style.transform = 'scale(0.95)';
+              card.style.transition = 'all 0.3s ease';
+              
+              setTimeout(() => {
+                card.remove();
+                // Check if no favorites left
+                const remainingCards = document.querySelectorAll('.grid .relative');
+                if (remainingCards.length === 0) {
+                  location.reload(); // Reload to show empty state
+                }
+              }, 300);
+            }
+          }
+
+          showNotification(data.message, data.is_favorited ? 'success' : 'info');
+        } else {
+          showNotification(data.message, 'error');
+        }
+      } catch (error) {
+        console.error('Error toggling favorite:', error);
+        showNotification('Terjadi kesalahan. Silakan coba lagi.', 'error');
+      }
+    }
+
+    // Show notification function
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transition-all duration-300 ${
+        type === 'success' ? 'bg-green-500' : 
+        type === 'error' ? 'bg-red-500' : 
+        'bg-blue-500'
+      }`;
+      notification.textContent = message;
+
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

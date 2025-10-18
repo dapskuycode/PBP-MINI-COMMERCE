@@ -76,16 +76,9 @@
 
                       <div class="p-6">
                           <dl class="grid grid-cols-12 items-center gap-y-6">
-                              <dt class="col-span-12 md:col-span-4 text-gray-600">Username</dt>
-                              <dd class="col-span-12 md:col-span-8 font-medium">
-                                  {{ $user->username ?? 'username_pengguna' }}
-                              </dd>
-
                               <dt class="col-span-12 md:col-span-4 text-gray-600">Nama Pengguna</dt>
                               <dd class="col-span-12 md:col-span-8 flex items-center gap-3">
                                   <span class="font-medium">{{ $user->name ?? 'nama pengguna' }}</span>
-                                  <a href="{{ route('user.profile.edit') }}"
-                                     class="text-emerald-600 text-sm font-semibold hover:underline">Ubah</a>
                               </dd>
 
                               <dt class="col-span-12 md:col-span-4 text-gray-600">Email</dt>
@@ -102,13 +95,13 @@
                               <dd class="col-span-12 md:col-span-8">
                                   <div class="flex items-center gap-8">
                                       <label class="inline-flex items-center gap-2">
-                                          <input type="radio" class="h-4 w-4"
-                                                 @checked(($user->gender ?? null) === 'male') disabled>
+                                          <input type="radio" name="gender" class="h-4 w-4"
+                                                 @checked(($user->gender ?? null) === 'male')>
                                           <span>Laki-laki</span>
                                       </label>
                                       <label class="inline-flex items-center gap-2">
-                                          <input type="radio" class="h-4 w-4"
-                                                 @checked(($user->gender ?? null) === 'female') disabled>
+                                          <input type="radio" name="gender" class="h-4 w-4"
+                                                 @checked(($user->gender ?? null) === 'female')>
                                           <span>Perempuan</span>
                                       </label>
                                   </div>

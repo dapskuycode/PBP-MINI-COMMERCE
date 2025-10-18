@@ -47,6 +47,16 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function favoriteItems()
+    {
+        return $this->hasMany(FavoriteItem::class);
+    }
+
+    public function favoritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favorite_items');
+    }
     
     public function getFormattedPriceAttribute()
     {
@@ -69,5 +79,14 @@ class Product extends Model
     public function getHasDiscountAttribute()
     {
         return $this->discount > 0;
+    }
+
+    public function isFavoritedBy($user)
+    {
+        if (!$user) {
+            return false;
+        }
+        
+        return $this->favoriteItems()->where('user_id', $user->id)->exists();
     }
 }

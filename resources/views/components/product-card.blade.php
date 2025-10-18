@@ -54,11 +54,18 @@
         @endif
         
         <!-- Favorite Button -->
-        <button class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-50">
-            <svg class="w-4 h-4 text-gray-400 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        @if($productId && Auth::check() && !Auth::user()->is_admin)
+        <button onclick="toggleFavorite({{ $productId }}, event)" 
+                id="fav-btn-{{ $productId }}" 
+                class="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-red-50">
+            <svg id="fav-outline-{{ $productId }}" class="w-4 h-4 text-gray-400 hover:text-red-500 {{ $product && $product->isFavoritedBy(Auth::user()) ? 'hidden' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
             </svg>
+            <svg id="fav-solid-{{ $productId }}" class="w-4 h-4 text-red-500 {{ $product && $product->isFavoritedBy(Auth::user()) ? '' : 'hidden' }}" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12.001 4.529c2.349-2.532 6.15-2.532 8.5 0 2.35 2.531 2.35 6.635 0 9.166l-7.07 7.622a2 2 0 0 1-2.86 0l-7.07-7.622c-2.35-2.531-2.35-6.635 0-9.166 2.35-2.532 6.151-2.532 8.5 0z"/>
+            </svg>
         </button>
+        @endif
     </div>
     
     <!-- Product Info -->

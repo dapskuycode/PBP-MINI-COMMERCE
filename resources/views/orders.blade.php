@@ -12,9 +12,6 @@
     {{-- Navbar --}}
     @include('components.navbar', ['isAdmin' => false])
 
-    {{-- Header strip --}}
-    <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
-
     {{-- Main Content --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
@@ -32,7 +29,6 @@
 
         {{-- Header --}}
         <div class="bg-white rounded-xl shadow-md p-6 flex items-center gap-4 mb-8">
-            <img src="{{ asset('images/logo.png') }}" alt="TokoKami" class="w-16 h-16 rounded-full">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900">Riwayat Pesanan</h1>
                 <p class="text-sm text-gray-500">Pantau status dan riwayat pesanan Anda</p>
@@ -40,17 +36,7 @@
         </div>
 
         {{-- Stats Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-xl shadow-md p-6 text-center">
-                <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg font-semibold text-gray-900">Pending</h3>
-                <p class="text-3xl font-bold text-yellow-600" id="pending-count">0</p>
-            </div>
-            
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <div class="bg-white rounded-xl shadow-md p-6 text-center">
                 <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +75,6 @@
                 <div class="flex gap-2">
                     <select x-model="activeStatus" @change="updateActiveStatus()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                         <option value="all">Semua Status</option>
-                        <option value="pending">Pending</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Dikirim</option>
                         <option value="completed">Selesai</option>

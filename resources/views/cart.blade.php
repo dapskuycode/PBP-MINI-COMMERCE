@@ -100,12 +100,10 @@
                   </div>
 
                   {{-- Remove item --}}
-                  <form method="POST" action="{{ route('cart.remove', $item->id) }}" style="display: inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button class="text-sm text-red-600 hover:text-red-700 font-medium" 
-                            onclick="return confirm('Hapus item ini dari keranjang?')">Hapus</button>
-                  </form>
+                  <button class="text-sm text-red-600 hover:text-red-700 font-medium" 
+                          onclick="if(confirm('Hapus item ini dari keranjang?')) removeCartItem({{ $item->id }})">
+                    Hapus
+                  </button>
                 </div>
               </div>
             </div>
