@@ -104,7 +104,7 @@ class OrderController extends Controller
 
                 return view('admin.adminorders', compact('orders', 'transformedOrders', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
             } else {
-                $orders = Order::with(['orderItems.product'])
+                $orders = Order::with(['orderItems.product.photos'])
                     ->where('user_id', $user->id)
                     ->latest()
                     ->get();

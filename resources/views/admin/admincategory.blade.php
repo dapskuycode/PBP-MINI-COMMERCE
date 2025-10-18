@@ -163,7 +163,6 @@
 					</div>
 
 					<div class="flex items-center gap-2">
-<<<<<<< HEAD
                             <button onclick="openEditCategoryModal({{ $category->id }}, '{{ $category->name }}', {{ $category->products->count() }})" class="text-sm px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">Edit</button>
                             
                             @if($category->products->count() == 0)
@@ -182,13 +181,6 @@
                                 </button>
                             @endif
                             
-=======
-						<button 
-                            onclick='openEditCategoryModal({ id: {{ $category->id }}, name: @json($category->name) })'
-                            class="text-sm text-blue-600 hover:underline">
-                            Edit
-                        </button>
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
 						<button onclick="toggleCategory({{ $category->id }})" class="text-sm px-3 py-1 bg-white border rounded hover:bg-gray-50">Tampilkan</button>
 					</div>
 				</div>
@@ -474,19 +466,13 @@
     </div>
 
     <!-- Modal Edit Kategori -->
-<<<<<<< HEAD
     <div id="editCategoryModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-=======
-    <div id="editCategoryModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-white w-full max-w-md rounded-lg shadow-lg p-6">
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
             <h2 class="text-lg font-semibold mb-4">Edit Kategori</h2>
 
             <form id="editCategoryForm" method="POST">
                 @csrf
                 @method('PUT')
-<<<<<<< HEAD
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2">Nama Kategori Saat Ini:</label>
                     <div id="currentCategoryName" class="text-lg font-medium text-gray-800 bg-gray-100 px-3 py-2 rounded-lg mb-4"></div>
@@ -516,19 +502,6 @@
             <button onclick="closeEditCategoryModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
                 &times;
             </button>
-=======
-                
-                <div class="mb-4">
-                    <label for="edit-name" class="block text-sm font-medium text-gray-700">Nama Kategori</label>
-                    <input type="text" id="edit-name" name="name" class="w-full border rounded p-2" required>
-                </div>
-
-                <div class="flex justify-end gap-2">
-                    <button type="button" onclick="closeEditCategoryModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Simpan</button>
-                </div>
-            </form>
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
         </div>
     </div>
 
@@ -556,7 +529,6 @@
             document.getElementById('categoryModal').classList.remove('flex');
         }
 
-<<<<<<< HEAD
         function openEditCategoryModal(categoryId, categoryName, productCount = 0) {
             // Set nama kategori saat ini
             document.getElementById('currentCategoryName').textContent = categoryName;
@@ -578,19 +550,10 @@
             // Tampilkan modal
             document.getElementById('editCategoryModal').classList.remove('hidden');
             document.getElementById('editCategoryModal').classList.add('flex');
-=======
-        function openEditCategoryModal(id, name) {
-            // Isi form dengan data kategori
-            document.getElementById('edit-name').value = name;
-            document.getElementById('editCategoryForm').action = `/admin/managecategories/${id}`;
-            // Tampilkan modal
-            document.getElementById('editCategoryModal').classList.remove('hidden');
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
         }
 
         function closeEditCategoryModal() {
             document.getElementById('editCategoryModal').classList.add('hidden');
-<<<<<<< HEAD
             document.getElementById('editCategoryModal').classList.remove('flex');
             
             // Reset form
@@ -627,8 +590,6 @@
                 console.error('Error:', error);
                 alert('Terjadi kesalahan saat menghapus kategori');
             }
-=======
->>>>>>> ac0ff3a7fffcfd4d63ed5b2b65cce359379e48a2
         }
 
         function openEditModal(product) {
