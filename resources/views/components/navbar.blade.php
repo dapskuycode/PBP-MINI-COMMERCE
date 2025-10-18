@@ -52,19 +52,18 @@
         @else
           {{-- Public Links --}}
 
+          <a href="{{ route('home') }}"
+            class="relative py-2 {{ request()->routeIs('home') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
+            {{ request()->routeIs('home') ? 'aria-current=page' : '' }}>
+            Home
+          </a>
+
           <a href="{{ url('/products') }}"
              class="relative py-2 {{ request()->is('products*') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
              {{ request()->is('products*') ? 'aria-current=page' : '' }}>
             Produk
           </a>
-
-          @if(isset($categories) && $categories->count() > 0)
-            <a href="{{ route('categories.index') }}"
-               class="relative py-2 {{ request()->is('categories*') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}">
-              Kategori
-            </a>
-          @endif
-
+          
           <a href="{{ route('about') }}"
              class="relative py-2 {{ request()->routeIs('about') ? 'text-emerald-700 font-semibold after:absolute after:left-0 after:-bottom-1 after:h-0.5 after:w-full after:bg-emerald-600' : 'text-gray-700 hover:text-emerald-600' }}"
              {{ request()->routeIs('about') ? 'aria-current=page' : '' }}>
@@ -90,15 +89,49 @@
         @if(!$isAdmin)
           {{-- Cart untuk user biasa --}}
           @php $cartCount = session('cart.count', 0); @endphp
-          <a href="{{ url('/cart') }}" class="relative p-2 text-gray-700 hover:text-emerald-600">
-            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <a href="{{ url('/cart') }}" class="relative p-2 text-gray-700 hover:text-emerald-600" aria-label="Buka keranjang">
+            {{-- ikon troli yang lebih “keranjang” --}}
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M5 8l2-3a2 2 0 011.7-1h6.6a2 2 0 011.7 1l2 3M6 8h12l-1 11a2 2 0 01-2 2H9a2 2 0 01-2-2L6 8zM9 11v6m6-6v6"/>
+                d="M3 3h2l.4 2m0 0L7 16a2 2 0 002 2h7a2 2 0 002-2l1.2-6H6.4m-.9-5h13.5M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z"/>
             </svg>
-            <span class="cart-count absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 grid place-items-center {{ $cartCount > 0 ? '' : 'hidden' }}">
+
+            {{-- badge jumlah --}}
+            <span id="cart-badge"
+                  data-count="{{ $cartCount }}"
+                  class="absolute -top-1.5 -right-1.5 min-w-[20px] h-5 px-1.5 rounded-full bg-red-500 text-white text-[11px] leading-5 text-center font-semibold
+                        {{ $cartCount > 0 ? '' : 'hidden' }}">
               {{ $cartCount }}
             </span>
           </a>
+          {{-- listener supaya badge auto sinkron dari halaman lain (cart/products) --}}
+          <script>
+          (function () {
+            const badge = document.getElementById('cart-badge');
+            if (!badge) return;
+
+            function render(n) {
+              if (n > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = n;
+              } else {
+                badge.classList.add('hidden');
+                badge.textContent = 0;
+              }
+            }
+
+            // inisialisasi dari server/session atau data-count
+            const init = parseInt(badge.dataset.count || '0', 10) || 0;
+            render(init);
+
+            // terima update dari halaman mana pun yang dispatch 'cart:count'
+            window.addEventListener('cart:count', (e) => {
+              const n = parseInt(e.detail?.count ?? 0, 10) || 0;
+              render(n);
+            });
+          })();
+          </script>
+
         @else
           {{-- Admin: Link to store view --}}
           <a href="{{ route('home') }}" class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:text-emerald-600 bg-gray-50 rounded-lg hover:bg-gray-100">

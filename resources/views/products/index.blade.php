@@ -29,48 +29,69 @@
 
         {{-- GRID: Sidebar kategori (3) + Konten produk (9) --}}
         <div class="grid grid-cols-12 gap-6">
-            {{-- Sidebar Kiri: kategori vertikal (1 baris = 1 item) --}}
+            {{-- Sidebar Kiri: Kategori elegan (tanpa query di Blade) --}}
             <aside class="col-span-12 md:col-span-3">
-                <div class="sticky top-24 rounded-2xl bg-white border border-gray-200 shadow-sm p-5">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="h-8 w-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">🏷️</div>
-                        <h2 class="font-semibold">Kategori</h2>
-                    </div>
+            <div class="sticky top-24 rounded-2xl bg-white border border-gray-200 shadow-sm p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 border-b pb-2">Kategori Produk</h2>
 
+                @php
+                // Kalau $categories ada dari controller, pakai itu.
+                // Kalau tidak, bangun dari $products (yang sudah include relasi category).
+                $cats = isset($categories)
+                    ? collect($categories)->map(function ($c) {
+                        $slug = \Illuminate\Support\Str::slug(data_get($c, 'name', ''));
+                        return (object)[ 'name' => data_get($c,'name'), 'slug' => $slug ];
+                    })
+                    : collect($products)
+                        ->pluck('category')            // ambil relasi category
+                        ->filter()                     // buang null
+                        ->unique('name')               // unik berdasarkan name (bukan slug)
+                        ->map(function ($c) {          // normalisasi bentuk object {name, slug}
+                            $slug = \Illuminate\Support\Str::slug(data_get($c, 'name', ''));
+                            return (object)[ 'name' => data_get($c,'name'), 'slug' => $slug ];
+                        })
+                        ->values();
+
+                $active = request('category'); // ?category=slug
+                @endphp
+
+                <ul class="space-y-2 text-sm">
+                <li>
+                    <a href="{{ url('/products') }}"
+                    class="block px-3 py-2 rounded-lg border transition
+                            {{ empty($active)
+                                ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-medium'
+                                : 'border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700' }}">
+                    Semua Produk
+                    </a>
+                </li>
+
+                @forelse($cats as $cat)
                     @php
-                        // Pakai $categories dari controller jika ada; kalau belum, fallback contoh
-                        $fallback = collect([
-                            (object)['name'=>'Semua','slug'=>'semua'],
-                            (object)['name'=>'Makanan Manis','slug'=>'makanan','emoji'=>'🍰'],
-                            (object)['name'=>'Minuman','slug'=>'minuman','emoji'=>'🧃'],
-                            (object)['name'=>'Makanan Kemasan','slug'=>'fashion','emoji'=>'👗'],
-                        ]);
-                        $cats = (isset($categories) && count($categories)) ? $categories : $fallback;
+                    $slug = data_get($cat, 'slug', '');
+                    $name = data_get($cat, 'name', '-');
+                    $isActive = $active === $slug;
                     @endphp
-
-                    <ul class="space-y-2">
-                        @foreach($cats as $cat)
-                            <li>
-                                {{-- Belum aktif diklik → pakai button --}}
-                                <button type="button"
-                                        class="w-full flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm hover:bg-gray-50">
-                                    <span class="flex items-center gap-2">
-                                        <span class="text-lg">{{ $cat->emoji ?? '🏷️' }}</span>
-                                        <span class="font-medium text-gray-700">{{ $cat->name }}</span>
-                                    </span>
-                                    <span class="text-gray-400">›</span>
-                                </button>
-                            </li>
-                        @endforeach
-                    </ul>
-
-                    {{-- Catatan kecil (opsional) --}}
-                    <p class="mt-4 text-xs text-gray-500 leading-relaxed">
-                        Nanti kalau mau diaktifkan, ubah tombol jadi link ke
-                        <code class="bg-gray-100 px-1 rounded">/products?category=slug-kategori</code>.
-                    </p>
-                </div>
+                    <li>
+                    <a href="{{ url('/products?category=' . $slug) }}"
+                        class="block px-3 py-2 rounded-lg border transition
+                                {{ $isActive
+                                    ? 'border-emerald-600 bg-emerald-50 text-emerald-700 font-medium'
+                                    : 'border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-700' }}">
+                        {{ $name }}
+                    </a>
+                    </li>
+                @empty
+                    <li>
+                    <span class="block px-3 py-2 text-gray-400 border border-dashed rounded-lg">
+                        Belum ada kategori
+                    </span>
+                    </li>
+                @endforelse
+                </ul>
+            </div>
             </aside>
+
 
             {{-- Konten Produk --}}
             <section class="col-span-12 md:col-span-9">
