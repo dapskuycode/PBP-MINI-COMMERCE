@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ubah Password — UMKM Mini-Commerce</title>
+  <title>Ubah Password — TumbasLek Mini Commerce</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-rose-50 text-gray-900 antialiased">

@@ -3,7 +3,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Edit Profil • Mini Commerce</title>
+  <title>Edit Profil - TumbasLek Mini Commerce</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .glass{background:rgba(255,255,255,.78);backdrop-filter:blur(16px) saturate(140%)}

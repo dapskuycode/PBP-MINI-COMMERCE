@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Produk Favorit — UMKM Mini-Commerce</title>
+  <title>Produk Favorit — TumbasLek Mini Commerce</title>
 
   {{-- Tailwind CDN --}}
   <script src="https://cdn.tailwindcss.com"></script>

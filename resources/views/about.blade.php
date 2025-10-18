@@ -3,7 +3,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Tentang Kami • TumbasLek</title>
+  <title>Tentang Kami - TumbasLek Mini Commerce</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {{-- Kalau beranda sudah load Tailwind/Vite global, baris di bawah boleh dihapus --}}
   <script src="https://cdn.tailwindcss.com"></script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Pengguna — UMKM Mini-Commerce</title>
+  <title>Profil Pengguna — TumbasLek Mini Commerce</title>
 
   {{-- Pakai Tailwind via CDN supaya langsung tampil rapi tanpa build --}}
   <script src="https://cdn.tailwindcss.com"></script>
