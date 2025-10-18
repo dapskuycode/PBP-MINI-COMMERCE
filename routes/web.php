@@ -171,9 +171,9 @@ Route::middleware('auth')->group(function () {
         ]);
 
         //Category management
-        Route::get('/admin/managecategories', [App\Http\Controllers\CategoryController::class, 'index'])->name('admin.managecategories.index');
         Route::resource('admin/managecategories', App\Http\Controllers\CategoryController::class, [
-            'as' => 'admin'
+            'as' => 'admin',
+            'parameters' => ['managecategories' => 'category']
         ]);
 
         //order management

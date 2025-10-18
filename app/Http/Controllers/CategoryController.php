@@ -43,17 +43,26 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name'
+        ], [
+            'name.required' => 'Nama kategori harus diisi',
+            'name.unique' => 'Nama kategori sudah digunakan',
+            'name.max' => 'Nama kategori maksimal 255 karakter'
         ]);
 
-        Category::create([
-            'name' => $request->name,
-        ]);
+        try {
+            Category::create([
+                'name' => $request->name
+            ]);
 
-        return redirect()->route('admin.managecategories.index')
-            ->with('success', 'Kategori berhasil ditambahkan!');
+            return redirect()->route('admin.managecategories.index')
+                ->with('success', 'Kategori berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal menambahkan kategori: ' . $e->getMessage());
+        }
     }
-
 
     /**
      * Display the specified resource.
@@ -76,7 +85,37 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id
+        ], [
+            'name.required' => 'Nama kategori harus diisi',
+            'name.unique' => 'Nama kategori sudah digunakan',
+            'name.max' => 'Nama kategori maksimal 255 karakter'
+        ]);
+
+        try {
+            $oldName = $category->name;
+            $productCount = $category->products()->count();
+            
+            $category->update([
+                'name' => $request->name
+            ]);
+
+            // Pesan sukses dengan informasi tambahan tentang produk yang terpengaruh
+            $message = "Kategori berhasil diperbarui dari '{$oldName}' menjadi '{$request->name}'";
+            if ($productCount > 0) {
+                $message .= " dan {$productCount} produk ikut terupdate kategorinya.";
+            } else {
+                $message .= ".";
+            }
+
+            return redirect()->route('admin.managecategories.index')
+                ->with('success', $message);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui kategori: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -84,6 +123,28 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        try {
+            // Cek apakah kategori masih memiliki produk
+            if ($category->products()->count() > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak dapat menghapus kategori yang masih memiliki produk. Pindahkan atau hapus produk terlebih dahulu.'
+                ], 422);
+            }
+
+            $categoryName = $category->name;
+            $category->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => "Kategori '{$categoryName}' berhasil dihapus."
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus kategori: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

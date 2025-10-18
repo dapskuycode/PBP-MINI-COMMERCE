@@ -163,7 +163,24 @@
 					</div>
 
 					<div class="flex items-center gap-2">
-						<a href="{{ route('admin.managecategories.edit', $category->id) }}" class="text-sm text-blue-600 hover:underline">Edit</a>
+                            <button onclick="openEditCategoryModal({{ $category->id }}, '{{ $category->name }}', {{ $category->products->count() }})" class="text-sm px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition-colors">Edit</button>
+                            
+                            @if($category->products->count() == 0)
+                                <button onclick="confirmDeleteCategory({{ $category->id }}, '{{ $category->name }}')" class="text-sm px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                    Hapus
+                                </button>
+                            @else
+                                <button disabled title="Tidak dapat menghapus kategori yang masih memiliki {{ $category->products->count() }} produk" class="text-sm px-3 py-1 bg-gray-300 text-gray-500 rounded cursor-not-allowed relative group">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                    </svg>
+                                    Hapus
+                                </button>
+                            @endif
+                            
 						<button onclick="toggleCategory({{ $category->id }})" class="text-sm px-3 py-1 bg-white border rounded hover:bg-gray-50">Tampilkan</button>
 					</div>
 				</div>
@@ -447,6 +464,46 @@
         </div>
     </div>
 
+    <!-- Modal Edit Kategori -->
+    <div id="editCategoryModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+            <h2 class="text-lg font-semibold mb-4">Edit Kategori</h2>
+
+            <form id="editCategoryForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Nama Kategori Saat Ini:</label>
+                    <div id="currentCategoryName" class="text-lg font-medium text-gray-800 bg-gray-100 px-3 py-2 rounded-lg mb-4"></div>
+                    
+                    <!-- Info produk yang akan terpengaruh -->
+                    <div id="productAffectedInfo" class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span id="productCount" class="text-blue-700 text-sm font-medium"></span>
+                        </div>
+                    </div>
+                    
+                    <label for="editCategoryName" class="block text-gray-700 font-medium mb-1">Nama Kategori Baru:</label>
+                    <input type="text" id="editCategoryName" name="name" required
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                </div>
+
+                <div class="flex justify-end gap-2 mt-6">
+                    <button type="button" onclick="closeEditCategoryModal()" class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50">Batalkan</button>
+                    <button type="submit" class="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">Setuju</button>
+                </div>
+            </form>
+
+            <!-- Tombol close (X) -->
+            <button onclick="closeEditCategoryModal()" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+                &times;
+            </button>
+        </div>
+    </div>
+
     <script>
         // Modal Functions
         function openCreateModal() {
@@ -469,6 +526,69 @@
         function closeCategoryModal() {
             document.getElementById('categoryModal').classList.add('hidden');
             document.getElementById('categoryModal').classList.remove('flex');
+        }
+
+        function openEditCategoryModal(categoryId, categoryName, productCount = 0) {
+            // Set nama kategori saat ini
+            document.getElementById('currentCategoryName').textContent = categoryName;
+            
+            // Set nilai default input nama baru dengan nama saat ini
+            document.getElementById('editCategoryName').value = categoryName;
+            
+            // Set informasi produk yang akan terpengaruh
+            const productCountElement = document.getElementById('productCount');
+            if (productCount > 0) {
+                productCountElement.textContent = `${productCount} produk akan ikut berubah kategorinya`;
+            } else {
+                productCountElement.textContent = 'Tidak ada produk yang terpengaruh';
+            }
+            
+            // Set action form ke route update dengan ID kategori
+            document.getElementById('editCategoryForm').action = `/admin/managecategories/${categoryId}`;
+            
+            // Tampilkan modal
+            document.getElementById('editCategoryModal').classList.remove('hidden');
+            document.getElementById('editCategoryModal').classList.add('flex');
+        }
+
+        function closeEditCategoryModal() {
+            document.getElementById('editCategoryModal').classList.add('hidden');
+            document.getElementById('editCategoryModal').classList.remove('flex');
+            
+            // Reset form
+            document.getElementById('editCategoryForm').reset();
+        }
+
+        async function confirmDeleteCategory(categoryId, categoryName) {
+            const confirmed = confirm(`Apakah Anda yakin ingin menghapus kategori "${categoryName}"?\n\nTindakan ini tidak dapat dibatalkan.`);
+            
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/managecategories/${categoryId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Tampilkan pesan sukses dan refresh halaman
+                    alert('Kategori berhasil dihapus!');
+                    location.reload();
+                } else {
+                    alert(result.message || 'Gagal menghapus kategori');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat menghapus kategori');
+            }
         }
 
         function openEditModal(product) {
@@ -539,12 +659,20 @@
         document.addEventListener('click', function(event) {
             const createModal = document.getElementById('createModal');
             const editModal = document.getElementById('editModal');
+            const categoryModal = document.getElementById('categoryModal');
+            const editCategoryModal = document.getElementById('editCategoryModal');
             
             if (event.target === createModal) {
                 closeCreateModal();
             }
             if (event.target === editModal) {
                 closeEditModal();
+            }
+            if (event.target === categoryModal) {
+                closeCategoryModal();
+            }
+            if (event.target === editCategoryModal) {
+                closeEditCategoryModal();
             }
         });
 
@@ -553,6 +681,8 @@
             if (event.key === 'Escape') {
                 closeCreateModal();
                 closeEditModal();
+                closeCategoryModal();
+                closeEditCategoryModal();
             }
         });
 
