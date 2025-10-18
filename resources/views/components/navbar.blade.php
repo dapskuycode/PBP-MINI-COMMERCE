@@ -22,7 +22,7 @@
           </div>
           <div>
             <div class="text-xl font-bold text-gray-900">
-              TokoKami
+              TumbasLek
             </div>
             <div class="text-xs text-gray-500">UMKM Mini-Commerce</div>
           </div>
