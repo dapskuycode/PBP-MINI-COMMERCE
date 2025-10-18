@@ -9,7 +9,7 @@
   <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-rose-50 min-h-screen flex">
+<body class="bg-gray-50 min-h-screen flex">
   {{-- Sidebar --}}
   <aside class="w-64 bg-white border-r">
     <div class="p-4 text-center border-b">
