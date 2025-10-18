@@ -74,40 +74,71 @@
                           <h2 class="text-lg font-semibold">Informasi Akun</h2>
                       </div>
 
-                      <div class="p-6">
-                          <dl class="grid grid-cols-12 items-center gap-y-6">
+                      <form action="{{ route('user.profile.update') }}" method="POST" class="p-6">
+                          @csrf
+                          @method('PUT')
+
+                          @if(session('success'))
+                              <div class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+                                  <div class="flex">
+                                      <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                      </svg>
+                                      <p class="ml-3 text-sm text-green-700">{{ session('success') }}</p>
+                                  </div>
+                              </div>
+                          @endif
+
+                          @if ($errors->any())
+                              <div class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                                  <ul class="list-disc list-inside text-sm text-red-700">
+                                      @foreach ($errors->all() as $error)
+                                          <li>{{ $error }}</li>
+                                      @endforeach
+                                  </ul>
+                              </div>
+                          @endif
+
+                          <div class="grid grid-cols-12 items-center gap-y-6">
                               <dt class="col-span-12 md:col-span-4 text-gray-600">Nama Pengguna</dt>
-                              <dd class="col-span-12 md:col-span-8 flex items-center gap-3">
-                                  <span class="font-medium">{{ $user->name ?? 'nama pengguna' }}</span>
+                              <dd class="col-span-12 md:col-span-8">
+                                  <input type="text" name="name" value="{{ old('name', $user->name) }}" 
+                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                               </dd>
 
                               <dt class="col-span-12 md:col-span-4 text-gray-600">Email</dt>
-                              <dd class="col-span-12 md:col-span-8 font-medium">
-                                  {{ $user->email ?? 'email.admin@gmail.com' }}
+                              <dd class="col-span-12 md:col-span-8">
+                                  <input type="email" name="email" value="{{ old('email', $user->email) }}" 
+                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
                               </dd>
 
                               <dt class="col-span-12 md:col-span-4 text-gray-600">Nomor HP</dt>
-                              <dd class="col-span-12 md:col-span-8 font-medium">
-                                  {{ $maskedPhone }}
+                              <dd class="col-span-12 md:col-span-8">
+                                  <input type="tel" name="nomor_hp" value="{{ old('nomor_hp', $user->nomor_hp) }}" 
+                                         pattern="[0-9]{10,13}" placeholder="08123456789"
+                                         class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                                  <p class="mt-1 text-xs text-gray-500">Format: 10-13 digit angka</p>
                               </dd>
 
-                              <dt class="col-span-12 md:col-span-4 text-gray-600">Jenis Kelamin</dt>
+                              <dt class="col-span-12 md:col-span-4 text-gray-600 self-start">Alamat Default</dt>
                               <dd class="col-span-12 md:col-span-8">
-                                  <div class="flex items-center gap-8">
-                                      <label class="inline-flex items-center gap-2">
-                                          <input type="radio" name="gender" class="h-4 w-4"
-                                                 @checked(($user->gender ?? null) === 'male')>
-                                          <span>Laki-laki</span>
-                                      </label>
-                                      <label class="inline-flex items-center gap-2">
-                                          <input type="radio" name="gender" class="h-4 w-4"
-                                                 @checked(($user->gender ?? null) === 'female')>
-                                          <span>Perempuan</span>
-                                      </label>
-                                  </div>
+                                  <textarea name="alamat_default" rows="4" placeholder="Masukkan alamat lengkap Anda (opsional)"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none">{{ old('alamat_default', $user->alamat_default) }}</textarea>
+                                  <p class="mt-1 text-xs text-gray-500">Alamat ini akan otomatis terisi saat checkout</p>
                               </dd>
-                          </dl>
-                      </div>
+                          </div>
+
+                          <div class="mt-8 flex justify-end gap-4">
+                              <button type="button" onclick="window.location.reload()" 
+                                      class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                                  Batal
+                              </button>
+                              <button type="submit" 
+                                      class="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                  Simpan Perubahan
+                              </button>
+                          </div>
+                      </form>
                   </div>
               </main>
           </div>

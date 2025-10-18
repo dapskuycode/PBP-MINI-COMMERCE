@@ -123,6 +123,27 @@
           @enderror
         </div>
 
+        <!-- Nomor HP -->
+        <div>
+          <label for="nomor_hp" class="block text-sm font-medium text-gray-700 mb-2">
+            <i class="fas fa-phone mr-2 text-emerald-500"></i>Nomor HP
+          </label>
+          <div class="relative">
+            <input type="tel" id="nomor_hp" name="nomor_hp" value="{{ old('nomor_hp') }}"
+                   class="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 input-focus transition-all duration-200 @error('nomor_hp') border-red-500 @enderror"
+                   placeholder="08123456789" pattern="[0-9]{10,13}" required>
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="fas fa-phone text-gray-400"></i>
+            </div>
+          </div>
+          @error('nomor_hp')
+            <p class="mt-1 text-sm text-red-600 flex items-center">
+              <i class="fas fa-exclamation-triangle mr-1"></i>{{ $message }}
+            </p>
+          @enderror
+          <p class="mt-1 text-xs text-gray-500">Format: 10-13 digit angka (contoh: 08123456789)</p>
+        </div>
+
         <!-- Password -->
         <div>
           <label for="password" class="block text-sm font-medium text-gray-700 mb-2">

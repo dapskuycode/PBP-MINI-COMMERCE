@@ -114,12 +114,18 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
+            'nomor_hp' => 'required|string|regex:/^[0-9]{10,13}$/|unique:users,nomor_hp',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ], [
+            'nomor_hp.required' => 'Nomor HP wajib diisi.',
+            'nomor_hp.regex' => 'Format nomor HP tidak valid. Gunakan 10-13 digit angka.',
+            'nomor_hp.unique' => 'Nomor HP sudah digunakan oleh pengguna lain.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'nomor_hp' => $request->nomor_hp,
             'password' => Hash::make($request->password),
             'role' => 'user', // Default role is user
         ]);
@@ -170,14 +176,23 @@ class UserController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'nomor_hp' => 'required|string|regex:/^[0-9]{10,13}$/|unique:users,nomor_hp,' . $user->id,
+            'alamat_default' => 'nullable|string|max:1000',
+        ], [
+            'nomor_hp.required' => 'Nomor HP wajib diisi.',
+            'nomor_hp.regex' => 'Format nomor HP tidak valid. Gunakan 10-13 digit angka.',
+            'nomor_hp.unique' => 'Nomor HP sudah digunakan oleh pengguna lain.',
+            'alamat_default.max' => 'Alamat tidak boleh lebih dari 1000 karakter.',
         ]);
 
         $user->update([
             'name' => $request->name,
             'email' => $request->email,
+            'nomor_hp' => $request->nomor_hp,
+            'alamat_default' => $request->alamat_default,
         ]);
 
-        return redirect()->route('user.profile')->with('success', 'Profile berhasil diupdate!');
+        return redirect()->route('user.profile')->with('success', 'Profil berhasil diupdate!');
     }
 
     /**

@@ -83,7 +83,10 @@
             <div class="sm:col-span-2">
               <label class="block text-sm mb-1 text-gray-700">Alamat Lengkap</label>
               <textarea rows="3" name="address" required placeholder="Jl. Pahlawan No. 12, Kota, Provinsi, 12345"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"></textarea>
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">{{ Auth::user()->alamat_default }}</textarea>
+              @if(Auth::user()->alamat_default)
+                <p class="mt-1 text-xs text-emerald-600">Alamat default telah diisi otomatis</p>
+              @endif
             </div>
 
             <div>
@@ -101,6 +104,7 @@
             <div class="sm:col-span-2">
               <label class="block text-sm mb-1 text-gray-700">Nomor Telepon</label>
               <input type="text" name="nomor_hp" placeholder="08xxxxxxxxxx" required
+                     value="{{ Auth::user()->nomor_hp }}"
                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
             </div>
           </div>

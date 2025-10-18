@@ -11,7 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('nomor_hp')->after('email');
+            $table->text('alamat_default')->nullable()->after('nomor_hp');
+        });
     }
 
     /**
@@ -19,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['nomor_hp', 'alamat_default']);
+        });
     }
 };
