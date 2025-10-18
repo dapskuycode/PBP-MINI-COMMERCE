@@ -64,7 +64,7 @@ class OrderController extends Controller
                         // Return basic data if transformation fails
                         return [
                             'code' => 'ORD' . str_pad($order->id ?? 0, 4, '0', STR_PAD_LEFT),
-                            'status' => 'pending',
+                            'status' => 'processing',
                             'date' => now()->format('Y-m-d H:i:s'),
                             'total' => 0,
                             'items' => [],
@@ -85,12 +85,10 @@ class OrderController extends Controller
                 ]);
                 
                 
-                $totPending = $orders->where('status', 'pending')->count();
                 $totProcessing = $orders->where('status', 'processing')->count();
                 $totShipped = $orders->where('status', 'shipped')->count();
                 $totCompleted = $orders->where('status', 'completed')->count();
                 $totCancelled = $orders->where('status', 'cancelled')->count();
-                $orderPending = $orders->where('status', 'pending');
                 $orderProcessing = $orders->where('status', 'processing');
                 $orderShipped = $orders->where('status', 'shipped');
                 $orderCompleted = $orders->where('status', 'completed');
@@ -104,18 +102,16 @@ class OrderController extends Controller
                     ]);
                 }
 
-                return view('admin.adminorders', compact('orders', 'transformedOrders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderPending', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
+                return view('admin.adminorders', compact('orders', 'transformedOrders', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
             } else {
                 $orders = Order::with(['orderItems.product'])
                     ->where('user_id', $user->id)
                     ->latest()
                     ->get();
-                $totPending = $orders->where('status', 'pending')->count();
                 $totProcessing = $orders->where('status', 'processing')->count();
                 $totShipped = $orders->where('status', 'shipped')->count();
                 $totCompleted = $orders->where('status', 'completed')->count();
                 $totCancelled = $orders->where('status', 'cancelled')->count();
-                $orderPending = $orders->where('status', 'pending');
                 $orderProcessing = $orders->where('status', 'processing');
                 $orderShipped = $orders->where('status', 'shipped');
                 $orderCompleted = $orders->where('status', 'completed');
@@ -128,7 +124,7 @@ class OrderController extends Controller
                     ]);
                 }
                 
-                return view('orders', compact('orders', 'totPending', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderPending', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
+                return view('orders', compact('orders', 'totProcessing', 'totCompleted', 'totCancelled', 'totShipped', 'orderProcessing', 'orderShipped', 'orderCompleted', 'orderCancelled'));
             }
         } catch (\Exception $e) {
             Log::error('Error in OrderController@index: ' . $e->getMessage(), [
@@ -151,12 +147,10 @@ class OrderController extends Controller
                 return view('admin.adminorders', [
                     'orders' => collect([]),
                     'transformedOrders' => $transformedOrders,
-                    'totPending' => 0,
                     'totProcessing' => 0,
                     'totCompleted' => 0,
                     'totCancelled' => 0,
                     'totShipped' => 0,
-                    'orderPending' => collect([]),
                     'orderProcessing' => collect([]),
                     'orderShipped' => collect([]),
                     'orderCompleted' => collect([]),
@@ -250,7 +244,8 @@ class OrderController extends Controller
         }
         
         $request->validate([
-            'status' => 'required|in:pending,processing,shipped,completed,cancelled'
+            // pending removed because demo flow moves directly to processing
+            'status' => 'required|in:processing,shipped,completed,cancelled'
         ]);
         
         try {
@@ -400,7 +395,6 @@ class OrderController extends Controller
     private function mapStatusToFrontend($status)
     {
         $statusMap = [
-            'pending' => 'belum_bayar',
             'processing' => 'dikemas', 
             'shipped' => 'dikirim',
             'completed' => 'selesai',

@@ -78,7 +78,8 @@ class CheckoutController extends Controller
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'address'           => $request->address,
                 'total'             => $request->total,
-                'status'            => 'pending',
+                // Demo flow: set to processing directly since there's no real payment flow
+                'status'            => 'processing',
             ]);
 
             \Log::info('Order Created:', ['order_id' => $order->id]);
