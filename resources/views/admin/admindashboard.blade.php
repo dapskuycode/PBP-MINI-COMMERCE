@@ -59,10 +59,14 @@
   <main class="flex-1 p-8 space-y-6">
     <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
+<<<<<<< HEAD
+      {{-- <a href="#" class="text-emerald-700 font-semibold hover:underline">Logout</a> --}}
+=======
       <div class="text-right">
         <div class="text-lg font-semibold text-gray-700" id="currentDate"></div>
         <div class="text-sm text-gray-500">{{ date('l') }}</div>
       </div>
+>>>>>>> 24d47397d66fb7ddb33c20118aed86151d0c465b
     </div>
 
     {{-- Kartu ringkasan --}}
