@@ -59,7 +59,15 @@
 	  </aside>
 	
 		<!-- Main Content (ubah menjadi flex-1 dan tambahkan spacing vertikal) -->
-		<main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main class="flex-1 p-8 space-y-6">
+            <div class="flex justify-between items-center">
+                <h1 class="text-3xl font-bold text-gray-800">Manajemen Produk</h1>
+                <div class="text-right">
+                    <div class="text-lg font-semibold text-gray-700" id="currentDate"></div>
+                    <div class="text-sm text-gray-500">{{ date('l') }}</div>
+                </div>
+            </div>
+            
 			<!-- Alert Messages -->
 			@if(session('warning'))
 			    <div class="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
