@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class FavoriteController extends Controller
 {
     /**
-     * Toggle favorite status for a product.
+     * Toggle favorite status for a product (AJAX).
      */
     public function toggle(Request $request, $productId)
     {
@@ -26,8 +26,8 @@ class FavoriteController extends Controller
         $product = Product::findOrFail($productId);
         
         $existingFavorite = FavoriteItem::where('user_id', $user->id)
-                                      ->where('product_id', $productId)
-                                      ->first();
+                                        ->where('product_id', $productId)
+                                        ->first();
 
         if ($existingFavorite) {
             // Remove from favorites
@@ -68,6 +68,21 @@ class FavoriteController extends Controller
                                 ->paginate(12);
 
         return view('favorites', compact('favorites'));
+    }
+
+    /**
+     * Remove product from favorites (via DELETE form).
+     */
+    public function destroy($productId)
+    {
+        $user = Auth::user();
+
+        FavoriteItem::where('user_id', $user->id)
+                    ->where('product_id', $productId)
+                    ->delete();
+
+        // Balikin ke halaman favorites lagi biar bisa ngecek kosong/tidak
+        return redirect()->route('favorites.index');
     }
 
     /**

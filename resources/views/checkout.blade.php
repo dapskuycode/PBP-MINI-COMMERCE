@@ -38,16 +38,18 @@
   @include('components.navbar', ['isAdmin' => false])
 
   {{-- Header strip --}}
-  <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div>
+  {{-- <div class="bg-emerald-100/60 h-16 w-full rounded-b-2xl"></div> --}}
+  <div class="bg-gray-50 h-16 w-full rounded-b-2xl"></div>
 
   {{-- Main --}}
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-9">
+  {{-- <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-9 mb-20"> --}}
     {{-- Header --}}
     <div class="bg-white rounded-2xl shadow-sm border p-6 flex items-center gap-4">
   <img src="{{ asset('images/logo.png') }}" alt="TumbasLek" class="w-12 h-12 rounded-full">
       <div>
         <h1 class="text-2xl font-bold">Checkout</h1>
-        <p class="text-sm text-gray-500">UMKM Mini-Commerce</p>
+        <p class="text-sm text-gray-500">Belanja mudah dan cepat</p>
       </div>
     </div>
 
@@ -227,6 +229,11 @@
           <p class="text-[12px] text-gray-500 mt-3">
             Dengan menekan “Buat Pesanan”, Anda menyetujui
             <a href="#" class="text-emerald-600 underline">Syarat & Ketentuan</a>.
+
+            {{-- Dengan menekan “Buat Pesanan”, Anda menyetujui 
+              <a href="{{ route('terms') }}" class="text-emerald-600 hover:underline" target="_blank">
+                Syarat & Ketentuan
+              </a>. --}}
           </p>
         </div>
         <input type="hidden" name="total" :value="total()">

@@ -326,26 +326,38 @@ class ProductController extends Controller
      */
     public function search(Request $request)
     {
-        $query = $request->get('q');
+        $query = $request->get('q') ?: $request->get('search');
         $categoryId = $request->get('category_id');
 
-        $products = Product::with('category')
+        $productsQuery = Product::with(['category', 'photos'])
             ->when($query, function ($q) use ($query) {
                 return $q->where('name', 'like', "%{$query}%")
                         ->orWhere('description', 'like', "%{$query}%");
             })
             ->when($categoryId, function ($q) use ($categoryId) {
                 return $q->where('category_id', $categoryId);
-            })
-            ->where('stock', '>', 0)
-            ->latest()
-            ->paginate(12);
+            });
 
-        return response()->json([
-            'success' => true,
-            'data' => $products,
-            'message' => 'Products search completed successfully'
-        ]);
+        // For admin search, don't filter by stock and return collection directly
+        if ($request->is('admin/*')) {
+            $products = $productsQuery->latest()->get();
+            
+            return response()->json([
+                'success' => true,
+                'products' => $products,
+                'message' => 'Products search completed successfully'
+            ]);
+        } else {
+            // For public search, use pagination
+            $products = $productsQuery->where('stock', '>', 0)->latest()->paginate(12);
+            
+            return response()->json([
+                'success' => true,
+                'products' => $products,
+                'data' => $products, // Keep backward compatibility
+                'message' => 'Products search completed successfully'
+            ]);
+        }
     }
 
     /**

@@ -149,7 +149,6 @@
                 <option value="">Semua Peran</option>
                 <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                 <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Customer</option>
-                <option value="moderator" {{ request('role') == 'moderator' ? 'selected' : '' }}>Moderator</option>
               </select>
               <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                 <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -421,7 +420,6 @@
                 <select id="u-role" name="role" class="w-full border rounded-lg px-3 py-2">
                   <option value="user">Customer</option>
                   <option value="admin">Admin</option>
-                  <option value="moderator">Moderator</option>
                 </select>
               </div>
               <div>

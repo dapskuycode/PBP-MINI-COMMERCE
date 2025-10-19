@@ -30,18 +30,24 @@ class OrderSeeder extends Seeder
         
         // Demo flow: orders start at processing, skip pending
         $statuses = ['processing', 'shipped', 'completed', 'cancelled'];
-        $addresses = [
-            'Jl. Sudirman No. 123, Jakarta Pusat, DKI Jakarta 10220',
-            'Jl. Gatot Subroto Kav. 56, Jakarta Selatan, DKI Jakarta 12950',
-            'Jl. MH Thamrin No. 87, Jakarta Pusat, DKI Jakarta 10310',
-            'Jl. HR Rasuna Said Blok X-5 Kav. 4-9, Jakarta Selatan, DKI Jakarta 12950',
-            'Jl. Jend. Soedirman Kav. 52-53, Jakarta Selatan, DKI Jakarta 12190',
-            'Jl. Kemang Raya No. 45, Jakarta Selatan, DKI Jakarta 12560',
-            'Jl. Pantai Indah Kapuk Blvd, Jakarta Utara, DKI Jakarta 14470',
-            'Jl. Kelapa Gading Boulevard, Jakarta Utara, DKI Jakarta 14240',
-            'Jl. Puri Indah Raya, Jakarta Barat, DKI Jakarta 11610',
-            'Jl. Cikini Raya No. 78, Jakarta Pusat, DKI Jakarta 10330'
+        $cities = [
+            'Jakarta', 'Surabaya', 'Bandung', 'Medan', 'Semarang', 
+            'Makassar', 'Palembang', 'Tangerang', 'Depok', 'Bekasi'
         ];
+        $addresses = [
+            'Jl. Sudirman No. 123, Jakarta Pusat',
+            'Jl. Gatot Subroto Kav. 56, Jakarta Selatan', 
+            'Jl. MH Thamrin No. 87, Jakarta Pusat',
+            'Jl. HR Rasuna Said Blok X-5 Kav. 4-9, Jakarta Selatan',
+            'Jl. Jend. Soedirman Kav. 52-53, Jakarta Selatan',
+            'Jl. Kemang Raya No. 45, Jakarta Selatan',
+            'Jl. Pantai Indah Kapuk Blvd, Jakarta Utara',
+            'Jl. Kelapa Gading Boulevard, Jakarta Utara',
+            'Jl. Puri Indah Raya, Jakarta Barat',
+            'Jl. Cikini Raya No. 78, Jakarta Pusat'
+        ];
+        $shippingMethods = ['reguler', 'express', 'same_day'];
+        $paymentMethods = ['transfer_bank', 'e_wallet', 'cod'];
         
         // Create 50 orders with realistic data
         for ($i = 0; $i < 50; $i++) {
@@ -49,30 +55,25 @@ class OrderSeeder extends Seeder
             $status = $faker->randomElement($statuses);
             
             // Create realistic order dates based on status
-            $orderDate = null;
-            switch ($status) {
-                case 'processing':
-                    // Processing orders are recent (last 3 days)
-                    $orderDate = Carbon::now()->subMinutes(rand(0, 4320)); // 0-72 hours ago
-                    break;
-                case 'shipped':
-                    // Shipped orders are 2-14 days old
-                    $orderDate = Carbon::now()->subDays(rand(2, 14));
-                    break;
-                case 'completed':
-                    // Completed orders are 1-30 days old
-                    $orderDate = Carbon::now()->subDays(rand(1, 30));
-                    break;
-                case 'cancelled':
-                    // Cancelled orders can be from any time in last month
-                    $orderDate = Carbon::now()->subDays(rand(1, 30));
-                    break;
+            $orderDate = $this->getCreatedDateByStatus($status, $faker);
+            
+            // Generate nomor resi for shipped and completed orders
+            $nomorResi = null;
+            if (in_array($status, ['shipped', 'completed'])) {
+                $nomorResi = 'JNE' . $faker->numberBetween(100000000000, 999999999999);
             }
             
             // Create the order first
             $order = Order::create([
                 'user_id' => $user->id,
+                'nama_pemesan' => $user->name,
+                'kota' => $faker->randomElement($cities),
+                'kode_pos' => $faker->numberBetween(10000, 99999),
+                'nomor_hp' => '08' . $faker->numberBetween(10000000, 99999999),
+                'jenis_pengiriman' => $faker->randomElement($shippingMethods),
+                'metode_pembayaran' => $faker->randomElement($paymentMethods),
                 'status' => $status,
+                'nomor_resi' => $nomorResi,
                 'address' => $faker->randomElement($addresses),
                 'total' => 0, // Will be updated after adding items
                 'created_at' => $orderDate,
@@ -116,27 +117,25 @@ class OrderSeeder extends Seeder
      */
     private function getCreatedDateByStatus(string $status, $faker)
     {
-        $now = now();
-        
         switch ($status) {
             case 'processing':
                 // Recent orders (last 3 days)
-                return $faker->dateTimeBetween('-3 days', 'now');
+                return Carbon::now()->subMinutes(rand(0, 4320)); // 0-3 days ago
                 
             case 'shipped':
                 // Orders from last 2 weeks
-                return $faker->dateTimeBetween('-14 days', '-3 days');
+                return Carbon::now()->subDays(rand(3, 14));
                 
             case 'completed':
                 // Orders from last month
-                return $faker->dateTimeBetween('-30 days', '-7 days');
+                return Carbon::now()->subDays(rand(7, 30));
                 
             case 'cancelled':
                 // Random cancelled orders
-                return $faker->dateTimeBetween('-60 days', '-1 day');
+                return Carbon::now()->subDays(rand(1, 60));
                 
             default:
-                return $faker->dateTimeBetween('-30 days', 'now');
+                return Carbon::now()->subDays(rand(1, 30));
         }
     }
     
