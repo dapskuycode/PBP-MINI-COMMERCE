@@ -91,9 +91,26 @@
                                             class="product-card border rounded-xl overflow-hidden bg-white hover:shadow-md transition">
 
                                             <a href="{{ route('products.show', $product->id) }}">
-                                                <img src="{{ asset('storage/' . $product->image) }}" 
-                                                    alt="{{ $product->name }}" 
-                                                    class="h-48 w-full object-cover">
+                                                @if($product->photos && $product->photos->count() > 0)
+                                                    <img src="{{ asset('storage/' . $product->photos->first()->url) }}" 
+                                                        alt="{{ $product->name }}" 
+                                                        class="h-48 w-full object-cover product-image"
+                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                    <div class="h-48 w-full bg-gray-200 flex items-center justify-center text-gray-500" style="display: none;">
+                                                        <div class="text-center">
+                                                            <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                            </svg>
+                                                            <span class="text-xs">No Image</span>
+                                                        </div>
+                                                    </div>
+                                                @else
+                                                    <div class="h-48 w-full bg-gray-200 flex items-center justify-center">
+                                                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                                        </svg>
+                                                    </div>
+                                                @endif
                                             </a>
 
                                             <div class="p-4">
@@ -126,6 +143,22 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Handle missing images
+            document.querySelectorAll(".product-image").forEach(img => {
+                img.addEventListener("error", function() {
+                    console.log("Image failed to load:", this.src);
+                    this.style.display = 'none';
+                    if (this.nextElementSibling) {
+                        this.nextElementSibling.style.display = 'flex';
+                    }
+                });
+                
+                // Check if image is already broken
+                if (!img.complete || img.naturalHeight === 0) {
+                    img.dispatchEvent(new Event('error'));
+                }
+            });
+
             document.querySelectorAll(".favorite-toggle").forEach(button => {
                 button.addEventListener("click", function(e) {
                     e.preventDefault();
