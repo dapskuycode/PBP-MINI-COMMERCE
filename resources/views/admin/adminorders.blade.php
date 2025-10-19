@@ -525,6 +525,16 @@
           }
         }
       };
+      // Set current date
+      document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const options = { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+    });
     </script>
     <!-- Muat Alpine.js setelah ordersPage didefinisikan agar x-data dapat memanggilnya -->
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>

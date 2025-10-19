@@ -515,7 +515,18 @@
             </button>
         </div>
     </div>
-
+    <script>
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const options = { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+        });
+    </script>
     <script>
         // Modal Functions
         function openCreateModal() {

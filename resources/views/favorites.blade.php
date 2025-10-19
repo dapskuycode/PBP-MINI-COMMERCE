@@ -92,8 +92,19 @@
                                       @endphp
                                       <div class="border rounded-xl overflow-hidden bg-white hover:shadow-md transition">
                                           <a href="{{ route('products.show', $product->id) }}">
-                                              <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" 
-                                                  class="h-48 w-full object-cover">
+                                              @if($product->photos && $product->photos->count() > 0)
+                                                  <img src="{{ asset('storage/' . $product->photos->first()->url) }}" alt="{{ $product->name }}" 
+                                                      class="h-48 w-full object-cover">
+                                              @else
+                                                  <div class="h-48 w-full bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center">
+                                                      <div class="text-center">
+                                                          <svg class="w-16 h-16 text-emerald-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                                          </svg>
+                                                          <span class="text-xs text-emerald-600 font-medium">{{ $product->category->name ?? 'Produk' }}</span>
+                                                      </div>
+                                                  </div>
+                                              @endif
                                               <div class="p-4">
                                                   <h3 class="text-gray-800 font-semibold text-base mb-1">{{ $product->name }}</h3>
                                                   <p class="text-emerald-600 font-bold text-sm mb-2">

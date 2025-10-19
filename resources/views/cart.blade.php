@@ -396,6 +396,12 @@
               </a>
             </div>
           `;
+          
+          // Also hide the cart summary section when cart is empty
+          const summarySection = document.querySelector('aside.bg-white');
+          if (summarySection) {
+            summarySection.style.display = 'none';
+          }
         }
       }
     }
@@ -447,7 +453,48 @@
           decreaseBtn.classList.add('opacity-50');
         }
       });
+      
+      // Check if cart is empty on page load and show dynamic empty state if needed
+      checkEmptyCartOnLoad();
     });
+
+    // Function to check empty cart on page load
+    function checkEmptyCartOnLoad() {
+      const remainingItems = document.querySelectorAll('[data-product-price]').length;
+      
+      // Only show dynamic empty state if there are no items AND the static empty state is not already shown
+      if (remainingItems === 0) {
+        const existingEmptyState = document.querySelector('.lg\\:col-span-2 .bg-white');
+        const cartSection = document.querySelector('.lg\\:col-span-2');
+        
+        // If there's no existing empty state shown (meaning cart has items but they were all removed)
+        // or if the cart section exists but is empty, show the dynamic empty state
+        if (cartSection && (!existingEmptyState || cartSection.children.length === 0)) {
+          cartSection.innerHTML = `
+            <div class="bg-white rounded-xl shadow p-10 text-center border border-gray-100">
+              <div class="w-16 h-16 mx-auto rounded-full bg-gray-100 grid place-items-center">
+                <svg class="w-8 h-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M5 8l2-3a2 2 0 011.7-1h6.6a2 2 0 011.7 1l2 3M6 8h12l-1 11a2 2 0 01-2 2H9a2 2 0 01-2-2L6 8z"/>
+                </svg>
+              </div>
+              <h1 class="mt-4 text-2xl font-extrabold">Keranjang masih kosong</h1>
+              <p class="mt-1 text-gray-600">Yuk pilih produk favoritmu dulu.</p>
+              <a href="{{ route('home') }}"
+                 class="inline-flex items-center gap-2 mt-5 bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-emerald-700">
+                Belanja Sekarang
+              </a>
+            </div>
+          `;
+          
+          // Also hide the cart summary section when cart is empty
+          const summarySection = document.querySelector('aside.bg-white');
+          if (summarySection) {
+            summarySection.style.display = 'none';
+          }
+        }
+      }
+    }
   </script>
 </body>
 </html>
