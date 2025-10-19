@@ -141,6 +141,49 @@
 			    
 			</div>
 	
+			<!-- Search Bar Section -->
+			<div class="bg-white rounded-xl shadow-md p-6">
+				<div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+					<div class="flex-1 w-full md:max-w-md">
+						<div class="relative">
+							<input type="text" 
+								   id="productSearch" 
+								   placeholder="Ketik untuk mencari produk secara real-time..." 
+								   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+								</svg>
+							</div>
+						</div>
+					</div>
+					<div class="flex gap-2">
+						<button onclick="clearSearch()" 
+								class="px-4 py-2 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+							<svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+							</svg>
+							Clear
+						</button>
+						<select id="categoryFilter" 
+								class="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+							<option value="">Semua Kategori</option>
+							@foreach($categories as $category)
+								<option value="{{ $category->id }}">{{ $category->name }}</option>
+							@endforeach
+						</select>
+					</div>
+				</div>
+				<div id="searchResults" class="mt-4 hidden">
+					<div class="text-sm text-gray-600 mb-2">
+						<span id="searchResultsCount">0</span> produk ditemukan
+					</div>
+					<div id="searchResultsList" class="grid grid-cols-1 gap-3 max-h-60 overflow-y-auto">
+						<!-- Search results akan tampil di sini -->
+					</div>
+				</div>
+			</div>
+
 			<!-- Products Section (ubah: kategori memanjang ke samping, produk disusun ke bawah per kategori) -->
 			<div class="bg-white rounded-xl shadow-md p-6">
 	<div class="flex justify-between items-center mb-6">
@@ -989,6 +1032,177 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Toggle category dropdown (scroll vertical saat dibuka)
+        function toggleCategory(id){
+            const el = document.getElementById('cat-' + id);
+            if(!el) return;
+            el.classList.toggle('hidden');
+            if(!el.classList.contains('hidden')){
+                // scroll parent category container into view (vertically)
+                const parent = el.closest('div[w-full]') || el.closest('.w-full');
+                (el).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Search functionality - isolated namespace
+        (function() {
+            let searchTimeout;
+            const productSearch = document.getElementById('productSearch');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const searchResults = document.getElementById('searchResults');
+            const searchResultsList = document.getElementById('searchResultsList');
+            const searchResultsCount = document.getElementById('searchResultsCount');
+
+            // Add search event listeners when DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                if (productSearch) {
+                    // Remove any existing listeners first
+                    productSearch.removeEventListener('input', handleSearch);
+                    productSearch.removeEventListener('keydown', handleKeydown);
+                    
+                    // Add fresh listeners
+                    productSearch.addEventListener('input', handleSearch);
+                    productSearch.addEventListener('keydown', handleKeydown);
+                }
+
+                if (categoryFilter) {
+                    categoryFilter.removeEventListener('change', handleCategoryChange);
+                    categoryFilter.addEventListener('change', handleCategoryChange);
+                }
+            });
+
+            function handleSearch(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(performSearch, 300);
+            }
+
+            function handleKeydown(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    performSearch();
+                }
+            }
+
+            function handleCategoryChange(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                performSearch();
+            }
+
+            async function performSearch() {
+                const searchTerm = productSearch.value.trim();
+                const categoryId = categoryFilter.value;
+
+                // Show loading state
+                if (searchTerm.length > 0 || categoryId) {
+                    searchResults.classList.remove('hidden');
+                    searchResultsList.innerHTML = '<div class="text-center py-4 text-gray-500"><div class="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div> Mencari...</div>';
+                } else {
+                    // Hide search results if no search term and no category filter
+                    searchResults.classList.add('hidden');
+                    return;
+                }
+
+                // Build search URL - declare outside try block for error handling
+                const params = new URLSearchParams();
+                if (searchTerm) params.append('search', searchTerm);
+                if (categoryId) params.append('category_id', categoryId);
+
+                const searchUrl = `/admin/search?${params.toString()}`;
+                console.log('Search URL:', searchUrl);
+
+                try {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]');
+
+                    const response = await fetch(searchUrl, {
+                        method: 'GET',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': csrfToken ? csrfToken.getAttribute('content') : ''
+                        }
+                    });
+
+                    console.log('Search response status:', response.status, response.statusText);
+                    
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        console.log('Error response body:', errorText);
+                        throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    displaySearchResults(data.products || []);
+                } catch (error) {
+                    console.error('Search error:', error);
+                    searchResultsList.innerHTML = '<div class="text-red-500 text-center py-4">Error dalam pencarian. Silakan coba lagi.</div>';
+                }
+            }
+
+            function displaySearchResults(products) {
+                searchResultsCount.textContent = products.length;
+                searchResultsList.innerHTML = '';
+
+                if (products.length === 0) {
+                    searchResultsList.innerHTML = '<div class="text-gray-500 text-center py-4">Tidak ada produk ditemukan</div>';
+                } else {
+                    products.forEach(product => {
+                        const productElement = createSearchResultElement(product);
+                        searchResultsList.appendChild(productElement);
+                    });
+                }
+
+                searchResults.classList.remove('hidden');
+            }
+
+            function createSearchResultElement(product) {
+                const div = document.createElement('div');
+                div.className = 'flex items-center gap-4 p-3 bg-gray-50 rounded border hover:bg-gray-100 transition-colors';
+                
+                const photoUrl = product.photos && product.photos.length > 0 
+                    ? `/storage/${product.photos[0].url}` 
+                    : 'https://via.placeholder.com/64x64?text=No+Image';
+                
+                div.innerHTML = `
+                    <div class="w-16 h-16 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                        <img src="${photoUrl}" alt="${product.name}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/64x64?text=No+Image'">
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold truncate">${product.name}</div>
+                        <div class="text-xs text-gray-500">${product.category ? product.category.name : 'Tanpa Kategori'}</div>
+                        <div class="text-xs text-gray-500">Stok: ${product.stock} • Rp ${new Intl.NumberFormat('id-ID').format(product.price)}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openEditModal(${JSON.stringify(product).replace(/"/g, '&quot;')})" class="text-sm bg-amber-500 text-white px-3 py-1 rounded hover:bg-amber-600 transition-colors">Edit</button>
+                        <button onclick="deleteProduct(${product.id})" class="text-sm bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">Hapus</button>
+                    </div>
+                `;
+                
+                return div;
+            }
+
+            // Expose clearSearch to global scope for button onclick
+            window.clearSearch = function() {
+                if (productSearch) {
+                    productSearch.value = '';
+                }
+                if (categoryFilter) {
+                    categoryFilter.value = '';
+                }
+                if (searchResults) {
+                    searchResults.classList.add('hidden');
+                }
+                // Focus back to search input for better UX
+                if (productSearch) {
+                    productSearch.focus();
+                }
+            };
+        })();
 
         // Toggle category dropdown (scroll vertical saat dibuka)
         function toggleCategory(id){

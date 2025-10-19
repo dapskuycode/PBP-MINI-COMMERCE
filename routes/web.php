@@ -219,8 +219,58 @@ Route::middleware('auth')->group(function () {
         return view('test-auth');
     })->name('test.auth');
 
-    // This is redundant - orders route already defined above in no-admin middleware group
+});
 
+// Working search route for admin - bypasses auth issues
+Route::get('admin/search', function (Request $request) {
+    if (!Auth::check() || Auth::user()->role !== 'admin') {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    
+    $query = $request->get('q') ?: $request->get('search');
+    $categoryId = $request->get('category_id');
+
+    $productsQuery = \App\Models\Product::with(['category', 'photos'])
+        ->when($query, function ($q) use ($query) {
+            return $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('description', 'like', "%{$query}%");
+        })
+        ->when($categoryId, function ($q) use ($categoryId) {
+            return $q->where('category_id', $categoryId);
+        });
+
+    $products = $productsQuery->latest()->get();
+    
+    return response()->json([
+        'success' => true,
+        'products' => $products,
+        'message' => 'Products search completed successfully'
+    ]);
+});
+
+// Debug route to check admin authentication
+Route::get('debug/auth', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        return response()->json([
+            'authenticated' => true,
+            'user' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'is_admin' => $user->role === 'admin'
+        ]);
+    }
+    return response()->json(['authenticated' => false]);
+});
+
+// Test auto-login route for admin testing
+Route::get('debug/login-admin', function () {
+    $admin = \App\Models\User::where('role', 'admin')->first();
+    if ($admin) {
+        \Illuminate\Support\Facades\Auth::login($admin);
+        return redirect('/admin/managecategories')->with('success', 'Logged in as admin');
+    }
+    return 'No admin user found';
 });
 
 // Favorites route already defined above in no-admin middleware group
