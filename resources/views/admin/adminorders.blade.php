@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Admin • TumbasLek</title>
+  <title>Dashboard Admin - TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
@@ -522,6 +525,16 @@
           }
         }
       };
+      // Set current date
+      document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const options = { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+    });
     </script>
     <!-- Muat Alpine.js setelah ordersPage didefinisikan agar x-data dapat memanggilnya -->
     <script defer src="https://unpkg.com/alpinejs@3.12.0/dist/cdn.min.js"></script>

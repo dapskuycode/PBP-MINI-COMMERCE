@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Mini Commerce</title>
+    <title>Login - TumbasLek Mini Commerce</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+    <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -106,7 +109,7 @@
                 <!-- Email Field -->
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email/Username
+                        <i class="fas fa-envelope mr-2 text-emerald-500"></i>Email
                     </label>
                     <div class="relative">
                         <input type="email"

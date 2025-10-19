@@ -102,4 +102,36 @@ class FavoriteController extends Controller
 
         return response()->json(['is_favorited' => $isFavorited]);
     }
+
+    /**
+     * Remove a product from favorites.
+     */
+    public function remove($productId)
+    {
+        $user = Auth::user();
+        
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must be logged in'
+            ], 401);
+        }
+
+        $favoriteItem = FavoriteItem::where('user_id', $user->id)
+                                   ->where('product_id', $productId)
+                                   ->first();
+
+        if ($favoriteItem) {
+            $favoriteItem->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'Product removed from favorites'
+            ]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Product not found in favorites'
+        ], 404);
+    }
 }

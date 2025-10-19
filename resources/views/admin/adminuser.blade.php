@@ -3,11 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pengguna • UMKM Mini-Commerce</title>
+  <title>Pengguna - TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
-<body class="bg-rose-50 min-h-screen flex">
+<body class="bg-gray-50 min-h-screen flex">
   {{-- Sidebar (copy dari dashboard-mu) --}}
   <aside class="w-64 bg-white border-r">
     <div class="p-4 text-center border-b">
@@ -52,7 +55,6 @@
         <h1 class="text-3xl font-bold text-gray-800">Manajemen Pengguna</h1>
         <p class="text-gray-600">Kelola akun admin & pelanggan.</p>
       </div>
-      <a href="{{ route('dashboard') }}" class="text-emerald-700 font-semibold hover:underline">← Kembali ke Dashboard</a>
     </div>
 
     {{-- Flash Messages --}}
@@ -113,39 +115,74 @@
       </div>
     </div>
 
-    {{-- Filter --}}
+        {{-- Filter --}}
     <div class="bg-white rounded-xl shadow p-4">
-      <div class="mb-3 flex items-center text-sm text-gray-600">
-      </div>
-      <form id="filterForm" method="GET" action="{{ route('admin.manageusers.showUsers') }}" class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div class="relative md:col-span-2">
-          <input 
-            type="text" 
-            name="search" 
-            id="searchInput"
-            placeholder="Ketik nama atau email untuk mencari..." 
-            value="{{ request('search') }}" 
-            class="w-full rounded-lg border-gray-300 px-3 py-2 pr-10">
-          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+      <form id="filterForm" method="GET" action="{{ route('admin.manageusers.showUsers') }}">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+          {{-- Pencarian --}}
+          <div class="md:col-span-2">
+            <label for="searchInput" class="block text-xs font-semibold text-gray-600 mb-2">Pencarian</label>
+            <div class="relative group flex items-center gap-3 rounded-xl border bg-gray-50 px-3 py-2 ring-1 ring-gray-200 focus-within:ring-emerald-300">
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+              <input 
+                type="text"
+                name="search"
+                id="searchInput"
+                placeholder="Ketik nama atau email untuk mencari…"
+                value="{{ request('search') }}"
+                class="w-full bg-transparent outline-none placeholder:text-gray-400"
+              />
+            </div>
+          </div>
+
+          {{-- Peran --}}
+          <div>
+            <label for="roleSelect" class="block text-xs font-semibold text-gray-600 mb-2">Peran</label>
+            <div class="relative rounded-xl border bg-gray-50 ring-1 ring-gray-200 focus-within:ring-emerald-300">
+              <select
+                name="role"
+                id="roleSelect"
+                class="w-full appearance-none bg-transparent px-3 py-2 rounded-xl outline-none"
+              >
+                <option value="">Semua Peran</option>
+                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Customer</option>
+                <option value="moderator" {{ request('role') == 'moderator' ? 'selected' : '' }}>Moderator</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 12a1 1 0 01-.707-.293l-3-3a1 1 0 111.414-1.414L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3A1 1 0 0110 12z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {{-- Status --}}
+          <div>
+            <label for="statusSelect" class="block text-xs font-semibold text-gray-600 mb-2">Status</label>
+            <div class="relative rounded-xl border bg-gray-50 ring-1 ring-gray-200 focus-within:ring-emerald-300">
+              <select
+                name="status"
+                id="statusSelect"
+                class="w-full appearance-none bg-transparent px-3 py-2 rounded-xl outline-none"
+              >
+                <option value="">Semua Status</option>
+                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
+                <option value="banned" {{ request('status') == 'banned' ? 'selected' : '' }}>Diblokir</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="w-4 h-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M10 12a1 1 0 01-.707-.293l-3-3a1 1 0 111.414-1.414L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3A1 1 0 0110 12z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
-        <select name="role" id="roleSelect" class="rounded-lg border-gray-300">
-          <option value="">Peran: Semua</option>
-          <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-          <option value="user" {{ request('role') == 'user' ? 'selected' : '' }}>Customer</option>
-          <option value="moderator" {{ request('role') == 'moderator' ? 'selected' : '' }}>Moderator</option>
-        </select>
-        <select name="status" id="statusSelect" class="rounded-lg border-gray-300">
-          <option value="">Status: Semua</option>
-          <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif</option>
-          <option value="banned" {{ request('status') == 'banned' ? 'selected' : '' }}>Diblokir</option>
-        </select>
       </form>
-      
-      {{-- Loading indicator and Reset button --}}
+
+      {{-- Loading + Reset --}}
       <div class="mt-3 flex justify-between items-center">
         <div id="loadingIndicator" class="hidden">
           <div class="flex items-center text-sm text-gray-600">
@@ -156,10 +193,10 @@
             Memfilter data...
           </div>
         </div>
-        
+
         @if(request()->hasAny(['search', 'role', 'status']))
           <a href="{{ route('admin.manageusers.showUsers') }}" 
-             class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+            class="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -168,6 +205,7 @@
         @endif
       </div>
     </div>
+
 
     {{-- Tabel pengguna --}}
     <section class="bg-white rounded-xl shadow overflow-hidden">

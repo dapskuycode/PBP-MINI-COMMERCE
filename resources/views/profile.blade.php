@@ -3,7 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Profil Pengguna — UMKM Mini-Commerce</title>
+  <title>Profil Pengguna — TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
 
   {{-- Pakai Tailwind via CDN supaya langsung tampil rapi tanpa build --}}
   <script src="https://cdn.tailwindcss.com"></script>
@@ -48,11 +51,6 @@
                               Profil Saya
                           </a>
                           @if(!$user->is_admin)
-                          <a href="{{ route('orders.index') }}"
-                             class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                              Riwayat Pesanan
-                          </a>
-                          
                             <a href="{{ route('favorites') }}"
                                 class="block px-4 py-2 rounded text-sm
                                         {{ request()->routeIs('profile.favorites') ? 'bg-emerald-100 text-emerald-800 font-medium' : 'text-gray-700 hover:bg-gray-100' }}">

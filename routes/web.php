@@ -155,6 +155,7 @@ Route::middleware('auth')->group(function () {
         // Favorites - for customers only
         Route::get('/favorites', [App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites');
         Route::post('/favorites/toggle/{product}', [App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle');
+        Route::delete('/favorites/remove/{product}', [App\Http\Controllers\FavoriteController::class, 'remove'])->name('favorites.remove');
         Route::get('/favorites/check/{product}', [App\Http\Controllers\FavoriteController::class, 'checkStatus'])->name('favorites.check');
     });
 

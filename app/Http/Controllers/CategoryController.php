@@ -21,11 +21,29 @@ class CategoryController extends Controller
         if (!Auth::user()->is_admin) {
             return redirect()->route('home')->with('error', 'Akses ditolak. Halaman ini hanya untuk admin.');
         }
-        $products = Product::with(['category', 'photos'])->paginate(10);
+        
+        // Get products with sold quantity calculation
+        $products = Product::with(['category', 'photos'])
+            ->withCount(['orderItems as total_sold' => function($query) {
+                $query->selectRaw('COALESCE(SUM(quantity), 0)')
+                      ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                      ->whereIn('orders.status', ['completed', 'shipped', 'delivered']);
+            }])
+            ->paginate(10);
+            
         $totalProducts = Product::count();
         $totalCategories = Category::count();
         $categoriesAll = Category::all();
-        $categories = Category::with('products')->get();
+        
+        // Get categories with products and their sold quantities
+        $categories = Category::with(['products' => function($query) {
+            $query->withCount(['orderItems as total_sold' => function($subQuery) {
+                $subQuery->selectRaw('COALESCE(SUM(quantity), 0)')
+                         ->join('orders', 'order_items.order_id', '=', 'orders.id')
+                         ->whereIn('orders.status', ['completed', 'shipped', 'delivered']);
+            }]);
+        }])->get();
+        
         return view('admin.admincategory', compact('products', 'categories', 'totalProducts', 'totalCategories', 'categoriesAll'));
     }
 

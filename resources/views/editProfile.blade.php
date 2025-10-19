@@ -3,7 +3,10 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Edit Profil • Mini Commerce</title>
+  <title>Edit Profil - TumbasLek Mini Commerce</title>
+  <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+  <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .glass{background:rgba(255,255,255,.78);backdrop-filter:blur(16px) saturate(140%)}

@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Admin • TumbasLek</title>
+    <title>Dashboard Admin - TumbasLek Mini Commerce</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+    <link rel="shortcut icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logoAtas.png') }}?v={{ time() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
@@ -134,6 +137,8 @@
 			        <h3 class="text-lg font-semibold text-gray-900">Nilai Stok</h3>
 			        <p class="text-3xl font-bold text-amber-600">Rp {{ number_format($products->sum(function($product) { return $product->price * $product->stock; }), 0, ',', '.') }}</p>
 			    </div>
+			    
+			    
 			</div>
 	
 			<!-- Products Section (ubah: kategori memanjang ke samping, produk disusun ke bawah per kategori) -->
@@ -211,7 +216,9 @@
 
 									<div class="flex-1 min-w-0">
 										<div class="font-semibold truncate">{{ $p->name }}</div>
-										<div class="text-xs text-gray-500">Stok: {{ $p->stock }} • Rp {{ number_format($p->price,0,',','.') }}</div>
+										<div class="text-xs text-gray-500">
+											Stok: {{ $p->stock }} • Terjual: {{ $p->total_sold ?? 0 }} • Rp {{ number_format($p->price,0,',','.') }}
+										</div>
 									</div>
 
 									<div class="flex gap-2">
@@ -512,7 +519,18 @@
             </button>
         </div>
     </div>
-
+    <script>
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        const options = { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('id-ID', options);
+        });
+    </script>
     <script>
         // Modal Functions
         function openCreateModal() {
