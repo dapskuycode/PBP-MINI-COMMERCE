@@ -44,7 +44,6 @@ class CartSeeder extends Seeder
             ]);
         }
         
-        // Note: Guest carts not supported in current schema (user_id is required)
         
         $totalCarts = Cart::count();
         

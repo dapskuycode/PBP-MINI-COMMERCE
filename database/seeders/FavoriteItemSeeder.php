@@ -17,7 +17,6 @@ class FavoriteItemSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
         
-        // Get all non-admin users and products
         $users = User::where('role', '!=', 'admin')->get();
         $products = Product::all();
         
@@ -26,18 +25,15 @@ class FavoriteItemSeeder extends Seeder
             return;
         }
         
-        // Create favorites for about 80% of users (most users have some favorites)
         $usersWithFavorites = $users->shuffle()->take(
             (int) ($users->count() * 0.8)
         );
         
         foreach ($usersWithFavorites as $user) {
-            // Each user has 1-8 favorite items (realistic wishlist size)
             $numFavorites = $faker->numberBetween(1, 8);
             $selectedProducts = $products->random($numFavorites);
             
             foreach ($selectedProducts as $product) {
-                // Check if this product is already in user's favorites
                 $existingFavorite = FavoriteItem::where('user_id', $user->id)
                     ->where('product_id', $product->id)
                     ->first();
@@ -59,30 +55,24 @@ class FavoriteItemSeeder extends Seeder
         $this->command->info("✅ FavoriteItems seeded successfully!");
         $this->command->info("📊 Created {$favoriteCount} favorite items");
         
-        // Show favorite statistics
         $this->showFavoriteStats();
     }
     
-    /**
-     * Show favorite statistics
-     */
+   
     private function showFavoriteStats()
     {
         $this->command->info('');
         $this->command->info('📈 Favorite Statistics:');
         
-        // Users with favorites
         $usersWithFavorites = User::has('favoriteItems')->count();
         $totalUsers = User::where('role', '!=', 'admin')->count();
         $favoritesPenetration = $totalUsers > 0 ? round(($usersWithFavorites / $totalUsers) * 100, 1) : 0;
         
         $this->command->info("   👤 Users with favorites: {$usersWithFavorites} / {$totalUsers} ({$favoritesPenetration}%)");
         
-        // Average favorites per user (for users who have favorites)
         $avgFavoritesPerUser = $usersWithFavorites > 0 ? round(FavoriteItem::count() / $usersWithFavorites, 1) : 0;
         $this->command->info("   💝 Average favorites per user: {$avgFavoritesPerUser}");
         
-        // Most favorited products
         $mostFavorited = Product::withCount('favoriteItems')
             ->orderBy('favorite_items_count', 'desc')
             ->limit(5)
@@ -96,7 +86,6 @@ class FavoriteItemSeeder extends Seeder
             }
         }
         
-        // Favorite distribution by category
         $favoritesByCategory = Product::join('favorite_items', 'products.id', '=', 'favorite_items.product_id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
             ->selectRaw('categories.name, COUNT(*) as count')

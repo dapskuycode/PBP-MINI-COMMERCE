@@ -78,7 +78,6 @@ class CheckoutController extends Controller
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'address'           => $request->address,
                 'total'             => $request->total,
-                // Demo flow: set to processing directly since there's no real payment flow
                 'status'            => 'processing',
             ]);
 

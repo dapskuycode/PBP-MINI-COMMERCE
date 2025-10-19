@@ -42,7 +42,6 @@ class CartController extends Controller
 
             $product = Product::findOrFail($request->product_id);
             
-            // Check if product has enough stock
             if ($product->stock < $request->quantity) {
                 \Log::warning('Insufficient stock', [
                     'product_id' => $product->id,
@@ -64,11 +63,9 @@ class CartController extends Controller
                 \Log::info('New cart created', ['cart_id' => $cart->id]);
             }
 
-            // Check if item already exists in cart (NEW DUPLICATE CHECK)
             $cartItem = $cart->cartItems()->where('product_id', $request->product_id)->first();
             
             if ($cartItem) {
-                // Product already exists in cart
                 \Log::info('Product already in cart', [
                     'cart_item_id' => $cartItem->id,
                     'product_id' => $request->product_id,
@@ -81,7 +78,6 @@ class CartController extends Controller
                     'already_exists' => true
                 ]);
             } else {
-                // Create new cart item
                 $cartItem = CartItem::create([
                     'cart_id' => $cart->id,
                     'product_id' => $request->product_id,
@@ -90,7 +86,6 @@ class CartController extends Controller
                 
                 \Log::info('New cart item created', ['cart_item_id' => $cartItem->id]);
                 
-                // Update cart total
                 $this->updateCartTotal($cart);
 
                 \Log::info('Cart operation successful', ['cart_id' => $cart->id]);
@@ -127,7 +122,6 @@ class CartController extends Controller
 
         $cartItem = CartItem::findOrFail($id);
         
-        // Verify that this cart item belongs to the current user
         if ($cartItem->cart->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -165,7 +159,6 @@ class CartController extends Controller
     {
         $cartItem = CartItem::findOrFail($id);
         
-        // Verify that this cart item belongs to the current user
         if ($cartItem->cart->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -207,7 +200,6 @@ class CartController extends Controller
             ], 404);
         }
 
-        // Verify that this cart belongs to the current user
         if ($cart->user_id !== Auth::id()) {
             return response()->json([
                 'success' => false,
@@ -215,13 +207,9 @@ class CartController extends Controller
             ], 403);
         }
 
-        // Delete all cart items
         $cart->cartItems()->delete();
 
-        // Note: Skip total_amount update since column doesn't exist
-        // $cart->update(['total_amount' => 0]);
-
-        // Check if this is a web request (not API)
+        
         if (!request()->expectsJson()) {
             return redirect()->route('cart.index')->with('success', 'Keranjang berhasil dikosongkan');
         }
@@ -232,20 +220,15 @@ class CartController extends Controller
         ]);
     }
 
-    /**
-     * Update cart total amount.
-     * Note: total_amount column doesn't exist in carts table, so we skip this update
-     */
+   
     private function updateCartTotal(Cart $cart)
     {
-        // Calculate total for logging purposes
         $total = $cart->cartItems()->with('product')->get()->sum(function ($item) {
             return $item->quantity * $item->product->price;
         });
         
         \Log::info('Cart total calculated', ['cart_id' => $cart->id, 'total' => $total]);
         
-        // Skip database update since total_amount column doesn't exist
-        // $cart->update(['total_amount' => $total]);
+       
     }
 }

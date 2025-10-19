@@ -29,7 +29,6 @@ class DashboardController extends Controller
         // Stats Cards Data
         $pendingShippedOrders = Order::whereIn('status', ['processing', 'shipped'])->count();
         
-        // Monthly revenue calculation
         $currentMonth = Carbon::now()->month;
         $currentYear = Carbon::now()->year;
         $monthlyRevenue = Order::whereIn('status', ['completed', 'shipped'])
@@ -37,20 +36,17 @@ class DashboardController extends Controller
             ->whereYear('created_at', $currentYear)
             ->sum('total');
         
-        // Active users (users who have made orders in last 30 days)
         $activeUsers = User::whereHas('orders', function($query) {
                 $query->where('created_at', '>=', Carbon::now()->subDays(30));
             })
             ->where('role', 'user')
             ->count();
 
-        // Low stock products (stock <= 10)
         $lowStockProducts = Product::with('category')
             ->where('stock', '<=', 10)
             ->orderBy('stock', 'asc')
             ->get();
 
-        // Monthly sales data for chart (last 12 months)
         $salesData = [];
         $monthLabels = [];
         for ($i = 11; $i >= 0; $i--) {
@@ -64,13 +60,11 @@ class DashboardController extends Controller
             $monthLabels[] = $date->format('M Y'); // Format: "Oct 2024", "Nov 2024", etc.
         }
 
-        // Recent orders
         $recentOrders = Order::with(['user', 'orderItems.product'])
             ->latest()
             ->limit(10)
             ->get();
 
-        // Top selling products (by quantity sold)
         $topProducts = Product::with('category')
             ->select('products.*', DB::raw('SUM(order_items.quantity) as total_sold'))
             ->join('order_items', 'products.id', '=', 'order_items.product_id')
