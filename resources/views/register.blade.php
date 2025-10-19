@@ -186,25 +186,24 @@
         </div>
 
             <!-- Terms -->
-        <div class="flex items-start">
-        <div class="flex items-center h-5">
-            <input type="checkbox" id="terms" name="terms"
-                class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded" required>
-        </div>
-        <div class="ml-3 text-sm">
-            <label for="terms" class="text-gray-700">
-  Saya setuju dengan
-  <a href="{{ route('terms') }}" target="_blank" class="text-emerald-600 hover:text-emerald-500 font-medium">
-    Syarat & Ketentuan
-  </a>
-  dan
-  <a href="{{ route('privacy') }}" target="_blank" class="text-emerald-600 hover:text-emerald-500 font-medium">
-    Kebijakan Privasi
-  </a>
-</label>
-
-        </div>
-        </div>
+            <div class="flex items-start">
+              <div class="flex items-center h-5">
+                  <input type="checkbox" id="terms" name="terms"
+                      class="h-4 w-4 text-emerald-600 focus:ring-emerald-500 border-gray-300 rounded" required>
+              </div>
+              <div class="ml-3 text-sm">
+                  <label for="terms" class="text-gray-700">
+                    Saya setuju dengan
+                    <a href="{{ route('terms') }}" target="_blank" class="text-emerald-600 hover:text-emerald-500 font-medium">
+                      Syarat & Ketentuan
+                    </a>
+                    dan
+                    <a href="{{ route('privacy') }}" target="_blank" class="text-emerald-600 hover:text-emerald-500 font-medium">
+                      Kebijakan Privasi
+                    </a>
+                  </label>
+              </div>
+            </div>
 
 
         <!-- Submit -->

@@ -4,9 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Produk Favorit — UMKM Mini-Commerce</title>
-
-  {{-- Tailwind CDN --}}
   <script src="https://cdn.tailwindcss.com"></script>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body class="bg-gray-50 text-gray-900 antialiased">
 
@@ -71,7 +70,7 @@
                       </div>
 
                       <div class="p-6">
-                          @if($favorites->isEmpty())
+                          @if(!$favorites || $favorites->isEmpty())
                             <div class="text-center p-10 text-gray-500 border-2 border-dashed rounded-xl">
                               <div class="mb-4">
                                 <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,33 +81,41 @@
                               <a href="{{ route('products.index') }}" class="text-emerald-600 hover:underline font-medium">Jelajahi Produk</a>
                             </div>
                           @else
-                              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                  @foreach($favorites as $favorite)
-                                      @php
-                                          $product = $favorite->product;
-                                      @endphp
-                                      <div class="border rounded-xl overflow-hidden bg-white hover:shadow-md transition">
-                                          <a href="{{ route('products.show', $product->id) }}">
-                                              <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" 
-                                                  class="h-48 w-full object-cover">
-                                              <div class="p-4">
-                                                  <h3 class="text-gray-800 font-semibold text-base mb-1">{{ $product->name }}</h3>
-                                                  <p class="text-emerald-600 font-bold text-sm mb-2">
-                                                      Rp{{ number_format($product->price, 0, ',', '.') }}
-                                                  </p>
-                                                  <form action="{{ route('favorites.remove', $product->id) }}" method="POST">
-                                                      @csrf
-                                                      @method('DELETE')
-                                                      <button type="submit"
-                                                          class="text-sm text-red-500 hover:text-red-700">
-                                                          Hapus dari Favorit
-                                                      </button>
-                                                  </form>
-                                              </div>
-                                          </a>
-                                      </div>
-                                  @endforeach
-                              </div>
+                                <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    @foreach($favorites as $favorite)
+                                        @php
+                                            $product = $favorite->product;
+                                        @endphp
+
+                                        <div id="product-{{ $product->id }}" 
+                                            class="product-card border rounded-xl overflow-hidden bg-white hover:shadow-md transition">
+
+                                            <a href="{{ route('products.show', $product->id) }}">
+                                                <img src="{{ asset('storage/' . $product->image) }}" 
+                                                    alt="{{ $product->name }}" 
+                                                    class="h-48 w-full object-cover">
+                                            </a>
+
+                                            <div class="p-4">
+                                                <a href="{{ route('products.show', $product->id) }}">
+                                                    <h3 class="text-gray-800 font-semibold text-base mb-1 hover:underline">
+                                                        {{ $product->name }}
+                                                    </h3>
+                                                </a>
+                                                <p class="text-emerald-600 font-bold text-sm mb-3">
+                                                    Rp{{ number_format($product->price, 0, ',', '.') }}
+                                                </p>
+
+                                                <button 
+                                                    type="button"
+                                                    class="favorite-toggle bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1 rounded-md transition"
+                                                    data-id="{{ $product->id }}">
+                                                    Hapus dari Favorit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                           @endif
                       </div>
                   </div>
@@ -117,8 +124,53 @@
       </div>
   </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".favorite-toggle").forEach(button => {
+                button.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    const productId = this.dataset.id;
+
+                    fetch(`/favorites/toggle/${productId}`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && !data.is_favorited) {
+                            const card = document.querySelector(`#product-${productId}`);
+                            if (card) card.remove();
+
+                            // Cek sisa produk favorit
+                            const remaining = document.querySelectorAll(".product-card").length;
+                            if (remaining === 0) {
+                                const productList = document.querySelector("#favorites-container");
+                                productList.innerHTML = `
+                                <div class="col-span-full text-center p-10 text-gray-500 border-2 border-dashed rounded-xl">
+                                    <div class="mb-4">
+                                    <svg class="w-16 h-16 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    </div>
+                                    <p class="mb-2">Belum ada produk favorit.</p>
+                                    <a href="{{ route('products.index') }}" class="text-emerald-600 hover:underline font-medium">Jelajahi Produk</a>
+                                </div>
+                                `;
+                            }
+                        }
+                    })
+                    .catch(err => console.error(err));
+                });
+            });
+        });
+    </script>
+
   {{-- FOOTER --}}
   @include('components.footer')
-
 </body>
 </html>
