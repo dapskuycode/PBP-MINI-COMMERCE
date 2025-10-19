@@ -42,7 +42,11 @@
         <!-- Discount Badge -->
         @if($productDiscount && $productDiscount > 0)
             <div class="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold">
-                -{{ $productDiscount }}%
+                @php
+                $discText = fmod((float)$productDiscount,1) === 0.0 ? (int)$productDiscount : rtrim(rtrim(number_format($productDiscount,2,'.',''),'0'),'.');
+                @endphp
+                -{{ $discText }}%
+
             </div>
         @endif
 
@@ -81,25 +85,14 @@
             @endif
         </h3>
         
-        <!-- Rating and Sold -->
-        <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center space-x-1">
-                <div class="flex items-center">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= floor($displayRating))
-                            <svg class="w-3 h-3 text-yellow-400 fill-current" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                        @else
-                            <svg class="w-3 h-3 text-gray-300 fill-current" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                        @endif
-                    @endfor
-                </div>
-                <span class="text-xs text-gray-500">({{ number_format($displayRating, 1) }})</span>
-            </div>
-            <span class="text-xs text-gray-500">{{ $displaySold }} terjual</span>
+        <!-- Info stok & terjual -->
+        <div class="flex items-center justify-between text-sm text-gray-500 mb-3">
+            <span>Stok: {{ $product->stock ?? 0 }}</span>
+            <span>
+            {{ $product->total_sold 
+                ?? ($product->order_items_sum_quantity ?? 0) 
+                ?? 0 }} terjual
+            </span>
         </div>
         
         <!-- Price -->
@@ -112,25 +105,19 @@
             </div>
         </div>
 
-        <!-- Stock Info -->
-        @if($product)
-            <div class="text-xs text-gray-500 mb-3">
-                Stok: {{ $product->stock }}
-            </div>
-        @endif
         
-        <!-- Add to Cart Button -->
-        @if($productId && $stockAvailable)
-            <button 
-                onclick="addToCart({{ $productId }})" 
-                class="add-to-cart-btn w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors duration-300 flex items-center justify-center space-x-2 group"
-                data-product-id="{{ $productId }}"
-            >
-                <svg class="w-4 h-4 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-                </svg>
-                <span class="text-sm font-medium">Tambah ke Keranjang</span>
-            </button>
+        <!-- Action Buttons -->
+            @if($productId && $stockAvailable)
+                <div class="flex gap-2">
+                    <button onclick="addToCart({{ $product->id }})" 
+                        class="flex-1 bg-emerald-500 text-white text-sm py-2 px-3 rounded-md hover:bg-emerald-600 transition-colors">
+                        <i class="bi bi-cart-plus mr-1"></i>Keranjang
+                        </button>
+                        <a href="{{ route('products.show', $product->id) }}" 
+                            class="bg-gray-100 text-gray-700 text-sm py-2 px-3 rounded-md hover:bg-gray-200 transition-colors">
+                                <i class="bi bi-eye"></i>
+                        </a>
+                </div>
         @elseif(!$stockAvailable)
             <button disabled class="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed flex items-center justify-center space-x-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

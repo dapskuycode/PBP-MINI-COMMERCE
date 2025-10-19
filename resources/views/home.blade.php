@@ -169,27 +169,11 @@
                                     {{ $product->name }}
                                 </h3>
 
-                                <!-- Rating -->
-                                <div class="flex items-center mb-2">
-                                    <div class="flex text-yellow-400 text-sm">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            @if($i <= floor($product->average_rating))
-                                                <i class="bi bi-star-fill"></i>
-                                            @elseif($i <= ceil($product->average_rating))
-                                                <i class="bi bi-star-half"></i>
-                                            @else
-                                                <i class="bi bi-star"></i>
-                                            @endif
-                                        @endfor
-                                    </div>
-                                    <span class="text-gray-500 text-sm ml-1">({{ number_format($product->average_rating, 1) }})</span>
-                                </div>
-
                                 <!-- Price -->
                                 <div class="mb-3">
                                     <span class="text-emerald-600 font-bold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                                 </div>
-
+                                
                                 <!-- Action Buttons -->
                                 <div class="flex gap-2">
                                     <button onclick="addToCart({{ $product->id }})" 

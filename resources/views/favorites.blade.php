@@ -49,11 +49,6 @@
                               Profil Saya
                           </a>
                           @if(!$user->is_admin)
-                          <a href="{{ route('orders.index') }}"
-                             class="block rounded-lg px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                              Riwayat Pesanan
-                          </a>
-                          
                           <a href="{{ route('favorites') }}"
                              class="block rounded-lg px-4 py-2 text-sm font-medium bg-emerald-100 text-emerald-700">
                               Produk Favorit
@@ -121,44 +116,6 @@
                                         </div>
                                     @endforeach
                                 </div>
-                              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                  @foreach($favorites as $favorite)
-                                      @php
-                                          $product = $favorite->product;
-                                      @endphp
-                                      <div class="border rounded-xl overflow-hidden bg-white hover:shadow-md transition">
-                                          <a href="{{ route('products.show', $product->id) }}">
-                                              @if($product->photos && $product->photos->count() > 0)
-                                                  <img src="{{ asset('storage/' . $product->photos->first()->url) }}" alt="{{ $product->name }}" 
-                                                      class="h-48 w-full object-cover">
-                                              @else
-                                                  <div class="h-48 w-full bg-gradient-to-br from-emerald-100 to-emerald-200 flex items-center justify-center">
-                                                      <div class="text-center">
-                                                          <svg class="w-16 h-16 text-emerald-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                                                          </svg>
-                                                          <span class="text-xs text-emerald-600 font-medium">{{ $product->category->name ?? 'Produk' }}</span>
-                                                      </div>
-                                                  </div>
-                                              @endif
-                                              <div class="p-4">
-                                                  <h3 class="text-gray-800 font-semibold text-base mb-1">{{ $product->name }}</h3>
-                                                  <p class="text-emerald-600 font-bold text-sm mb-2">
-                                                      Rp{{ number_format($product->price, 0, ',', '.') }}
-                                                  </p>
-                                                  <form action="{{ route('favorites.remove', $product->id) }}" method="POST">
-                                                      @csrf
-                                                      @method('DELETE')
-                                                      <button type="submit"
-                                                          class="text-sm text-red-500 hover:text-red-700">
-                                                          Hapus dari Favorit
-                                                      </button>
-                                                  </form>
-                                              </div>
-                                          </a>
-                                      </div>
-                                  @endforeach
-                              </div>
                           @endif
                       </div>
                   </div>
