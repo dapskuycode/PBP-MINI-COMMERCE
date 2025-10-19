@@ -137,6 +137,8 @@
 			        <h3 class="text-lg font-semibold text-gray-900">Nilai Stok</h3>
 			        <p class="text-3xl font-bold text-amber-600">Rp {{ number_format($products->sum(function($product) { return $product->price * $product->stock; }), 0, ',', '.') }}</p>
 			    </div>
+			    
+			    
 			</div>
 	
 			<!-- Products Section (ubah: kategori memanjang ke samping, produk disusun ke bawah per kategori) -->
@@ -214,7 +216,9 @@
 
 									<div class="flex-1 min-w-0">
 										<div class="font-semibold truncate">{{ $p->name }}</div>
-										<div class="text-xs text-gray-500">Stok: {{ $p->stock }} • Rp {{ number_format($p->price,0,',','.') }}</div>
+										<div class="text-xs text-gray-500">
+											Stok: {{ $p->stock }} • Terjual: {{ $p->total_sold ?? 0 }} • Rp {{ number_format($p->price,0,',','.') }}
+										</div>
 									</div>
 
 									<div class="flex gap-2">

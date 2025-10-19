@@ -110,7 +110,7 @@ class ProductController extends Controller
         }
 
         if (!$request->expectsJson()) {
-            return redirect()->route('dashboard')->with('success', 'Produk berhasil ditambahkan');
+            return redirect()->route('admin.managecategories.index')->with('success', 'Produk berhasil ditambahkan');
         }
 
         return response()->json([
@@ -246,7 +246,7 @@ class ProductController extends Controller
 
         // Jika request dari Blade (bukan dari API)
         if (!$request->expectsJson()) {
-            return redirect()->route('dashboard')->with('success', 'Produk berhasil diperbarui');
+            return redirect()->route('admin.managecategories.index')->with('success', 'Produk berhasil diperbarui');
         }
 
         return response()->json([
