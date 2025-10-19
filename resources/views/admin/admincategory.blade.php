@@ -619,7 +619,7 @@
         }
 
         function openEditModal(product) {
-            // Fill form with product data
+            //isi dengan data yang ada
             document.getElementById('edit-id').value = product.id;
             document.getElementById('edit-name').value = product.name;
             document.getElementById('edit-category').value = product.category_id;
@@ -628,15 +628,15 @@
             document.getElementById('edit-discount').value = product.discount || 0;
             document.getElementById('edit-description').value = product.description || '';
             
-            // Display existing photos
+            // tampilkan foto
             displayExistingPhotos(product.photos || []);
             
-            // Clear new photo previews
+            // bersihkan preview foto baru
             document.getElementById('edit-photo-preview').innerHTML = '';
             document.getElementById('edit-photo-preview').classList.add('hidden');
             document.getElementById('edit-photos').value = '';
             
-            // Set form action
+            // kirim lewat endpoint yang sesuai
             document.getElementById('editForm').action = `/admin/products/${product.id}`;
             
             // Show modal
@@ -646,7 +646,6 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.add('hidden');
             document.getElementById('editForm').reset();
-            // Clear photo previews and existing photos display
             document.getElementById('edit-photo-preview').innerHTML = '';
             document.getElementById('edit-photo-preview').classList.add('hidden');
             document.getElementById('existing-photos').innerHTML = '';
@@ -682,7 +681,6 @@
             }
         }
 
-        // Close modals when clicking outside
         document.addEventListener('click', function(event) {
             const createModal = document.getElementById('createModal');
             const editModal = document.getElementById('editModal');
@@ -713,9 +711,7 @@
             }
         });
 
-        // Add form submit debugging
         document.addEventListener('DOMContentLoaded', function() {
-            // Debug create form submission
             const createForm = document.querySelector('#createModal form');
             if (createForm) {
                 createForm.addEventListener('submit', function(e) {
@@ -740,7 +736,6 @@
                         }
                     }
                     
-                    // Log file info (no alert)
                     if (fileCount > 0) {
                         console.log('Found ' + fileCount + ' files for submission');
                     } else {
@@ -749,7 +744,6 @@
                 });
             }
 
-            // Debug edit form submission
             const editForm = document.querySelector('#editForm');
             if (editForm) {
                 editForm.addEventListener('submit', function(e) {
@@ -774,7 +768,6 @@
                         }
                     }
                     
-                    // Log file info for edit (no alert)
                     if (fileCount > 0) {
                         console.log('Found ' + fileCount + ' files for edit submission');
                     } else {
@@ -784,7 +777,6 @@
             }
         });
 
-        // Photo preview functions
         function previewCreatePhotos(input) {
             console.log('previewCreatePhotos called', input.files);
             const previewContainer = document.getElementById('create-photo-preview');
@@ -794,7 +786,6 @@
                 console.log('Files selected:', input.files.length);
                 previewContainer.classList.remove('hidden');
                 
-                // Limit to 10 photos
                 const filesToProcess = Math.min(input.files.length, 10);
                 
                 for (let i = 0; i < filesToProcess; i++) {
@@ -841,7 +832,6 @@
                 console.log('Edit files selected:', input.files.length);
                 previewContainer.classList.remove('hidden');
                 
-                // Limit to 10 photos
                 const filesToProcess = Math.min(input.files.length, 10);
                 
                 for (let i = 0; i < filesToProcess; i++) {
@@ -957,11 +947,9 @@
                 console.log('Delete result:', result);
                 
                 if (result.success) {
-                    // Remove photo from display
                     const photoElement = buttonElement.closest('.relative.group');
                     photoElement.remove();
                     
-                    // Hide container if no photos left
                     const existingPhotosContainer = document.getElementById('existing-photos');
                     if (existingPhotosContainer.children.length === 0) {
                         document.getElementById('existing-photos-container').classList.add('hidden');
@@ -978,7 +966,6 @@
             }
         }
 
-        // Add some utility styles
         const style = document.createElement('style');
         style.textContent = `
             .line-clamp-2 {

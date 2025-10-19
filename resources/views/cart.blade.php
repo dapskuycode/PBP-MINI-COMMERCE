@@ -334,11 +334,9 @@
       }
     }
 
-    // Function to update cart summary (subtotal, total, etc.)
     function updateCartSummary() {
       let subtotal = 0;
       
-      // Calculate new subtotal from all items
       document.querySelectorAll('[data-product-price]').forEach(priceElement => {
         const itemCard = priceElement.closest('.bg-white');
         const qtyInput = itemCard?.querySelector('input[id^="qty-"]');
@@ -348,36 +346,30 @@
         subtotal += productPrice * quantity;
       });
       
-      // Update subtotal display
       const subtotalElement = document.querySelector('[data-subtotal]');
       if (subtotalElement) {
         subtotalElement.textContent = formatRupiah(subtotal);
       }
       
-      // Calculate shipping and total
       const shipping = subtotal > 0 ? 12000 : 0;
       const discount = 0;
       const total = Math.max(subtotal + shipping - discount, 0);
       
-      // Update shipping display
       const shippingElement = document.querySelector('[data-shipping]');
       if (shippingElement) {
         shippingElement.textContent = shipping > 0 ? formatRupiah(shipping) : 'TBD';
       }
       
-      // Update total display
       const totalElement = document.querySelector('[data-total]');
       if (totalElement) {
         totalElement.textContent = formatRupiah(total);
       }
     }
 
-    // Function to check if cart is empty and show empty state
     function checkEmptyCart() {
       const remainingItems = document.querySelectorAll('[data-product-price]').length;
       
       if (remainingItems === 0) {
-        // Show empty cart state
         const cartSection = document.querySelector('.lg\\:col-span-2');
         if (cartSection) {
           cartSection.innerHTML = `
@@ -397,7 +389,6 @@
             </div>
           `;
           
-          // Also hide the cart summary section when cart is empty
           const summarySection = document.querySelector('aside.bg-white');
           if (summarySection) {
             summarySection.style.display = 'none';
@@ -411,9 +402,7 @@
       return 'Rp ' + number.toLocaleString('id-ID');
     }
 
-    // Function to show notification
     function showNotification(message, type = 'info') {
-      // Create notification element
       const notification = document.createElement('div');
       notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg text-white transform translate-x-full transition-transform duration-300 ${
         type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500'
@@ -422,12 +411,10 @@
       
       document.body.appendChild(notification);
       
-      // Show notification
       setTimeout(() => {
         notification.style.transform = 'translateX(0)';
       }, 100);
       
-      // Hide notification after 3 seconds
       setTimeout(() => {
         notification.style.transform = 'translateX(full)';
         setTimeout(() => {
@@ -438,13 +425,10 @@
       }, 3000);
     }
 
-    // Initialize cart on page load
     document.addEventListener('DOMContentLoaded', function() {
-      // Store original quantities in data attributes and initialize button states
       document.querySelectorAll('input[id^="qty-"]').forEach(input => {
         input.setAttribute('data-original-qty', input.value);
         
-        // Initialize decrease button state 
         const itemId = input.id.replace('qty-', '');
         const currentQty = parseInt(input.value) || 1;
         const decreaseBtn = document.getElementById(`decrease-${itemId}`);
@@ -454,21 +438,16 @@
         }
       });
       
-      // Check if cart is empty on page load and show dynamic empty state if needed
       checkEmptyCartOnLoad();
     });
 
-    // Function to check empty cart on page load
     function checkEmptyCartOnLoad() {
       const remainingItems = document.querySelectorAll('[data-product-price]').length;
       
-      // Only show dynamic empty state if there are no items AND the static empty state is not already shown
       if (remainingItems === 0) {
         const existingEmptyState = document.querySelector('.lg\\:col-span-2 .bg-white');
         const cartSection = document.querySelector('.lg\\:col-span-2');
         
-        // If there's no existing empty state shown (meaning cart has items but they were all removed)
-        // or if the cart section exists but is empty, show the dynamic empty state
         if (cartSection && (!existingEmptyState || cartSection.children.length === 0)) {
           cartSection.innerHTML = `
             <div class="bg-white rounded-xl shadow p-10 text-center border border-gray-100">
@@ -487,7 +466,6 @@
             </div>
           `;
           
-          // Also hide the cart summary section when cart is empty
           const summarySection = document.querySelector('aside.bg-white');
           if (summarySection) {
             summarySection.style.display = 'none';
