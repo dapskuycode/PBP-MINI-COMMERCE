@@ -176,6 +176,13 @@ Route::middleware('auth')->group(function () {
         ]);
 
         //Category management
+        // Guard: catch accidental PUT/PATCH to the collection path (e.g. when JS fails to include ID)
+        // so we return a friendly redirect instead of a MethodNotAllowed exception.
+        Route::match(['put', 'patch'], '/admin/managecategories', function (Request $request) {
+            return redirect()->route('admin.managecategories.index')
+                ->with('warning', 'Permintaan update tidak valid — ID kategori tidak ditemukan. Silakan coba lagi.');
+        });
+
         Route::resource('admin/managecategories', App\Http\Controllers\CategoryController::class, [
             'as' => 'admin',
             'parameters' => ['managecategories' => 'category']

@@ -103,7 +103,25 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+        ], [
+            'name.required' => 'Nama kategori harus diisi',
+            'name.unique' => 'Nama kategori sudah digunakan',
+            'name.max' => 'Nama kategori maksimal 255 karakter',
+        ]);
+
+        try {
+            $category->name = $request->input('name');
+            $category->save();
+
+            return redirect()->route('admin.managecategories.index')
+                ->with('success', 'Kategori berhasil diperbarui!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Gagal memperbarui kategori: ' . $e->getMessage());
+        }
     }
 
 

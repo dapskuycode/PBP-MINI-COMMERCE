@@ -531,6 +531,8 @@
             <form id="editCategoryForm" method="POST">
                 @csrf
                 @method('PUT')
+                <!-- Hidden ID as a fallback if JS fails to set action correctly -->
+                <input type="hidden" id="editCategoryId" name="id" />
                 <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2">Nama Kategori Saat Ini:</label>
                     <div id="currentCategoryName" class="text-lg font-medium text-gray-800 bg-gray-100 px-3 py-2 rounded-lg mb-4"></div>
@@ -613,13 +615,49 @@
                 productCountElement.textContent = 'Tidak ada produk yang terpengaruh';
             }
             
-            // Set action form ke route update dengan ID kategori
-            document.getElementById('editCategoryForm').action = `/admin/managecategories/${categoryId}`;
+            // Set action form ke route update dengan ID kategori (use encodeURIComponent)
+            const editForm = document.getElementById('editCategoryForm');
+            const encodedId = encodeURIComponent(String(categoryId));
+            editForm.action = `/admin/managecategories/${encodedId}`;
+
+            // Also set hidden fallback input so we can repair the action on submit if needed
+            const editIdInput = document.getElementById('editCategoryId');
+            if (editIdInput) {
+                editIdInput.value = categoryId;
+            }
             
             // Tampilkan modal
             document.getElementById('editCategoryModal').classList.remove('hidden');
             document.getElementById('editCategoryModal').classList.add('flex');
         }
+
+        // Ensure form action contains an ID before submitting; if not, try to repair with the hidden input
+        (function() {
+            const editCategoryForm = document.getElementById('editCategoryForm');
+            if (editCategoryForm) {
+                editCategoryForm.addEventListener('submit', function(e) {
+                    try {
+                        const actionPath = new URL(this.action, window.location.origin).pathname;
+                        // If action ends with /admin/managecategories or doesn't end with a numeric id, try to fix it
+                        const parts = actionPath.replace(/\/+$/, '').split('/');
+                        const last = parts[parts.length - 1];
+                        if (!last || isNaN(Number(last))) {
+                            const fallbackId = document.getElementById('editCategoryId') ? document.getElementById('editCategoryId').value : null;
+                            if (fallbackId) {
+                                this.action = `/admin/managecategories/${encodeURIComponent(String(fallbackId))}`;
+                            } else {
+                                e.preventDefault();
+                                alert('ID kategori tidak ditemukan. Silakan coba lagi.');
+                                return false;
+                            }
+                        }
+                    } catch (err) {
+                        // If URL parsing fails, allow form to proceed (it will hit the guard route added server-side)
+                        console.error('Error validating editCategoryForm action:', err);
+                    }
+                });
+            }
+        })();
 
         function closeEditCategoryModal() {
             document.getElementById('editCategoryModal').classList.add('hidden');

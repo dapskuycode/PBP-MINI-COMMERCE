@@ -22,6 +22,7 @@ class Product extends Model
         'price' => 'decimal:2',
         'discount' => 'decimal:2',
     ];
+    
 
     public function category()
     {
